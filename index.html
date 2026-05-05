@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#191A23">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Sistem Operasional Bolu Sakinah</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
-    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3144/3144760.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js" defer></script>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -523,7 +525,10 @@
                 <div class="form-group"><label>Harga Satuan</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="new-b-harga" value="0" min="0" class="has-prefix text-right"></div></div>
                 <div class="form-group">
                     <label>Jenis Satuan</label>
-                    <select id="new-b-satuan" class="custom-select"><option value="kg">Resep Gram (-> kg)</option><option value="pcs">Resep Absolut (-> pcs)</option></select>
+                    <select id="new-b-satuan" class="custom-select" onchange="updateBahanUnitLabel()">
+                    <option value="kg">Resep Gram (-> kg)</option>
+                    <option value="pcs">Resep Absolut (-> pcs)</option>
+                </select>
                 </div>
             </div>
 
@@ -858,18 +863,69 @@
     let daftarToken = [];
     let sesiAktif = null; 
     let db;
+    let isPdfLoaded = false;
+    
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    function updateBahanUnitLabel() {
+        const jenisSatuan = document.getElementById('new-b-satuan').value;
+        const labelBaru = (jenisSatuan === 'kg') ? 'kg/adonan' : 'pcs/adonan';
+        
+        const unitSpans = document.querySelectorAll('#form-bahan-dinamis .input-unit');
+        unitSpans.forEach(span => {
+            span.innerText = labelBaru;
+        });
+    }
+    async function initPdfModules() {
+        if (isPdfLoaded && typeof window.jspdf !== 'undefined') return true;
+        
+        showLoading("Mengunduh Pustaka PDF...");
+        try {
+            await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+            await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js");
+            isPdfLoaded = true;
+            return true;
+        } catch (error) {
+            hideLoading();
+            showToast("Gagal memuat pustaka PDF. Periksa koneksi internet.", "error");
+            return false;
+        }
+    }
     let isModeEditHPP = false;
     let isFirebaseReady = false;
     try {
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         db = firebase.firestore();
+        
+       
+        db.enablePersistence({ synchronizeTabs: true })
+            .catch(function(err) {
+                console.warn("Peringatan: Gagal mengaktifkan cache offline Firebase:", err.code);
+            });
+        
         isFirebaseReady = true;
     } catch (e) {
         console.warn("Koneksi Firebase gagal. Menggunakan penyimpanan Offline (LocalStorage).");
     }
 
     const STORAGE_KEY = 'boluSakinahData_CloudV6';
-    
+    function escapeHTML(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
     window.appPin = localStorage.getItem('bolu_pin') || "1234";
 
     let produkBolu = [
@@ -904,7 +960,7 @@
         { id: "b21", nama: "Gula Merah", harga: 25000, sedia: 2, isKg: true, manualButuh: null, resep: { p1: 0, p2: 0, p3: 0, p4: 0, p5: 1300 } }
     ];
 
-    let pesanan = [ { id: "pes_" + Date.now(), n: "Usep", tgl: new Date().toISOString().slice(0,10), k: 46, gm: 13, u: 0, p: 0, timestamp: Date.now() } ];
+    let pesanan = [];
     let kas = [];
     let ownerBeban = { jual: 0, gas: 0, upah: 0, retur: 0 };
     let totalBelanjaGlobal = 0;
@@ -916,8 +972,52 @@
     const getVal = (val) => isNaN(parseFloat(val)) ? 0 : parseFloat(val);
     const unt = (b) => b.isKg ? "kg" : "pcs";
 
+    const Schema = {
+        str: (val, fallback = "") => (val && typeof val !== 'object') ? String(val).trim() : fallback,
+        num: (val, fallback = 0) => { let n = parseFloat(val); return isNaN(n) ? fallback : n; },
+        arr: (val, fallback = []) => Array.isArray(val) ? val : fallback,
+        obj: (val, fallback = {}) => (val && typeof val === 'object' && !Array.isArray(val)) ? val : fallback
+    };
+
     function cleanData(obj) {
-        return JSON.parse(JSON.stringify(obj, (k, v) => v === undefined ? null : v));
+        let basicClean = JSON.parse(JSON.stringify(obj, (k, v) => v === undefined ? null : v));
+        if (basicClean.kas) {
+            basicClean.kas = basicClean.kas.map(k => ({
+                id: Schema.str(k.id, "kas_" + Date.now()),
+                t: Schema.str(k.t),
+                k: Schema.str(k.k),
+                kas: Schema.num(k.kas),
+                bnk: Schema.num(k.bnk),
+                bol: Schema.num(k.bol),
+                sis: Schema.num(k.sis),
+                sel: Schema.num(k.sel),
+                timestamp: Schema.num(k.timestamp, Date.now())
+            }));
+        }
+        if (basicClean.pesanan) {
+            basicClean.pesanan = basicClean.pesanan.map(p => ({
+                id: Schema.str(p.id, "pes_" + Date.now()),
+                n: Schema.str(p.n, "Tanpa Nama"),
+                tgl: Schema.str(p.tgl),
+                timestamp: Schema.num(p.timestamp, Date.now()),
+                items: Schema.arr(p.items).map(item => ({
+                    name: Schema.str(item.name),
+                    qty: Schema.num(item.qty, 1)
+                }))
+            }));
+        }
+        if (basicClean.laporanPenggunaan) {
+            basicClean.laporanPenggunaan = basicClean.laporanPenggunaan.map(l => ({
+                id: Schema.str(l.id, "lap_" + Date.now()),
+                no: Schema.str(l.no),
+                tgl: Schema.str(l.tgl),
+                prod: Schema.str(l.prod),
+                qty: Schema.num(l.qty),
+                petugas: Schema.str(l.petugas)
+            }));
+        }
+
+        return basicClean;
     }
 
     function toggleMobileMenu() {
@@ -938,7 +1038,11 @@
 
     let saveTimeout;
     function saveData() {
-        saveToLocal();
+        
+        setTimeout(() => {
+            saveToLocal();
+        }, 0);
+        
         if(!isFirebaseReady) return;
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
@@ -1008,17 +1112,21 @@
 
     function applyLoadedData() {
         try {
-            document.getElementById('own-penjualan').value = ownerBeban.jual || 0; 
-            document.getElementById('own-gas').value = ownerBeban.gas || 0;
-            document.getElementById('own-upah').value = ownerBeban.upah || 0; 
-            document.getElementById('own-retur').value = ownerBeban.retur || 0;
+            if(document.getElementById('own-penjualan')) {
+                document.getElementById('own-penjualan').value = ownerBeban.jual || 0; 
+                document.getElementById('own-gas').value = ownerBeban.gas || 0;
+                document.getElementById('own-upah').value = ownerBeban.upah || 0; 
+                document.getElementById('own-retur').value = ownerBeban.retur || 0;
+            }
             
-            populateLogProduk();
-            updateHPPFromLaporan(); 
-            renderLaporanPenggunaan();
-            renderPesanan(); 
-            renderKas(); 
-            renderChecklistHistory();
+    
+            try { populateLogProduk(); } catch(e) {}
+            try { updateHPPFromLaporan(); } catch(e) {}
+            try { renderLaporanPenggunaan(); } catch(e) {}
+            try { renderPesanan(); } catch(e) {}
+            try { renderKas(); } catch(e) {}
+            try { renderChecklistHistory(); } catch(e) {}
+            
         } catch (error) {
             console.error("Terjadi bentrokan data lama:", error);
         } finally {
@@ -1052,13 +1160,23 @@
     }
 
     function simpanLaporanPenggunaan(cetakLangsung = false) {
-        let no = document.getElementById('log-no-adonan').value;
+        let no = document.getElementById('log-no-adonan').value.trim();
         let tgl = document.getElementById('log-tanggal').value;
         let prod = document.getElementById('log-produk').value;
         let qty = getVal(document.getElementById('log-qty').value);
         let petugas = document.getElementById('log-petugas').value;
 
         if(!no || !tgl || !prod || qty <= 0 || !petugas) return showToast("Harap isi semua data form laporan dengan benar!", "error");
+
+        // --- TAMBAHKAN VALIDASI DUPLIKAT DI SINI ---
+        let isDuplicate = laporanPenggunaan.some(lap => lap.no.toLowerCase() === no.toLowerCase());
+        if (isDuplicate) {
+            document.getElementById('log-no-adonan').classList.add('invalid');
+            return showToast("Gagal! No. Adonan '" + no + "' sudah dilaporkan. HPP bisa ganda!", "error");
+        } else {
+            document.getElementById('log-no-adonan').classList.remove('invalid');
+        }
+        // -------------------------------------------
 
         laporanPenggunaan.push({
             id: "lap_" + Date.now(),
@@ -1081,29 +1199,40 @@
 
         document.getElementById('log-no-adonan').value = '';
         document.getElementById('log-qty').value = '';
+        
+        // Memanggil fungsi ini agar No. Adonan otomatis bergeser ke nomor selanjutnya
+        updateAutoNoAdonan();
     }
 
     function renderLaporanPenggunaan() {
         let tbody = document.getElementById('tabel-laporan-penggunaan');
         if(!tbody) return;
-        tbody.innerHTML = '';
+        
         if(laporanPenggunaan.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-folder-open"></i><br>Belum ada laporan penggunaan bahan.</td></tr>`;
             return;
         }
+
+        // 1. Buat variabel penampung sementara
+        let htmlContent = ''; 
+
         laporanPenggunaan.forEach((l, i) => {
-            tbody.innerHTML += `<tr>
-                <td data-label="No. Adonan" style="font-weight:800;">${l.no}</td>
-                <td data-label="Tanggal">${l.tgl}</td>
-                <td data-label="Nama Produk">${l.prod}</td>
-                <td data-label="Qty (loyang)" class="text-right"><b>${l.qty}</b> loyang</td>
-                <td data-label="Nama Petugas">${l.petugas}</td>
+            // 2. Tambahkan ke variabel penampung, BUKAN ke DOM
+            htmlContent += `<tr>
+                <td data-label="No. Adonan" style="font-weight:800;">${escapeHTML(l.no)}</td>
+                <td data-label="Tanggal">${escapeHTML(l.tgl)}</td>
+                <td data-label="Nama Produk">${escapeHTML(l.prod)}</td>
+                <td data-label="Qty (loyang)" class="text-right"><b>${escapeHTML(l.qty)}</b> loyang</td>
+                <td data-label="Nama Petugas">${escapeHTML(l.petugas)}</td>
                 <td data-label="Aksi" class="text-center" style="display: flex; gap: 8px; justify-content: flex-end;">
                     <button class="btn" style="padding: 6px 10px; background: var(--accent); color: var(--primary);" onclick="cetakLaporanPDF(${i})" title="Cetak PDF"><i class="fas fa-print"></i></button>
                     <button class="btn-danger" style="padding: 6px 10px;" onclick="hapusLaporanPenggunaan(${i})" title="Hapus"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         });
+        
+        // 3. Render ke layar HANYA SATU KALI
+        tbody.innerHTML = htmlContent; 
     }
     
     function hapusLaporanPenggunaan(idx) {
@@ -1111,12 +1240,14 @@
             laporanPenggunaan.splice(idx, 1);
             saveData();
             renderLaporanPenggunaan();
-            updateHPPFromLaporan(); // PENTING: Update HPP Otomatis
+            updateHPPFromLaporan();
         });
     }
 
-    // FUNGSI GENERTATE PDF KHUSUS BAHAN
-    function cetakLaporanPDF(idx) {
+    async function cetakLaporanPDF(idx) {   
+        let ready = await initPdfModules();
+        if (!ready) return;
+
         let lap = laporanPenggunaan[idx];
         let prodObj = produkBolu.find(p => p.nama === lap.prod);
         
@@ -1318,8 +1449,8 @@
         document.getElementById('chk-qty').value = '';
         document.getElementById('preview-checklist-card').style.display = 'none';
         currentChecklistData = null;
+        updateAutoNoAdonan();
     }
-
         function renderChecklistHistory() {
         let tbody = document.getElementById('tabel-checklist-history');
         if(!tbody) return;
@@ -1365,8 +1496,13 @@
         });
     }
 
-  
-    function cetakChecklistStrukPDF(idx) {
+    async function cetakChecklistStrukPDF(idx) {
+        
+        
+        let ready = await initPdfModules();
+        if (!ready) return;
+        
+
         let chk = checklistHistory[idx];
         if(!chk || !chk.items) return showToast("Data checklist tidak valid!", "error");
 
@@ -1451,7 +1587,9 @@
         const modal = document.getElementById('confirm-modal'); modal.style.display = 'flex'; requestAnimationFrame(()=> modal.classList.add('show'));
     }
     document.getElementById('btn-confirm-delete').addEventListener('click', () => {
-        if(deleteActionCallback) deleteActionCallback(); tutupModal('confirm-modal'); showToast('Data berhasil dihapus', 'success'); saveData();
+        if(deleteActionCallback) deleteActionCallback(); 
+        tutupModal('confirm-modal'); 
+        showToast('Data berhasil dihapus', 'success'); 
     });
 
     function showLoading(msg = 'Memproses Data...') { document.getElementById('loading-text').innerText = msg; document.getElementById('loading-overlay').style.display = 'flex'; }
@@ -1515,10 +1653,10 @@
                 <td data-label="Biaya Belanja" id="jmlPem-${i}" class="danger text-right" style="font-size:14.5px; font-weight:800;">Rp 0</td>
             </tr>`;
         });
-        calcHPP(); 
+        calcHPP(true); 
     }
 
-    function calcHPP() {
+    function calcHPP(isRenderOnly = false) {
         let totalPcsSemua = 0, grandTotKebutuhan = 0, grandTotPembelanjaan = 0;
         produkBolu.forEach((p, i) => { 
             let pcs = p.loyang * p.rPcs; totalPcsSemua += pcs; 
@@ -1568,6 +1706,7 @@
             if(document.activeElement !== inputSedia) { inputSedia.value = formatSedia; } 
             document.getElementById(`unit-sedia-${i}`).innerText = dispSediaUnit;
             document.getElementById(`sisa-${i}`).innerText = `${formatSisa} ${dispSisaUnit}`; 
+        
             
             document.getElementById(`jmlKeb-${i}`).innerText = rp(jmlKeb); 
             document.getElementById(`jmlPem-${i}`).innerText = rp(jmlPem);
@@ -1575,10 +1714,16 @@
             grandTotKebutuhan += jmlKeb; 
             grandTotPembelanjaan += jmlPem; 
         });
+        
         document.getElementById('tot-kebutuhan').innerText = rp(grandTotKebutuhan); 
         document.getElementById('tot-pembelanjaan').innerText = rp(grandTotPembelanjaan);
         totalBelanjaGlobal = grandTotPembelanjaan; 
-        hitungOwner(); saveData();
+ 
+        hitungOwner(true); 
+        
+        if (!isRenderOnly) {
+            saveData();
+        }
     }
 
 
@@ -1643,25 +1788,24 @@
         showToast("Formula resep berhasil diperbarui!", "success");
     }
     function renderPesanan() {
+        let todayStr = new Date().toISOString().slice(0,10);
+        let adaPesananHariIni = false;
+        let totals = {}; 
+        produkBolu.forEach(p => totals[p.id] = 0); 
         pesanan.forEach(p => {
             if (!p.items) {
                 p.items = [];
                 produkBolu.forEach(prod => {
-                    let qty = p[`qty_${prod.id}`] || p.k || p.gm || p.u || p.p || 0; 
+                    let qty = p[`qty_${prod.id}`] || 0; 
                     if (qty > 0) p.items.push({ name: prod.nama, qty: qty });
-                    delete p[`qty_${prod.id}`]; delete p.k; delete p.gm; delete p.u; delete p.p;
                 });
-                if (p.custom_var) {
-                    p.items.push({ name: p.custom_var, qty: 1 });
-                    delete p.custom_var;
-                }
             }
         });
 
         let thead = `<tr>
             <th style="width: 20%;">Nama Pemesan</th>
             <th style="width: 15%;">Untuk Tgl</th>
-            <th style="width: 55%;">Rincian Varian (Pilih / Ketik Bebas)</th>
+            <th style="width: 55%;">Rincian Varian (Pilih Varian Produk)</th>
             <th class="text-center" style="width: 10%;">Aksi</th>
         </tr>`;
         document.getElementById('tabel-pesanan-head').innerHTML = thead;
@@ -1675,15 +1819,10 @@
         else filteredPesanan.sort((a,b) => (b.tgl || "").localeCompare(a.tgl || ""));
 
         const tbody = document.getElementById('tabel-pesanan-body');
-        tbody.innerHTML = '';
-        
-        let totals = {};
-        produkBolu.forEach(prod => totals[prod.id] = 0);
-        let adaPesananHariIni = false;
-        let todayStr = new Date().toISOString().slice(0,10);
+        let tbodyHtml = ''; 
 
         if (filteredPesanan.length === 0) { 
-            tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fas fa-folder-open"></i><br>Belum ada pesanan.</td></tr>`; 
+            tbodyHtml = `<tr><td colspan="4" class="empty-state"><i class="fas fa-folder-open"></i><br>Belum ada pesanan.</td></tr>`; 
         } else {
             filteredPesanan.forEach(p => {
                 let realIdx = pesanan.findIndex(orig => orig.id === p.id);
@@ -1695,14 +1834,23 @@
                 });
 
                 let tr = `<tr>
-                    <td data-label="Pemesan"><input type="text" class="wide" value="${p.n}" placeholder="Nama..." onchange="if(!this.value){showToast('Nama kosong!','error');}else{pesanan[${realIdx}].n=this.value; saveData();}"></td>
+                    <td data-label="Pemesan"><input type="text" class="wide" value="${escapeHTML(p.n)}" placeholder="Nama..." onchange="if(!this.value){showToast('Nama kosong!','error');}else{pesanan[${realIdx}].n=this.value; saveData();}"></td>
                     <td data-label="Untuk Tanggal"><input type="date" value="${p.tgl || ''}" onchange="pesanan[${realIdx}].tgl=this.value; saveData(); renderPesanan();"></td>`;
                 
                 let itemsHtml = `<div style="background: var(--surface); padding: 10px; border-radius: var(--radius-sm); border: 1px dashed var(--border);">`;
+                
                 p.items.forEach((item, itemIdx) => {
+                    let productOptions = `<option value="">-- Pilih Varian --</option>`;
+                    produkBolu.forEach(prod => {
+                        let isSelected = item.name === prod.nama ? 'selected' : '';
+                        productOptions += `<option value="${escapeHTML(prod.nama)}" ${isSelected}>${escapeHTML(prod.nama)}</option>`;
+                    });
+
                     itemsHtml += `
                         <div class="pesanan-item-row">
-                            <input type="text" class="wide" list="list-produk-bolu" placeholder="Pilih Varian / Ketik Baru..." value="${item.name}" onchange="updatePesananItem(${realIdx}, ${itemIdx}, 'name', this)" style="flex: 1;">
+                            <select class="wide" onchange="updatePesananItem(${realIdx}, ${itemIdx}, 'name', this)" style="flex: 1; min-height: 48px; font-weight: 700; border: 1px solid var(--border); border-radius: var(--radius-sm); background-color: white;">
+                                ${productOptions}
+                            </select>
                             <div class="input-group" style="width: 140px; margin: 0;">
                                 <input type="number" class="text-right has-unit" value="${item.qty}" onchange="updatePesananItem(${realIdx}, ${itemIdx}, 'qty', this)" onfocus="this.select()">
                                 <span class="input-unit">Pak</span>
@@ -1711,15 +1859,18 @@
                         </div>
                     `;
                 });
+                
                 itemsHtml += `<button class="btn" style="padding: 8px 12px; font-size: 12px; background: var(--accent); margin-top: 10px; width: 100%; border-style: dashed;" onclick="tambahPesananItem(${realIdx})"><i class="fas fa-plus"></i> Tambah Varian Bolu</button>`;
                 itemsHtml += `</div>`;
 
                 tr += `<td data-label="Rincian Varian">${itemsHtml}</td>`;
                 tr += `<td data-label="Aksi" class="text-center"><button class="btn-danger" style="border:none; border-radius:8px; padding: 15px;" onclick="hapusPesanan(${realIdx})" title="Hapus Pesanan Ini"><i class="fas fa-trash"></i></button></td></tr>`;
-                tbody.innerHTML += tr;
+                
+                tbodyHtml += tr;
             });
         }
-
+        
+        tbody.innerHTML = tbodyHtml; 
         let summaryPak = [], summaryLoyang = [], summaryKresek = [];
         produkBolu.forEach(prod => {
             let t = totals[prod.id];
@@ -1737,13 +1888,10 @@
         `;
         document.getElementById('tabel-pesanan-foot').innerHTML = tfoot;
 
-        let datalist = `<datalist id="list-produk-bolu">`;
-        produkBolu.forEach(prod => datalist += `<option value="${prod.nama}">`);
-        datalist += `</datalist>`;
-        if (!document.getElementById('list-produk-bolu')) document.body.insertAdjacentHTML('beforeend', datalist);
-
-        if(adaPesananHariIni && !sessionStorage.getItem('notifPesanan_shown')) { showToast('Ada pesanan untuk dikirim hari ini!', 'accent'); sessionStorage.setItem('notifPesanan_shown', 'true'); }
-        saveData();
+        if(adaPesananHariIni && !sessionStorage.getItem('notifPesanan_shown')) { 
+            showToast('Ada pesanan untuk dikirim hari ini!', 'accent'); 
+            sessionStorage.setItem('notifPesanan_shown', 'true'); 
+        }
     }
     function tambahPesananItem(pesIdx) {
         if (!pesanan[pesIdx].items) pesanan[pesIdx].items = [];
@@ -1762,7 +1910,13 @@
         } else {
             pesanan[pesIdx].items[itemIdx].name = element.value;
         }
-        saveData(); renderPesanan();
+        
+        saveData(); 
+        if (field !== 'qty') {
+            renderPesanan(); 
+        } else {
+           
+        }
     }
 
     function tambahPesanan() { 
@@ -1778,18 +1932,35 @@
         showToast('Form pesanan ditambahkan'); 
     }
     function hapusPesanan(index) { 
-        confirmDelete("Hapus data pesanan ini?", () => { pesanan.splice(index, 1); renderPesanan(); }); 
+        confirmDelete("Hapus data pesanan ini?", () => { 
+            pesanan.splice(index, 1); 
+            renderPesanan(); 
+            saveData(); 
+        }); 
     }
 
-    function hitungOwner() {
-        ownerBeban.jual = validateNumInput(document.getElementById('own-penjualan')); ownerBeban.gas = validateNumInput(document.getElementById('own-gas')); ownerBeban.upah = validateNumInput(document.getElementById('own-upah')); ownerBeban.retur = validateNumInput(document.getElementById('own-retur'));
-        let beban = ownerBeban.upah + ownerBeban.gas + ownerBeban.retur; let laba = ownerBeban.jual - totalBelanjaGlobal - beban;
-        document.getElementById('stat-jual').innerText = rp(ownerBeban.jual); document.getElementById('stat-hpp').innerText = rp(totalBelanjaGlobal); document.getElementById('stat-beban').innerText = rp(beban); document.getElementById('stat-laba').innerText = rp(laba);
+    function hitungOwner(skipSave = false) {
+        ownerBeban.jual = validateNumInput(document.getElementById('own-penjualan')); 
+        ownerBeban.gas = validateNumInput(document.getElementById('own-gas')); 
+        ownerBeban.upah = validateNumInput(document.getElementById('own-upah')); 
+        ownerBeban.retur = validateNumInput(document.getElementById('own-retur'));
+        
+        let beban = ownerBeban.upah + ownerBeban.gas + ownerBeban.retur; 
+        let laba = ownerBeban.jual - totalBelanjaGlobal - beban;
+        
+        document.getElementById('stat-jual').innerText = rp(ownerBeban.jual); 
+        document.getElementById('stat-hpp').innerText = rp(totalBelanjaGlobal); 
+        document.getElementById('stat-beban').innerText = rp(beban); 
+        document.getElementById('stat-laba').innerText = rp(laba);
         
         let elLaba = document.getElementById('stat-laba');
         elLaba.style.color = laba < 0 ? 'var(--danger)' : 'var(--primary)';
         
-        updateDailySummary(); checkSyncStatus(); saveData();
+        updateDailySummary(); 
+        checkSyncStatus(); 
+        if (!skipSave) {
+            saveData();
+        }
     }
 
     function updateDailySummary() {
@@ -1909,7 +2080,14 @@
         kas.push({id: "kas_"+Date.now(), t: newDate, k:"", kas:0, bnk:0, bol:0, sis:0, sel:0, timestamp: Date.now()}); 
         renderKas(); showToast('Baris kas baru ditambahkan'); logActivity("CREATE", "Menambah baris transaksi kas manual");
     }
-    function hapusKas(index) { confirmDelete("Hapus riwayat kas ini?", () => { kas.splice(index, 1); renderKas(); logActivity("DELETE", "Menghapus transaksi dari Buku Kas"); }); }
+    function hapusKas(index) { 
+        confirmDelete("Hapus riwayat kas ini?", () => { 
+            kas.splice(index, 1); 
+            renderKas(); 
+            saveData();
+            logActivity("DELETE", "Menghapus transaksi dari Buku Kas"); 
+        }); 
+    }
 
     function bukaModalProduk() { 
         const container = document.getElementById('form-resep-dinamis'); 
@@ -1952,9 +2130,20 @@
     function bukaModalBahan() { 
         const container = document.getElementById('form-bahan-dinamis'); 
         container.innerHTML = ''; 
+        const jenisSatuan = document.getElementById('new-b-satuan').value;
+        const labelAwal = (jenisSatuan === 'kg') ? 'kg/adonan' : 'pcs/adonan';
+
         produkBolu.forEach(p => { 
-            container.innerHTML += `<div class="form-group"><label>${p.nama}</label><div class="input-group full-width"><input type="number" id="new-b-res-${p.id}" value="0" class="has-unit text-right" style="padding-right: 95px;"><span class="input-unit">unit/adonan</span></div></div>`; 
+            container.innerHTML += `
+                <div class="form-group">
+                    <label>${p.nama}</label>
+                    <div class="input-group full-width">
+                        <input type="number" id="new-b-res-${p.id}" value="0" class="has-unit text-right" style="padding-right: 95px;">
+                        <span class="input-unit">${labelAwal}</span>
+                    </div>
+                </div>`; 
         }); 
+        
         document.getElementById('bahan-modal').style.display = 'flex'; 
         requestAnimationFrame(() => document.getElementById('bahan-modal').classList.add('show')); 
     }
@@ -2028,10 +2217,9 @@
     
     function verifikasiLogin() {
         const pin = document.getElementById('input-pin').value;
-        const pLower = pin.toLowerCase();
         
-        if (pin === window.appPin || pLower === "ghazy2184" || pLower === "ghazy abiyyu maulana 2184") {
-            tutupModal('login-modal'); 
+        if (pin === window.appPin) {
+            tutupModal('login-modal');
             
             localStorage.setItem('boluSakinah_isOwner', 'true');
             
@@ -2067,8 +2255,12 @@
             let encodedUri = encodeURI("data:text/csv;charset=utf-8," + csv); let link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", `Bolu_Sakinah_Kas_${new Date().getTime()}.csv`); document.body.appendChild(link); link.click(); link.remove(); hideLoading(); showToast('CSV Berhasil diunduh!');
         }, 500);
     }
-    function exportPDF() {
-        let filteredKas = getFilteredKasForExport(); if(filteredKas.length === 0) return showToast("Tidak ada data untuk diunduh", "error");
+
+    async function exportPDF() {
+        let ready = await initPdfModules();
+        if (!ready) return;
+        let filteredKas = getFilteredKasForExport(); 
+        if(filteredKas.length === 0) return showToast("Tidak ada data untuk diunduh", "error");
         showLoading('Men-generate PDF...');
         setTimeout(() => {
             const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape');
@@ -2092,10 +2284,6 @@
         }
         
     };
- 
-// ==========================================
-    // SISTEM AUTENTIKASI ENTERPRISE & NO. ADONAN
-    // ==========================================
 
     function switchAuthMode(mode) {
         if (mode === 'register') {
@@ -2110,34 +2298,46 @@
         }
     }
 
+    let failCount = 0;
+    let lockUntil = 0;
+
+    function switchAuthMode(mode) {
+
+    }
+
     function prosesLogin() {
+        if (Date.now() < lockUntil) {
+            let sisaWaktu = Math.ceil((lockUntil - Date.now()) / 1000);
+            return showToast(`Sistem terkunci sementara. Coba lagi dalam ${sisaWaktu} detik`, "error");
+        }
+
         let u = document.getElementById('login-user').value.trim();
         let p = document.getElementById('login-pin').value.trim();
         
         if (!u || !p) return showToast("Username dan PIN harus diisi!", "error");
 
-        // BYPASS DARURAT & PEMBUATAN AKUN OWNER OTOMATIS
-        if (u.toLowerCase() === "owner" && p === "2184") {
-            // Pastikan akun ini terdaftar di database sistem
-            if (!daftarUser.some(x => x.username.toLowerCase() === 'owner')) {
-                daftarUser.push({ id: "usr_own_default", username: "Owner", pin: "2184", cabang: "Pusat", role: "owner", tgl_daftar: new Date().toISOString().slice(0,10) });
-                saveData();
-            }
-            // Langsung login
-            let ownerDb = daftarUser.find(x => x.username.toLowerCase() === 'owner');
-            buatSesiAktif(ownerDb);
-            return;
-        }
-
-        // Jika bukan bypass, cari pegawai biasa
+      
         let userAktif = daftarUser.find(x => x.username.toLowerCase() === u.toLowerCase() && x.pin === p);
         
         if (userAktif) {
+            
+            failCount = 0;
             buatSesiAktif(userAktif);
         } else {
-            showToast("Username atau PIN tidak ditemukan!", "error");
+           
+            failCount++;
+            
+            if (failCount >= 5) {
+                lockUntil = Date.now() + 30000;
+                failCount = 0; 
+                showToast("Terlalu banyak tebakan. Sistem terkunci 30 detik!", "error");
+            } else {
+                showToast(`Username atau PIN salah! (Peringatan: ${failCount}/5)`, "error");
+            }
         }
     }
+        
+
 
     function buatSesiAktif(userObj) {
         sesiAktif = userObj;
@@ -2229,37 +2429,38 @@
         document.getElementById('login-user').value = u;
     }
 
-    // --- MANAJEMEN ADMIN / OWNER ---
     function bukaModalAdminAuth() {
         document.getElementById('count-token-aktif').innerText = daftarToken.length;
         
         let ulCabang = document.getElementById('list-cabang-admin');
-        ulCabang.innerHTML = '';
+        let cabangHtml = '';
         daftarCabang.forEach((c, i) => {
-            ulCabang.innerHTML += `<li style="display:flex; justify-content:space-between; padding:8px 10px; background:#fff; margin-bottom:5px; border-radius:6px; border:1px solid #eee; align-items:center;">
-                ${c} <button class="btn-danger" style="padding:4px 8px; font-size:10px; border:none; background:transparent; color:var(--danger);" onclick="hapusCabang(${i})"><i class="fas fa-trash"></i></button>
+            cabangHtml += `<li style="display:flex; justify-content:space-between; padding:8px 10px; background:#fff; margin-bottom:5px; border-radius:6px; border:1px solid #eee; align-items:center;">
+                ${escapeHTML(c)} <button class="btn-danger" style="padding:4px 8px; font-size:10px; border:none; background:transparent; color:var(--danger);" onclick="hapusCabang(${i})"><i class="fas fa-trash"></i></button>
             </li>`;
         });
+        ulCabang.innerHTML = cabangHtml; 
 
         let ulPegawai = document.getElementById('list-akun-pegawai');
-        ulPegawai.innerHTML = '';
+        let pegawaiHtml = ''; 
         
         daftarUser.forEach((u, i) => {
             let badgeRole = u.role === 'owner' 
                 ? '<span style="background:var(--primary); color:var(--secondary); padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800; margin-left:5px;">OWNER</span>' 
                 : '<span style="background:var(--accent); color:var(--text-muted); padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800; margin-left:5px;">PEGAWAI</span>';
-            
-            let infoPin = `<span style="background: #fff3cd; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 800; border: 1px dashed #f59e0b;"><i class="fas fa-key"></i> PIN: ${u.pin}</span>`;
 
-            ulPegawai.innerHTML += `<li style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border-light); align-items:center; background: ${u.role === 'owner' ? '#f8fafc' : '#fff'};">
+            let infoPin = `<span style="background: #fff3cd; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 800; border: 1px dashed #f59e0b;"><i class="fas fa-key"></i> PIN: ${escapeHTML(u.pin)}</span>`;
+
+            pegawaiHtml += `<li style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border-light); align-items:center; background: ${u.role === 'owner' ? '#f8fafc' : '#fff'};">
                 <div style="line-height: 1.6;">
-                    <b style="color:var(--primary); font-size:14px;">${u.username}</b> ${badgeRole}<br>
-                    <span style="font-size:11.5px; color:var(--text-muted);"><i class="fas fa-store"></i> ${u.cabang}</span><br>
+                    <b style="color:var(--primary); font-size:14px;">${escapeHTML(u.username)}</b> ${badgeRole}<br>
+                    <span style="font-size:11.5px; color:var(--text-muted);"><i class="fas fa-store"></i> ${escapeHTML(u.cabang)}</span><br>
                     ${infoPin}
                 </div>
                 <button class="btn-danger" onclick="hapusPegawai(${i}, '${u.role}')" title="Hapus Akun" style="padding: 10px; border-radius: 8px;"><i class="fas fa-trash"></i></button>
             </li>`;
         });
+        ulPegawai.innerHTML = pegawaiHtml; 
 
         const modal = document.getElementById('admin-auth-modal');
         modal.style.display = 'flex'; requestAnimationFrame(() => modal.classList.add('show'));
@@ -2329,7 +2530,15 @@
                 }
             });
         }
-    }, 500); // Beri jeda 0.5 detik agar elemen form pasti sudah ter-render
+    }, 500); 
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('✅ PWA Ready: Service Worker berhasil didaftarkan.'))
+                .catch(err => console.warn('⚠️ PWA Gagal:', err));
+        });
+    }
 </script>
 </body>
 </html>
