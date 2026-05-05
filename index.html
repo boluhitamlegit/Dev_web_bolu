@@ -18,9 +18,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <style>
-        /* =======================================================
-           1. ROOT VARIABLES & GLOBAL STYLES
-           ======================================================= */
+
         :root {
             --primary: #191A23; 
             --primary-light: #292A32;
@@ -49,10 +47,7 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; padding-top: 75px; color: var(--text-main); font-size: 14px; line-height: 1.6; }
-        
-        /* =======================================================
-           2. HEADER & DESKTOP NAVIGATION
-           ======================================================= */
+   
         .header { background: var(--surface); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; border-bottom: 2px solid var(--border); height: 75px; }
         .brand { color: var(--primary); font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
         .brand i { color: var(--secondary); padding: 5px; background: var(--primary); border-radius: 8px; border: 1px solid var(--primary); }
@@ -66,10 +61,11 @@
         .btn-gembok { background: var(--surface); color: var(--primary); border: 1px solid var(--border); padding: 10px 20px; border-radius: var(--radius-md); font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm); }
         .btn-gembok:hover { background: var(--secondary); transform: translate(2px, 2px); box-shadow: var(--shadow-hover); }
         .hide-mobile { display: inline; }
+        @media (min-width: 769px) {
+            .hide-desktop { display: none !important; }
+        }
 
-        /* =======================================================
-           3. PAGE CONTAINERS & CARDS
-           ======================================================= */
+
         .page-container { display: none; padding: 40px 20px; max-width: 1300px; margin: 0 auto; animation: fadeUp 0.3s ease; }
         .page-container.active { display: block; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -81,9 +77,6 @@
         .card-header h2 { margin: 0; font-size: 20px; color: var(--primary); display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.5px; }
         .card-header h2 i { background: var(--secondary); padding: 6px 8px; border-radius: 8px; border: 1px solid var(--primary); box-shadow: 2px 2px 0 var(--primary); font-size: 16px; }
 
-        /* =======================================================
-           4. FORMS, INPUTS & BUTTONS
-           ======================================================= */
         .form-input-card { background: linear-gradient(145deg, #ffffff, #f7fcf0); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 35px; box-shadow: 6px 6px 0 var(--border); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
         .form-group label { display: block; font-weight: 800; margin-bottom: 10px; font-size: 12.5px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -102,10 +95,10 @@
         
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
-        
-        input[type="number"], input[type="text"], input[type="date"], input[type="month"], select { width: 100%; min-height: 48px; padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14.5px; background: var(--surface); color: var(--primary); font-weight: 700; font-family: inherit; transition: var(--transition); box-shadow: var(--shadow-sm); }
+
+        input[type="number"], input[type="text"], input[type="password"], input[type="date"], input[type="month"], select { width: 100%; min-height: 48px; padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14.5px; background: var(--surface); color: var(--primary); font-weight: 700; font-family: inherit; transition: var(--transition); box-shadow: var(--shadow-sm); }
         input[type="number"].has-unit { padding-right: 55px; text-align: right; }
-        input[type="number"].has-prefix, input[type="text"].has-prefix { padding-left: 38px; }
+        input[type="number"].has-prefix, input[type="text"].has-prefix, input[type="password"].has-prefix { padding-left: 38px; }
         input[type="text"].wide { min-width: 150px; }
         input:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px var(--secondary); outline: none; }
         input.invalid { border-color: var(--danger) !important; background: #fef2f2 !important; }
@@ -121,9 +114,6 @@
         .btn-gold { background: var(--accent); color: var(--primary); }
         .btn-gold:hover { background: #e0e0e0; }
 
-        /* =======================================================
-           5. TABLES & PESANAN ITEMS
-           ======================================================= */
         .table-responsive { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); overflow-x: auto; background: var(--surface); position: relative; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         th, td { padding: 16px; text-align: left; font-size: 13.5px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); vertical-align: middle; }
@@ -145,10 +135,6 @@
         .pesanan-item-row:last-child { margin-bottom: 0; }
         .summary-footer-text { color: white; font-size: 13.5px; line-height: 1.8; display: flex; flex-wrap: wrap; gap: 15px; }
         .summary-footer-text span { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; }
-
-        /* =======================================================
-           6. DASHBOARD STATS & TREND BADGES
-           ======================================================= */
         .grid-owner { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 35px; }
         .stat-box { padding: 30px 25px; border-radius: var(--radius-lg); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; box-shadow: var(--shadow-md); transition: var(--transition); border: 1px solid var(--border); }
         .stat-box:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
@@ -172,9 +158,6 @@
         .trend-down { background: #fff; color: var(--danger); border-color: var(--danger); box-shadow: 1px 1px 0 var(--danger);}
         .trend-neutral { background: var(--accent); color: var(--text-muted); }
 
-        /* =======================================================
-           7. MODALS, TOASTS & UTILITIES
-           ======================================================= */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(25, 26, 35, 0.85); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.show { opacity: 1; }
         .modal-box { background: var(--surface); padding: 40px 35px; border-radius: var(--radius-lg); width: 100%; max-width: 440px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border); transform: scale(0.95) translateY(10px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -185,7 +168,7 @@
         .btn-close { position: absolute; top: 20px; right: 20px; font-size: 24px; color: var(--primary); cursor: pointer; border: 1px solid var(--border); background: var(--surface); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: var(--transition); box-shadow: 2px 2px 0 var(--border); }
         .btn-close:hover { background: var(--secondary); transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--border); }
 
-        #toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 3000; display: flex; flex-direction: column; gap: 15px; }
+        #toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 99999; display: flex; flex-direction: column; gap: 15px; }
         .toast { background: var(--primary); color: var(--surface); padding: 18px 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-md); border: 1px solid var(--border); font-weight: 700; display: flex; align-items: center; gap: 15px; min-width: 320px; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); border-left: 8px solid transparent; font-size: 14.5px;}
         .toast.show { transform: translateX(0); }
         .toast.success { border-left-color: var(--secondary); } .toast.success i { color: var(--secondary); font-size: 20px; }
@@ -202,40 +185,37 @@
         .footer { text-align: center; padding: 15px 10px; background: var(--surface); border-top: 2px solid var(--border); color: var(--text-muted); font-weight: 700; font-size: 12px; margin-top: 10px; }
         .footer b { color: var(--primary); }
 
-        /* =======================================================
-           8. RESPONSIVE MOBILE (MAKSIMAL 768px) - RAPI & OPTIMAL
-           ======================================================= */
         @media (max-width: 768px) {
+            .hamburger-btn { display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 24px; color: var(--primary); cursor: pointer; padding: 5px; }
+            
+            /* Gunakan mode Sidebar murni yang rapi, hapus mode bottom-bar yang bentrok */
+            .nav-menu { 
+                position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; 
+                background: var(--surface); border-left: 2px solid var(--border); border-top: none;
+                flex-direction: column; justify-content: flex-start; align-items: flex-start;
+                padding: 80px 20px 20px 20px; gap: 10px; z-index: 999; 
+                transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            }
+            .nav-menu.open { right: 0; }
+            
+            .mobile-overlay-menu {
+                position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998;
+                opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(2px);
+            }
+            .mobile-overlay-menu.open { opacity: 1; visibility: visible; }
+            
+            .nav-item { width: 100%; flex-direction: row; justify-content: flex-start; padding: 14px 20px; border-radius: 12px; font-size: 14.5px; border: 1px solid transparent; background: transparent;}
+            .nav-item i { width: 30px; font-size: 18px; text-align: center; border: none; height: auto; display: inline-block; }
+            .nav-item.active { background: var(--bg-color); border: 1px solid var(--border-light); font-weight: 800; color: var(--primary); }
+            .nav-item.active i { color: var(--primary); background: transparent; border: none; box-shadow: none; }
+            
             .header { padding: 0 15px; height: 65px; }
-            body { padding-top: 65px; padding-bottom: 90px; } 
+            body { padding-top: 65px; } 
             .brand { font-size: 18px; width: auto; justify-content: flex-start; }
             .hide-mobile { display: none; }
             .btn-gembok { padding: 8px 12px; font-size: 14px; }
             .footer { margin-top: 0px; padding-bottom: 20px; }
-            
-            /* --- NAVIGASI BAWAH: Fleksibel, Rapi Tengah & Bisa di-Swipe --- */
-            .nav-menu { 
-                position: fixed; bottom: 0; left: 0; width: 100%; 
-                background: var(--surface); border-top: 2px solid var(--border); 
-                display: flex; flex-wrap: nowrap; overflow-x: auto; 
-                padding: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); 
-                gap: 5px; z-index: 999; height: auto;
-                -webkit-overflow-scrolling: touch; -ms-overflow-style: none; scrollbar-width: none;
-            }
-            .nav-menu::-webkit-scrollbar { display: none; }
-            
-            .nav-item { 
-                flex: 1; /* Otomatis membagi rata ruang yang ada */
-                min-width: 75px; /* Batas minimal lebar agar tidak gepeng saat tombol banyak */
-                flex-direction: column; color: var(--text-muted); font-size: 11px; 
-                padding: 5px; border: none !important; border-radius: 0; height: auto; gap: 6px; 
-                box-shadow: none !important; background: transparent !important; 
-                align-items: center; justify-content: center; 
-            }
-            .nav-item i { font-size: 20px; width: 50px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 2px solid transparent; transition: var(--transition); }
-            .nav-item.active { color: var(--primary) !important; font-weight: 800; }
-            .nav-item.active i { background: var(--secondary); border: 2px solid var(--primary); box-shadow: 2px 2px 0 var(--primary); color: var(--primary); }
-            .nav-item span { text-align: center; line-height: 1.1; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px; }
             
             /* --- LAYOUT CARDS & HEADER --- */
             .page-container { padding: 15px 10px; }
@@ -243,26 +223,22 @@
             .form-input-card { padding: 20px 15px; }
             .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .card-header h2 { display: block; line-height: 1.5; width: 100%; }
-            .card-header h2 i { display: inline-block; vertical-align: middle; margin-right: 5px; margin-bottom: 4px; }
             .card-header > div { width: 100%; display: flex; flex-direction: column; gap: 10px; } 
             .card-header > div > * { width: 100% !important; min-width: 0 !important; max-width: none !important; }
 
-            /* --- SEARCH BAR FULL WIDTH --- */
             .card-header .input-group { max-width: 100% !important; width: 100% !important; }
             .card-header .input-group input { width: 100% !important; }
 
-            /* --- PESANAN DINAMIS RAPI & HEMAT RUANG --- */
             .pesanan-item-row { flex-direction: row !important; flex-wrap: wrap !important; gap: 8px !important; }
             .pesanan-item-row > input[type="text"] { width: 100% !important; flex: 0 0 100% !important; margin-bottom: 2px !important; }
             .pesanan-item-row .input-group { flex: 1 !important; max-width: none !important; }
             .pesanan-item-row button { width: 50px !important; flex: 0 0 50px !important; margin-top: 0 !important; }
 
-            /* --- TABEL RESPONSIVE (UBAH JADI CARD-STYLE) --- */
+            /* --- TABEL RESPONSIVE --- */
             .table-responsive { border: none; background: transparent; overflow-x: hidden; }
             .table-responsive table, .table-responsive thead, .table-responsive tbody, .table-responsive th, .table-responsive td, .table-responsive tr { display: block; width: 100%; }
             .table-responsive thead { display: none; }
             .table-responsive tbody tr { margin-bottom: 20px; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--surface); padding: 15px; box-shadow: 4px 4px 0 var(--border); }
-            
             .table-responsive td { display: flex; flex-direction: row; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ccc; border-right: none; padding: 12px 0; min-height: 44px; gap: 10px; text-align: right; }
             .table-responsive td:last-child { border-bottom: none; padding-bottom: 0; }
             .table-responsive td::before { content: attr(data-label); font-weight: 800; color: var(--primary); font-size: 12px; text-transform: uppercase; text-align: left; }
@@ -272,7 +248,6 @@
             input[type="text"].wide { width: 100%; min-width: unset; max-width: 180px; }
             .table-responsive td .input-group { max-width: 150px !important; margin-left: auto !important; }
 
-            /* --- FOOTER TABEL (GRAND TOTAL) --- */
             .table-responsive tfoot { display: block; width: 100%; }
             .table-responsive tfoot tr { background: var(--primary); padding: 15px; border-radius: var(--radius-md); margin-top: 20px; border: 2px solid var(--border); box-shadow: 4px 4px 0 var(--border); display: flex; flex-direction: column; gap: 5px; }
             .table-responsive tfoot td { color: white; border-bottom: 1px dashed rgba(255,255,255,0.2) !important; flex-direction: row; justify-content: space-between; align-items: center; padding: 8px 0; min-height: auto; }
@@ -287,7 +262,6 @@
             .table-responsive .date-group-header td::before { display: none; }
             
             .modal-box { padding: 30px 20px; }
-            .text-right, .text-center { text-align: right !important; }
         }
     </style>
 </head>
@@ -329,48 +303,161 @@
 
     <div id="toast-container"></div>
 
-    <header class="header">
+<div id="mobile-overlay" class="mobile-overlay-menu" onclick="toggleMobileMenu()"></div>
+
+    <header class="header" id="main-header" style="display:none;">
         <div class="brand">
             <i class="fas fa-cookie-bite"></i> Bolu Sakinah
         </div>
-        <div class="nav-menu">
-            <button class="nav-item active" onclick="bukaPage('page-hpp', this)" data-tooltip="Stok & Produksi"><i class="fas fa-calculator"></i> <span>Stok & Produksi</span></button>
-            <button class="nav-item" onclick="bukaPage('page-pesanan', this)" data-tooltip="Kelola Pesanan Pelanggan"><i class="fas fa-clipboard-list"></i> <span>Pesanan</span></button>
-            <button class="nav-item" onclick="bukaPage('page-checklist', this)" data-tooltip="Checklist Bahan Pegawai"><i class="fas fa-clipboard-check"></i> <span>Checklist Bahan</span></button>
-            
-            <button class="nav-item owner-menu" onclick="bukaPage('page-dashboard', this)" data-tooltip="Laporan Finansial Owner"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
-            <button class="nav-item owner-menu" onclick="bukaPage('page-kas', this)" data-tooltip="Buku Kas & Analitik"><i class="fas fa-wallet"></i> <span>Buku Kas</span></button>
-        </div>
-        <button id="btn-auth-desktop" class="btn-gembok" onclick="bukaLogin()" title="Buka Akses Owner"><i class="fas fa-lock"></i> <span class="hide-mobile">Area Owner</span></button>
-    </header>
+        
+        <div class="nav-menu" id="nav-menu-container">
+            <button class="hamburger-btn hide-desktop" style="position: absolute; top: 20px; right: 20px;" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
 
-    <div id="login-modal" class="modal-overlay">
-        <div class="modal-box" style="text-align: center;">
-            <button class="btn-close" onclick="tutupModal('login-modal')" title="Tutup">&times;</button>
-            <div style="background: var(--primary); width: 80px; height: 80px; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-                <i class="fas fa-key" style="font-size: 35px; color: var(--secondary);"></i>
+            <button class="nav-item active" onclick="bukaPage('page-hpp', this); toggleMobileMenu()" data-tooltip="Stok & Produksi"><i class="fas fa-calculator"></i> <span>Stok & Produksi</span></button>
+            <button class="nav-item" onclick="bukaPage('page-pesanan', this); toggleMobileMenu()" data-tooltip="Kelola Pesanan Pelanggan"><i class="fas fa-clipboard-list"></i> <span>Pesanan</span></button>
+            <button class="nav-item" onclick="bukaPage('page-checklist', this); toggleMobileMenu()" data-tooltip="Checklist Bahan Pegawai"><i class="fas fa-clipboard-check"></i> <span>Checklist Bahan</span></button>
+            
+            <div class="owner-menu" id="owner-menu" style="display: none; align-items: center; gap: 10px;">
+                <span class="hide-desktop" style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px;">MENU OWNER</span>
+                <button class="nav-item" onclick="bukaPage('page-dashboard', this); toggleMobileMenu()" data-tooltip="Laporan Finansial Owner"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
+                <button class="nav-item" onclick="bukaPage('page-kas', this); toggleMobileMenu()" data-tooltip="Buku Kas & Analitik"><i class="fas fa-wallet"></i> <span>Buku Kas</span></button>
             </div>
-            <h2>Akses Keamanan</h2>
-            <p>Sistem ini dikunci. Masukkan PIN Owner.</p>
-            <input type="password" id="input-pin" class="pin-input" placeholder="****" autocomplete="off">
-            <button class="btn btn-primary" style="width: 100%; font-size: 16px;" onclick="verifikasiLogin()">Buka Brankas <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="btn" style="background: var(--surface); color: var(--primary); border-color: var(--border); font-weight: 800; display: flex; align-items: center; gap: 8px; padding: 8px 12px; min-height: 40px;" onclick="logoutUser()">
+                <i class="fas fa-user-circle" style="font-size: 18px; color: var(--secondary);"></i>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
+                    <span id="display-user-name" class="hide-mobile" style="font-size: 12px;">User</span>
+                </div>
+                <i class="fas fa-sign-out-alt hide-mobile" style="margin-left: 5px; color: var(--danger);" title="Logout"></i>
+            </button>
+            
+            <button class="hamburger-btn hide-desktop" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+    <div id="auth-screen" style="position: fixed; inset: 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        
+        <div id="form-login-box" class="modal-box" style="box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: none; border-radius: 28px; width: 100%; max-width: 400px; padding: 45px 35px; background: #ffffff;">
+            <div style="text-align: center; margin-bottom: 35px;">
+                <div style="background: linear-gradient(135deg, var(--secondary) 0%, #85d628 100%); width: 75px; height: 75px; border-radius: 22px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 18px; box-shadow: 0 10px 20px rgba(185, 255, 102, 0.3);">
+                    <i class="fas fa-cookie-bite" style="font-size: 38px; color: var(--primary);"></i>
+                </div>
+                <h2 style="font-size: 26px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; margin: 0 0 6px 0;">Bolu Sakinah</h2>
+                <p style="color: var(--text-muted); font-size: 13.5px; font-weight: 500; margin: 0;">Sistem Manajemen Operasional</p>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">USERNAME / ID</label>
+                <div class="input-group full-width">
+                    <span class="input-prefix" style="color: var(--text-muted);"><i class="fas fa-user"></i></span>
+                    <input type="text" id="login-user" class="has-prefix" placeholder="Masukkan username..." autocomplete="off" style="border: 1px solid #e2e8f0; border-radius: 14px; height: 54px; font-size: 15px; background: #f8fafc; transition: all 0.3s;">
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">PIN KEAMANAN</label>
+                <div class="input-group full-width">
+                    <span class="input-prefix" style="color: var(--text-muted);"><i class="fas fa-lock"></i></span>
+                    <input type="password" id="login-pin" class="has-prefix" placeholder="••••••" autocomplete="off" style="border: 1px solid #e2e8f0; border-radius: 14px; height: 54px; font-size: 20px; letter-spacing: 4px; background: #f8fafc; transition: all 0.3s;">
+                </div>
+            </div> <div style="text-align: right; margin-bottom: 30px;">
+                <a href="#" onclick="alert('Lupa PIN? Silahkan hubungi Owner / Admin untuk mereset akun Anda.'); return false;" style="color: var(--text-muted); font-size: 12.5px; font-weight: 600; text-decoration: none; transition: color 0.2s;">Lupa PIN?</a>
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; font-size: 16px; height: 54px; border-radius: 14px; margin-bottom: 25px; box-shadow: 0 8px 15px rgba(25, 26, 35, 0.15); transition: all 0.3s; border: none;" onclick="prosesLogin()">
+                Masuk Sistem <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+            </button>
+            
+            <div style="text-align: center; font-size: 13.5px; font-weight: 500; color: var(--text-muted);">
+                Belum punya akun? <a href="#" onclick="switchAuthMode('register')" style="color: var(--primary); font-weight: 800; text-decoration: none; margin-left: 5px;">Daftar Pegawai</a>
+            </div>
+        </div>
+
+        <div id="form-register-box" class="modal-box" style="display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: none; border-radius: 28px; width: 100%; max-width: 400px; padding: 45px 35px; background: #ffffff;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="background: #f1f5f9; width: 65px; height: 65px; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <i class="fas fa-user-plus" style="font-size: 26px; color: var(--primary);"></i>
+                </div>
+                <h2 style="font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 5px 0;">Daftar Pegawai</h2>
+                <p style="margin:0; font-size: 13px; color: var(--text-muted);">Gunakan Token dari Owner</p>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="font-size: 11px; color: var(--text-muted);">TOKEN PENDAFTARAN</label>
+                <div class="input-group full-width">
+                    <span class="input-prefix" style="color:var(--danger);"><i class="fas fa-ticket-alt"></i></span>
+                    <input type="text" id="reg-token" class="has-prefix" placeholder="Misal: X9A2KQ" style="text-transform: uppercase; letter-spacing: 2px; font-weight:800; text-align: center; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="font-size: 11px; color: var(--text-muted);">PILIH CABANG</label>
+                <select id="reg-cabang" class="custom-select" style="border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;"></select>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="font-size: 11px; color: var(--text-muted);">BUAT USERNAME</label>
+                <input type="text" id="reg-user" placeholder="Nama panggilan Anda..." style="border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
+            </div>
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label style="font-size: 11px; color: var(--text-muted);">BUAT PIN KEAMANAN</label>
+                <input type="password" id="reg-pin" placeholder="Minimal 4 digit" style="border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; letter-spacing: 2px;">
+            </div>
+            
+            <button class="btn btn-success" style="width: 100%; font-size: 15px; height: 50px; margin-bottom: 15px; border-radius: 12px; border: none;" onclick="prosesRegister()">
+                <i class="fas fa-check-circle"></i> Selesai & Daftarkan
+            </button>
+            <button class="btn" style="width: 100%; background: transparent; color: var(--text-muted); border: 1px solid #e2e8f0; border-radius: 12px; height: 50px;" onclick="switchAuthMode('login')">
+                Kembali ke Login
+            </button>
         </div>
     </div>
 
-    <div id="ganti-pin-modal" class="modal-overlay">
-        <div class="modal-box">
-            <button class="btn-close" onclick="tutupModal('ganti-pin-modal')" title="Tutup">&times;</button>
-            <h2><i class="fas fa-key" style="color:var(--primary);"></i> Pengaturan Keamanan</h2>
-            <p style="margin-bottom: 15px;">Ubah PIN akses untuk Area Owner.</p>
-            <div class="form-group" style="margin-top:25px;">
-                <label>PIN Lama / Master Key</label>
-                <input type="password" id="pin-lama" class="pin-input" style="font-size:20px; letter-spacing:4px; margin-bottom:15px; padding: 12px;">
+    <div id="admin-auth-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 800px; width: 95%;">
+            <button class="btn-close" onclick="tutupModal('admin-auth-modal')">&times;</button>
+            <h2 style="font-size: 22px; margin-bottom: 20px;"><i class="fas fa-users-cog" style="color:var(--primary);"></i> Pusat Kontrol Admin</h2>
+            
+            <div class="grid-owner" style="gap: 15px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="background: var(--surface); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                        <h3 style="margin: 0 0 10px 0; font-size: 14px;"><i class="fas fa-store"></i> Daftar Cabang / Pabrik</h3>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" id="input-cabang-baru" placeholder="Nama cabang baru...">
+                            <button class="btn btn-success" onclick="tambahCabangBaru()"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <ul id="list-cabang-admin" style="list-style:none; padding:0; margin:0; font-size:12.5px; font-weight:700; max-height:120px; overflow-y:auto;"></ul>
+                    </div>
+
+                    <div style="background: var(--accent); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                        <h3 style="margin: 0 0 10px 0; font-size: 14px; color: var(--primary);"><i class="fas fa-user-tie"></i> Tambah Akun Owner Baru</h3>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <input type="text" id="new-owner-user" placeholder="Username Owner..." style="background: #fff;">
+                            <input type="text" id="new-owner-pin" placeholder="PIN Owner..." style="background: #fff;">
+                            <button class="btn btn-primary" onclick="tambahOwnerBaru()"><i class="fas fa-shield-alt"></i> Daftarkan Owner</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="background: #fafff0; padding: 20px; border-radius: var(--radius-md); border: 2px dashed var(--secondary);">
+                        <h3 style="margin: 0 0 10px 0; font-size: 14px;"><i class="fas fa-ticket-alt"></i> Token Pendaftaran Pegawai</h3>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" id="generate-token-display" readonly style="font-weight: 800; text-align:center; letter-spacing: 2px; background: #fff;" placeholder="-----">
+                            <button class="btn btn-primary" onclick="buatTokenBaru()">Buat</button>
+                        </div>
+                        <div style="font-size: 12px; font-weight:800; color:var(--text-muted);">Token belum terpakai: <span id="count-token-aktif" style="color:var(--danger); font-size: 14px;">0</span></div>
+                    </div>
+
+                    <div style="background: var(--surface); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border); flex: 1;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 14px;"><i class="fas fa-users"></i> Database Semua Akun</h3>
+                        <p style="font-size: 11.5px; color: var(--danger); margin-bottom: 10px; font-weight: 600;"><i class="fas fa-exclamation-circle"></i> Info: PIN Pegawai dapat dilihat di sini jika mereka lupa.</p>
+                        <ul id="list-akun-pegawai" style="list-style:none; padding:0; margin:0; max-height:200px; overflow-y:auto; border: 1px solid var(--border-light); border-radius: var(--radius-sm);">
+                            </ul>
+                    </div>
+                </div>
+
             </div>
-            <div class="form-group">
-                <label>PIN Baru</label>
-                <input type="password" id="pin-baru" class="pin-input" style="font-size:20px; letter-spacing:4px; margin-bottom:25px; padding: 12px;">
-            </div>
-            <button class="btn btn-success" style="width:100%;" onclick="simpanPinBaru()"><i class="fas fa-save"></i> Simpan PIN Baru</button>
         </div>
     </div>
 
@@ -454,8 +541,8 @@
                 <h2><i class="fas fa-clipboard-check"></i> Form Input Penggunaan Bahan</h2>
             </div>
             <div class="form-grid">
-                <div class="form-group"><label>No. Adonan</label><input type="text" id="log-no-adonan" placeholder="....." style="font-weight: 800;"></div>
-                <div class="form-group"><label>Tanggal</label><input type="date" id="log-tanggal" style="font-weight: 800;"></div>
+            <div class="form-group"><label>No. Adonan </label><input type="text" id="log-no-adonan" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="log-tanggal" style="font-weight: 800;" onchange="updateAutoNoAdonan()"></div>
                 <div class="form-group">
                     <label>Nama Produk</label>
                     <select id="log-produk" class="custom-select"></select>
@@ -467,7 +554,7 @@
                         <span class="input-unit">loyang</span>
                     </div>
                 </div>
-                <div class="form-group"><label>Nama petugas</label><input type="text" id="log-petugas" placeholder="....." style="font-weight: 800;"></div>
+                <div class="form-group"><label>Nama petugas </label><input type="text" id="log-petugas" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
             </div>
             
             <div style="display: flex; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
@@ -535,8 +622,8 @@
                 <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; display: inline-block; margin-top: 5px;">Input data produksi untuk mendapatkan checklist bahan baku.</span>
             </div>
             <div class="form-grid">
-                <div class="form-group"><label>No. Adonan</label><input type="text" id="chk-no-adonan" placeholder="Cth: A-01" style="font-weight: 800;"></div>
-                <div class="form-group"><label>Tanggal</label><input type="date" id="chk-tanggal" style="font-weight: 800;"></div>
+                <div class="form-group"><label>No. Adonan </label><input type="text" id="chk-no-adonan" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="chk-tanggal" style="font-weight: 800;" onchange="updateAutoNoAdonan()"></div>
                 <div class="form-group">
                     <label>Nama Varian Bolu</label>
                     <select id="chk-produk" class="custom-select"></select>
@@ -548,7 +635,7 @@
                         <span class="input-unit">loyang</span>
                     </div>
                 </div>
-                <div class="form-group"><label>Nama Pegawai</label><input type="text" id="chk-petugas" placeholder="Cth: Udin" style="font-weight: 800;"></div>
+                <div class="form-group"><label>Nama Pegawai </label><input type="text" id="chk-petugas" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
             </div>
             
             <div style="margin-top: 25px;">
@@ -672,7 +759,7 @@
             <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="bukaModalProduk()"><i class="fas fa-plus-circle"></i> Tambah Bolu Sakinah Baru</button>
                 <button class="btn btn-gold" onclick="bukaModalBahan()"><i class="fas fa-box-open"></i> Tambah Bahan Baku</button>
-                <button class="btn" style="background: var(--surface); color: var(--primary);" onclick="bukaModalGantiPin()"><i class="fas fa-key"></i> Ganti PIN Sistem</button>
+                <button class="btn" style="background: var(--surface); color: var(--primary);" onclick="bukaModalAdminAuth()"><i class="fas fa-users-cog"></i> Manajemen Pegawai</button>
                 <button class="btn" style="background: var(--accent); color: var(--primary);" onclick="bukaActivityLog()"><i class="fas fa-history"></i> Log Aktivitas Cloud</button>
             </div>
         </div>
@@ -766,7 +853,10 @@
         messagingSenderId: "66021256539",
         appId: "1:66021256539:web:2d841d39970662495d3e7e"
     };
-
+    let daftarUser = [];
+    let daftarCabang = ["Pusat Tasikmalaya"];
+    let daftarToken = [];
+    let sesiAktif = null; 
     let db;
     let isModeEditHPP = false;
     let isFirebaseReady = false;
@@ -830,7 +920,15 @@
         return JSON.parse(JSON.stringify(obj, (k, v) => v === undefined ? null : v));
     }
 
-
+    function toggleMobileMenu() {
+        const navMenu = document.getElementById('nav-menu-container');
+        const overlay = document.getElementById('mobile-overlay');
+        
+        if(navMenu && overlay) {
+            navMenu.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+    }
     function saveToLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ produkBolu, bahanBaku, pesanan, kas, ownerBeban, laporanPenggunaan, checklistHistory })); }
 
     function logActivity(action, note) {
@@ -847,37 +945,41 @@
             db.collection('bolu_sakinah').doc('produksi').set(cleanData({ produkBolu, bahanBaku, pesanan, laporanPenggunaan, checklistHistory })).catch(e=>console.warn(e));
             db.collection('bolu_sakinah').doc('kas').set(cleanData({ kas })).catch(e=>console.warn(e));
             db.collection('bolu_sakinah').doc('laba').set(cleanData({ ownerBeban })).catch(e=>console.warn(e));
+            db.collection('bolu_sakinah').doc('auth_data').set(cleanData({ daftarUser, daftarCabang, daftarToken })).catch(e=>console.warn(e));
         }, 1500); 
     }
 
     function loadData() {
         if(!isFirebaseReady) { fallbackLoadLocal(); return; }
-        showLoading('Mengunduh data dari Cloud...');
-        
-        db.collection('bolu_sakinah').doc('settings').get().then(doc => {
-            if(doc.exists && doc.data().pin) { window.appPin = doc.data().pin; localStorage.setItem('bolu_pin', window.appPin); }
-        }).catch(e => console.warn(e));
+        showLoading('Menyiapkan Sistem...');
 
         Promise.all([
             db.collection('bolu_sakinah').doc('produksi').get(),
             db.collection('bolu_sakinah').doc('kas').get(),
-            db.collection('bolu_sakinah').doc('laba').get()
-        ]).then(([prodDoc, kasDoc, labDoc]) => {
+            db.collection('bolu_sakinah').doc('laba').get(),
+            db.collection('bolu_sakinah').doc('auth_data').get()
+        ]).then(([prodDoc, kasDoc, labDoc, authDoc]) => {
             let hasData = false;
             if(prodDoc.exists) { 
                 let d = prodDoc.data(); 
-                if(d.produkBolu) produkBolu=d.produkBolu; 
-                if(d.bahanBaku) bahanBaku=d.bahanBaku; 
-                if(d.pesanan) pesanan=d.pesanan; 
-                if(d.laporanPenggunaan) laporanPenggunaan=d.laporanPenggunaan; 
-                if(d.checklistHistory) checklistHistory=d.checklistHistory;
-                hasData=true; 
+                if(d.produkBolu) produkBolu=d.produkBolu; if(d.bahanBaku) bahanBaku=d.bahanBaku; 
+                if(d.pesanan) pesanan=d.pesanan; if(d.laporanPenggunaan) laporanPenggunaan=d.laporanPenggunaan; 
+                if(d.checklistHistory) checklistHistory=d.checklistHistory; hasData=true; 
             }
             if(kasDoc.exists) { let d = kasDoc.data(); if(d.kas) kas = d.kas; hasData=true; }
             if(labDoc.exists) { let d = labDoc.data(); if(d.ownerBeban) ownerBeban = d.ownerBeban; hasData=true; }
-            
+            if(authDoc.exists) {
+                let d = authDoc.data();
+                if(d.daftarUser) daftarUser = d.daftarUser;
+                if(d.daftarCabang) daftarCabang = d.daftarCabang;
+                if(d.daftarToken) daftarToken = d.daftarToken;
+            }
+
             if(!hasData) saveData();
-            applyLoadedData(); hideLoading();
+            
+            applyLoadedData();
+            cekSesiLogin(); 
+            hideLoading();
         }).catch(e => {
             console.warn("Gagal fetch cloud, load local", e);
             fallbackLoadLocal(); hideLoading(); showToast("Mode Offline Aktif", "error");
@@ -1025,7 +1127,7 @@
             const { jsPDF } = window.jspdf; 
             const doc = new jsPDF('landscape', 'mm', 'a4'); 
 
-            // Header Laporan
+
             doc.setFontSize(18); 
             doc.setTextColor(25, 26, 35); 
             doc.setFont("helvetica", "bold");
@@ -1041,7 +1143,6 @@
             doc.text(`Qty            : ${lap.qty} loyang`, 14, 50);
             doc.text(`Nama petugas   : ${lap.petugas}`, 14, 56);
 
-            // Perhitungan Bahan sesuai Format yang diminta
             let tableData = [];
             let qtyLoyang = getVal(lap.qty);
             let adonan = qtyLoyang / prodObj.rAdonan;
@@ -1275,15 +1376,11 @@
             
             let listBahan = chk.items;
 
-            // Kalkulasi tinggi kertas dinamis sesuai banyak item bahan
-            let baseHeight = 65; // Area Header dan Footer
-            let itemHeight = listBahan.length * 6.5; // Tiap baris butuh ~6.5mm
+            let baseHeight = 65; 
+            let itemHeight = listBahan.length * 6.5; 
             let totalHeight = baseHeight + itemHeight;
-
-            // Buat PDF mode potret berukuran width:58mm (Printer Kasir)
             const doc = new jsPDF('p', 'mm', [58, totalHeight]);
-            
-            // Header
+
             doc.setFontSize(11);
             doc.setFont("helvetica", "bold");
             doc.text("CHECKLIST PRODUKSI", 29, 8, {align: 'center'});
@@ -1298,8 +1395,7 @@
             doc.text(`Adonan  : ${chk.no}`, 4, 33);
             doc.text(`Produk  : ${chk.prod}`, 4, 37);
             doc.text(`Jumlah  : ${chk.qty} Loyang`, 4, 41);
-            
-            // Garis pembatas
+    
             doc.setLineWidth(0.3);
             doc.setLineDash([1.5, 1.5], 0);
             doc.line(4, 44, 54, 44);
@@ -1311,17 +1407,16 @@
             doc.setFontSize(8);
             doc.setFont("helvetica", "normal");
             let y = 55;
-            
-            // List item dan Checkbox (Kotak Kosong)
-            doc.setLineDash([]); // Reset line dash solid
+
+            doc.setLineDash([]); 
             listBahan.forEach((item) => {
-                doc.rect(4, y - 3, 3, 3); // Gambar kotak checkbox
+                doc.rect(4, y - 3, 3, 3); 
                 doc.text(`${item.nama}`, 9, y);
                 doc.text(`${item.butuh} ${item.unit}`, 54, y, {align: 'right'});
                 y += 6.5;
             });
             
-            // Footer Approval (Signature area)
+   
             doc.setLineDash([1.5, 1.5], 0);
             doc.line(4, y, 54, y);
             
@@ -1334,7 +1429,7 @@
             doc.text("(............)", 12, y, {align: 'center'});
             doc.text("(............)", 45, y, {align: 'center'});
             
-            // Save output
+   
             doc.save(`Struk_Checklist_${chk.no}_${chk.prod.replace(/\s+/g, '_')}.pdf`);
             hideLoading();
             showToast('Struk Printer berhasil dibuat!', 'success');
@@ -1342,9 +1437,7 @@
     }
 
 
-    // ==========================================
-    // 3. UI UTILITIES (TOAST, MODALS)
-    // ==========================================
+
     function showToast(msg, type='success') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':(type==='accent'?'fa-bell':'fa-exclamation-circle')}"></i> ${msg}`;
@@ -1597,7 +1690,6 @@
                 if(p.tgl === todayStr) adaPesananHariIni = true;
 
                 p.items.forEach(item => {
-                    // KODE DIPERBAIKI: Kebal error nama varian kosong
                     let knownProd = produkBolu.find(x => (x.nama || "").toLowerCase() === (item.name || "").toLowerCase());
                     if (knownProd) totals[knownProd.id] += getVal(item.qty);
                 });
@@ -1700,9 +1792,6 @@
         updateDailySummary(); checkSyncStatus(); saveData();
     }
 
-    // ==========================================
-    // 6. INTEGRATION & DAILY SUMMARY
-    // ==========================================
     function updateDailySummary() {
         let today = new Date().toISOString().slice(0,10);
         document.getElementById('daily-date').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
@@ -1743,9 +1832,7 @@
         else { btn.disabled = false; btn.innerHTML = '<i class="fas fa-exchange-alt"></i> Pindahkan ke Kas'; btn.classList.add('btn-primary'); btn.classList.remove('btn-gold');}
     }
 
-    // ==========================================
-    // 7. BUKU KAS & ADVANCED ANALYTICS
-    // ==========================================
+
     let cashChartInstance = null; let kasDebounceTimer;
     function debouncedRenderKas() { clearTimeout(kasDebounceTimer); kasDebounceTimer = setTimeout(renderKas, 400); }
     function clearMonth() { document.getElementById('filter-bulan').value = ''; }
@@ -1771,7 +1858,7 @@
                     let dateObj = new Date(k.t); let dateStr = isNaN(dateObj) ? k.t : dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
                     tbody.innerHTML += `<tr class="date-group-header"><td colspan="10" style="font-weight: 800; color: var(--primary); padding: 16px; background: var(--accent); border-bottom: 2px solid var(--border);"><i class="fas fa-calendar-day" style="color:var(--primary); margin-right:8px;"></i> ${dateStr}</td></tr>`; lastDate = k.t;
                 }
-                tbody.innerHTML += `<tr><td data-label="No" class="text-center">${displayIndex + 1}</td><td data-label="Tanggal"><input type="date" value="${k.t}" onchange="kas[${i}].t=this.value; renderKas()"></td><td data-label="Ket"><input type="text" class="wide" value="${k.k}" placeholder="Keterangan..." onchange="kas[${i}].k=this.value; saveData()"></td><td data-label="Kas(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.kas}" onchange="kas[${i}].kas=validateNumInput(this); renderKas()" onfocus="this.select()"></div></td><td data-label="Bank(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.bnk}" onchange="kas[${i}].bnk=validateNumInput(this); renderKas()" onfocus="this.select()"></div></td><td data-label="Bolu(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.bol}" onchange="kas[${i}].bol=validateNumInput(this); renderKas()" onfocus="this.select()"></div></td><td data-label="Sisa(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.sis}" onchange="kas[${i}].sis=validateNumInput(this); renderKas()" onfocus="this.select()"></div></td><td data-label="Jumlah(Rp)" class="auto-value text-right" style="font-size:14.5px;">${rp(jumlah)}</td><td data-label="Selisih(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.sel}" onchange="kas[${i}].sel=validateNumInput(this); saveData()" onfocus="this.select()"></div></td><td data-label="Aksi" class="text-center"><button onclick="hapusKas(${i})" class="btn-danger" style="padding:10px 14px;"><i class="fas fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td data-label="No" class="text-center">${displayIndex + 1}</td><td data-label="Tanggal"><input type="date" value="${k.t}" onchange="kas[${i}].t=this.value; renderKas(); saveData();"></td><td data-label="Ket"><input type="text" class="wide" value="${k.k}" placeholder="Keterangan..." onchange="kas[${i}].k=this.value; saveData()"></td><td data-label="Kas(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.kas}" onchange="kas[${i}].kas=validateNumInput(this); renderKas(); saveData();" onfocus="this.select()"></div></td><td data-label="Bank(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.bnk}" onchange="kas[${i}].bnk=validateNumInput(this); renderKas(); saveData();" onfocus="this.select()"></div></td><td data-label="Bolu(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.bol}" onchange="kas[${i}].bol=validateNumInput(this); renderKas(); saveData();" onfocus="this.select()"></div></td><td data-label="Sisa(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.sis}" onchange="kas[${i}].sis=validateNumInput(this); renderKas(); saveData();" onfocus="this.select()"></div></td><td data-label="Jumlah(Rp)" class="auto-value text-right" style="font-size:14.5px;">${rp(jumlah)}</td><td data-label="Selisih(Rp)"><div class="input-group"><span class="input-prefix">Rp</span><input type="number" class="text-right has-prefix" value="${k.sel}" onchange="kas[${i}].sel=validateNumInput(this); saveData()" onfocus="this.select()"></div></td><td data-label="Aksi" class="text-center"><button onclick="hapusKas(${i})" class="btn-danger" style="padding:10px 14px;"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -1789,7 +1876,7 @@
         } else {
             compareHtml = `<div class="stat-box bg-white"><h3><i class="fas fa-money-bill-wave"></i> Total Kas</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumKas)}</h1></div><div class="stat-box bg-white"><h3><i class="fas fa-university"></i> Total Bank</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBnk)}</h1></div><div class="stat-box bg-white"><h3><i class="fas fa-cookie"></i> Total Bolu</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBol)}</h1></div><div class="stat-box bg-red"><h3><i class="fas fa-wallet"></i> Grand Total Filter</h3><h1 style="font-size:24px;">${rp(sumJml)}</h1></div>`;
         }
-        summaryDiv.innerHTML = compareHtml; updateAnalytics(filteredKas, sumKas, sumBnk, sumBol, sumSis); saveData();
+        summaryDiv.innerHTML = compareHtml; updateAnalytics(filteredKas, sumKas, sumBnk, sumBol, sumSis); 
     }
 
     function updateAnalytics(filteredKas, sumKas, sumBnk, sumBol, sumSis) {
@@ -1809,9 +1896,11 @@
             <li style="margin-bottom:12px; background:var(--surface); padding:10px 15px; border-radius:8px; border:1px solid var(--border);"><i class="fas fa-trophy" style="color: #f59e0b; width:20px;"></i> Instrumen dominan: <b>${cats[0].name}</b> (${rp(cats[0].val)}).</li>
             <li style="margin-bottom:0; background:var(--surface); padding:10px 15px; border-radius:8px; border:1px solid var(--border);"><i class="fas fa-chart-line" style="color: var(--primary); width:20px;"></i> Rata-rata uang harian: <b>${rp(avgHarian)}</b>.</li></ul>`;
 
-        const ctx = document.getElementById('cashChart').getContext('2d'); const labels = Object.keys(dailyTotals).sort(); const data = labels.map(l => dailyTotals[l]);
-        if(cashChartInstance) { cashChartInstance.data.labels = labels; cashChartInstance.data.datasets[0].data = data; cashChartInstance.update(); } 
-        else { cashChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Pergerakan Kas (Rp)', data: data, borderColor: '#191A23', backgroundColor: '#B9FF66', borderWidth: 3, fill: true, tension: 0, pointBackgroundColor: '#191A23', pointBorderColor: '#fff', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return rp(c.raw); } } } }, scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4] }, grid: { color: '#e5e5e5' } } } } }); }
+        if (typeof Chart !== 'undefined') {
+            const ctx = document.getElementById('cashChart').getContext('2d'); const labels = Object.keys(dailyTotals).sort(); const data = labels.map(l => dailyTotals[l]);
+            if(cashChartInstance) { cashChartInstance.data.labels = labels; cashChartInstance.data.datasets[0].data = data; cashChartInstance.update(); } 
+            else { cashChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Pergerakan Kas (Rp)', data: data, borderColor: '#191A23', backgroundColor: '#B9FF66', borderWidth: 3, fill: true, tension: 0, pointBackgroundColor: '#191A23', pointBorderColor: '#fff', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return rp(c.raw); } } } }, scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4] }, grid: { color: '#e5e5e5' } } } } }); }
+        }
     }
 
     function tambahKas() {
@@ -1822,15 +1911,12 @@
     }
     function hapusKas(index) { confirmDelete("Hapus riwayat kas ini?", () => { kas.splice(index, 1); renderKas(); logActivity("DELETE", "Menghapus transaksi dari Buku Kas"); }); }
 
-    // ==========================================
-    // 8. MASTER DATA MODALS
-    // ==========================================
     function bukaModalProduk() { 
         const container = document.getElementById('form-resep-dinamis'); 
         container.innerHTML = ''; 
         bahanBaku.forEach(b => { 
             if(!b.isMikaS) { 
-                // PERBAIKAN: Menambahkan inline style padding-right agar teks tidak bertumpuk
+
                 container.innerHTML += `<div class="form-group"><label>${b.nama}</label><div class="input-group full-width"><input type="number" id="new-res-${b.id}" value="0" class="has-unit text-right" style="padding-right: 85px;"><span class="input-unit">${unt(b)}/adonan</span></div></div>`; 
             } 
         }); 
@@ -1867,7 +1953,6 @@
         const container = document.getElementById('form-bahan-dinamis'); 
         container.innerHTML = ''; 
         produkBolu.forEach(p => { 
-            // PERBAIKAN: Menambahkan inline style padding-right agar teks tidak bertumpuk
             container.innerHTML += `<div class="form-group"><label>${p.nama}</label><div class="input-group full-width"><input type="number" id="new-b-res-${p.id}" value="0" class="has-unit text-right" style="padding-right: 95px;"><span class="input-unit">unit/adonan</span></div></div>`; 
         }); 
         document.getElementById('bahan-modal').style.display = 'flex'; 
@@ -1919,9 +2004,6 @@
         tutupModal('ganti-pin-modal');
     }
 
-    // ==========================================
-    // 10. SPA & SYSTEM LOGIC
-    // ==========================================
     function bukaPage(pageId, element) { 
         document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active')); 
         document.getElementById(pageId).classList.add('active'); 
@@ -1969,11 +2051,9 @@
         document.querySelectorAll('.btn-gembok').forEach(btn => { btn.innerHTML = btnUI; btn.style.background = "var(--surface)"; btn.style.color = "var(--primary)"; btn.style.borderColor = "var(--border)"; });
         bukaPage('page-hpp', document.querySelectorAll('.nav-item')[0]); showToast('Sistem dikembalikan ke Mode Pegawai');
     }
-    document.getElementById("input-pin").addEventListener("keypress", function(e) { if (e.key === "Enter") { e.preventDefault(); verifikasiLogin(); } });
 
-    // ==========================================
-    // EXPORT
-    // ==========================================
+
+
     function getFilteredKasForExport() {
         let fMonth = document.getElementById('filter-bulan').value; let fStart = document.getElementById('filter-start').value; let fEnd = document.getElementById('filter-end').value; let fSearch = document.getElementById('filter-search').value.toLowerCase();
         return kas.filter(k => { let pass = true; if(fMonth && !k.t.startsWith(fMonth)) pass = false; if(fStart && k.t < fStart) pass = false; if(fEnd && k.t > fEnd) pass = false; if(fSearch && !k.k.toLowerCase().includes(fSearch)) pass = false; return pass; }).sort((a, b) => a.t.localeCompare(b.t));
@@ -2000,7 +2080,6 @@
         }, 800);
     }
 
-
     window.onload = () => { 
         loadData(); 
         let currentMonthStr = new Date().toISOString().slice(0,7); 
@@ -2012,23 +2091,245 @@
             requestAnimationFrame(() => welcomeModal.classList.add('show'));
         }
         
-        
-        if(localStorage.getItem('boluSakinah_isOwner') === 'true') {
-            document.querySelectorAll('.owner-menu').forEach(menu => menu.style.display = 'flex');
-            let btnUI = '<i class="fas fa-lock-open"></i> <span class="hide-mobile">Tutup Brankas</span>';
-            document.querySelectorAll('.btn-gembok').forEach(btn => { btn.innerHTML = btnUI; btn.style.background = "var(--surface)"; btn.style.color = "var(--danger)"; btn.style.borderColor = "var(--danger)"; });
-        }
-        
-        let lastActivePage = localStorage.getItem('activePageBoluSakinah');
-        if(lastActivePage) {
-            let targetNav = document.querySelector(`.nav-item[onclick*="${lastActivePage}"]`);
-            if(targetNav) {
-                bukaPage(lastActivePage, targetNav);
-            } else {
-                bukaPage('page-hpp', document.querySelectorAll('.nav-item')[0]);
-            }
-        }
     };
+ 
+// ==========================================
+    // SISTEM AUTENTIKASI ENTERPRISE & NO. ADONAN
+    // ==========================================
+
+    function switchAuthMode(mode) {
+        if (mode === 'register') {
+            document.getElementById('form-login-box').style.display = 'none';
+            document.getElementById('form-register-box').style.display = 'block';
+            let selCabang = document.getElementById('reg-cabang');
+            selCabang.innerHTML = '<option value="">-- Pilih Cabang --</option>';
+            daftarCabang.forEach(c => selCabang.innerHTML += `<option value="${c}">${c}</option>`);
+        } else {
+            document.getElementById('form-register-box').style.display = 'none';
+            document.getElementById('form-login-box').style.display = 'block';
+        }
+    }
+
+    function prosesLogin() {
+        let u = document.getElementById('login-user').value.trim();
+        let p = document.getElementById('login-pin').value.trim();
+        
+        if (!u || !p) return showToast("Username dan PIN harus diisi!", "error");
+
+        // BYPASS DARURAT & PEMBUATAN AKUN OWNER OTOMATIS
+        if (u.toLowerCase() === "owner" && p === "2184") {
+            // Pastikan akun ini terdaftar di database sistem
+            if (!daftarUser.some(x => x.username.toLowerCase() === 'owner')) {
+                daftarUser.push({ id: "usr_own_default", username: "Owner", pin: "2184", cabang: "Pusat", role: "owner", tgl_daftar: new Date().toISOString().slice(0,10) });
+                saveData();
+            }
+            // Langsung login
+            let ownerDb = daftarUser.find(x => x.username.toLowerCase() === 'owner');
+            buatSesiAktif(ownerDb);
+            return;
+        }
+
+        // Jika bukan bypass, cari pegawai biasa
+        let userAktif = daftarUser.find(x => x.username.toLowerCase() === u.toLowerCase() && x.pin === p);
+        
+        if (userAktif) {
+            buatSesiAktif(userAktif);
+        } else {
+            showToast("Username atau PIN tidak ditemukan!", "error");
+        }
+    }
+
+    function buatSesiAktif(userObj) {
+        sesiAktif = userObj;
+        let waktuSkrg = new Date().getTime();
+        localStorage.setItem('bs_session_user', JSON.stringify(userObj));
+        localStorage.setItem('bs_session_time', waktuSkrg.toString());
+
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-header').style.display = 'flex';
+        
+        if(document.getElementById('log-petugas')) document.getElementById('log-petugas').value = userObj.username;
+        if(document.getElementById('chk-petugas')) document.getElementById('chk-petugas').value = userObj.username;
+        
+        document.getElementById('display-user-name').innerText = userObj.username + (userObj.role === 'owner' ? ' (Owner)' : '');
+
+        let ownerMenu = document.getElementById('owner-menu');
+        if (userObj.role === "owner") {
+            ownerMenu.style.display = window.innerWidth <= 768 ? 'flex' : 'flex';
+            if (window.innerWidth <= 768) ownerMenu.style.flexDirection = 'column';
+            bukaPage('page-dashboard', document.querySelectorAll('.nav-item[onclick*="page-dashboard"]')[0]);
+            showToast(`Selamat datang Owner, ${userObj.username}`, 'success');
+        } else {
+            ownerMenu.style.display = 'none';
+            bukaPage('page-hpp', document.querySelectorAll('.nav-item[onclick*="page-hpp"]')[0]);
+            showToast(`Login berhasil. Halo ${userObj.username}`, 'success');
+        }
+        
+        updateAutoNoAdonan(); 
+    }
+
+    function cekSesiLogin() {
+        let savedUser = localStorage.getItem('bs_session_user');
+        let savedTime = localStorage.getItem('bs_session_time');
+
+        if (savedUser && savedTime) {
+            let waktuSkrg = new Date().getTime();
+            let selisihJam = (waktuSkrg - parseInt(savedTime)) / (1000 * 60 * 60);
+            
+            if (selisihJam >= 12) {
+                logoutUser(true);
+            } else {
+                buatSesiAktif(JSON.parse(savedUser));
+            }
+        } else {
+            document.getElementById('auth-screen').style.display = 'flex';
+            document.getElementById('main-header').style.display = 'none';
+        }
+    }
+
+    function logoutUser(karenaTimeout = false) {
+        localStorage.removeItem('bs_session_user');
+        localStorage.removeItem('bs_session_time');
+        sesiAktif = null;
+        
+        document.getElementById('login-user').value = '';
+        document.getElementById('login-pin').value = '';
+        
+        document.getElementById('auth-screen').style.display = 'flex';
+        document.getElementById('main-header').style.display = 'none';
+        
+        switchAuthMode('login');
+        
+        if(karenaTimeout) showToast("Sesi habis (12 Jam). Silakan login kembali.", "error");
+        else showToast("Berhasil Logout", "success");
+    }
+
+    function prosesRegister() {
+        let token = document.getElementById('reg-token').value.trim().toUpperCase();
+        let cabang = document.getElementById('reg-cabang').value;
+        let u = document.getElementById('reg-user').value.trim();
+        let p = document.getElementById('reg-pin').value.trim();
+
+        if (!token || !cabang || !u || !p) return showToast("Harap isi semua form pendaftaran!", "error");
+        if (p.length < 4) return showToast("PIN minimal 4 digit!", "error");
+
+        let tokenIndex = daftarToken.findIndex(x => x === token);
+        if (tokenIndex === -1) return showToast("Token tidak valid atau sudah terpakai!", "error");
+
+        if (daftarUser.some(x => x.username.toLowerCase() === u.toLowerCase())) {
+            return showToast("Username ini sudah digunakan, pilih nama lain!", "error");
+        }
+
+        daftarToken.splice(tokenIndex, 1);
+        daftarUser.push({ id: "usr_" + Date.now(), username: u, pin: p, cabang: cabang, role: "pegawai", tgl_daftar: new Date().toISOString().slice(0,10) });
+
+        saveData();
+        showToast("Pendaftaran berhasil! Silahkan Login.", "success");
+        switchAuthMode('login');
+        document.getElementById('login-user').value = u;
+    }
+
+    // --- MANAJEMEN ADMIN / OWNER ---
+    function bukaModalAdminAuth() {
+        document.getElementById('count-token-aktif').innerText = daftarToken.length;
+        
+        let ulCabang = document.getElementById('list-cabang-admin');
+        ulCabang.innerHTML = '';
+        daftarCabang.forEach((c, i) => {
+            ulCabang.innerHTML += `<li style="display:flex; justify-content:space-between; padding:8px 10px; background:#fff; margin-bottom:5px; border-radius:6px; border:1px solid #eee; align-items:center;">
+                ${c} <button class="btn-danger" style="padding:4px 8px; font-size:10px; border:none; background:transparent; color:var(--danger);" onclick="hapusCabang(${i})"><i class="fas fa-trash"></i></button>
+            </li>`;
+        });
+
+        let ulPegawai = document.getElementById('list-akun-pegawai');
+        ulPegawai.innerHTML = '';
+        
+        daftarUser.forEach((u, i) => {
+            let badgeRole = u.role === 'owner' 
+                ? '<span style="background:var(--primary); color:var(--secondary); padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800; margin-left:5px;">OWNER</span>' 
+                : '<span style="background:var(--accent); color:var(--text-muted); padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800; margin-left:5px;">PEGAWAI</span>';
+            
+            let infoPin = `<span style="background: #fff3cd; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 800; border: 1px dashed #f59e0b;"><i class="fas fa-key"></i> PIN: ${u.pin}</span>`;
+
+            ulPegawai.innerHTML += `<li style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border-light); align-items:center; background: ${u.role === 'owner' ? '#f8fafc' : '#fff'};">
+                <div style="line-height: 1.6;">
+                    <b style="color:var(--primary); font-size:14px;">${u.username}</b> ${badgeRole}<br>
+                    <span style="font-size:11.5px; color:var(--text-muted);"><i class="fas fa-store"></i> ${u.cabang}</span><br>
+                    ${infoPin}
+                </div>
+                <button class="btn-danger" onclick="hapusPegawai(${i}, '${u.role}')" title="Hapus Akun" style="padding: 10px; border-radius: 8px;"><i class="fas fa-trash"></i></button>
+            </li>`;
+        });
+
+        const modal = document.getElementById('admin-auth-modal');
+        modal.style.display = 'flex'; requestAnimationFrame(() => modal.classList.add('show'));
+    }
+
+    function tambahOwnerBaru() {
+        let u = document.getElementById('new-owner-user').value.trim();
+        let p = document.getElementById('new-owner-pin').value.trim();
+        
+        if(!u || !p) return showToast("Username dan PIN Owner harus diisi!", "error");
+        if(daftarUser.some(x => x.username.toLowerCase() === u.toLowerCase())) return showToast("Username sudah dipakai!", "error");
+
+        daftarUser.push({ id: "usr_own_" + Date.now(), username: u, pin: p, cabang: "Pusat/Semua", role: "owner", tgl_daftar: new Date().toISOString().slice(0,10) });
+        saveData();
+        
+        document.getElementById('new-owner-user').value = '';
+        document.getElementById('new-owner-pin').value = '';
+        
+        bukaModalAdminAuth(); 
+        showToast("Akun Owner Baru Berhasil Ditambahkan!", "success");
+    }
+
+    function hapusPegawai(idx, role) {
+        if(role === 'owner') {
+            let ownerCount = daftarUser.filter(x => x.role === 'owner').length;
+            if(ownerCount <= 1) return showToast("Gagal! Harus ada minimal 1 akun Owner di sistem.", "error");
+        }
+        
+        confirmDelete("Hapus akun ini secara permanen?", () => {
+            daftarUser.splice(idx, 1); saveData(); bukaModalAdminAuth();
+        });
+    }
+
+    function buatTokenBaru() { let acak = Math.random().toString(36).substring(2, 8).toUpperCase(); daftarToken.push(acak); saveData(); document.getElementById('generate-token-display').value = acak; document.getElementById('count-token-aktif').innerText = daftarToken.length; showToast("Token dibuat!", "success"); }
+    function tambahCabangBaru() { let input = document.getElementById('input-cabang-baru'); let val = input.value.trim(); if(!val) return; if(daftarCabang.includes(val)) return showToast("Cabang sudah ada!", "error"); daftarCabang.push(val); input.value = ''; saveData(); bukaModalAdminAuth(); showToast("Cabang ditambahkan", "success"); }
+    function hapusCabang(idx) { confirmDelete("Hapus cabang ini?", () => { daftarCabang.splice(idx, 1); saveData(); bukaModalAdminAuth(); }); }
+
+    function updateAutoNoAdonan() {
+        let tglHPP = document.getElementById('log-tanggal') ? document.getElementById('log-tanggal').value : null;
+        if(tglHPP && document.getElementById('log-no-adonan')) {
+            let hitungHPP = laporanPenggunaan.filter(x => x.tgl === tglHPP).length;
+            document.getElementById('log-no-adonan').value = "A-" + ((hitungHPP + 1) < 10 ? "0" + (hitungHPP + 1) : (hitungHPP + 1));
+        }
+        let tglChk = document.getElementById('chk-tanggal') ? document.getElementById('chk-tanggal').value : null;
+        if(tglChk && document.getElementById('chk-no-adonan')) {
+            let hitungChk = checklistHistory.filter(x => x.tgl === tglChk).length;
+            document.getElementById('chk-no-adonan').value = "A-" + ((hitungChk + 1) < 10 ? "0" + (hitungChk + 1) : (hitungChk + 1));
+        }
+    }
+    setTimeout(() => {
+        const inputUser = document.getElementById('login-user');
+        const inputPinLgn = document.getElementById('login-pin');
+        
+        if (inputUser) {
+            inputUser.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if(this.value.trim() !== '') inputPinLgn.focus();
+                }
+            });
+        }
+        if (inputPinLgn) {
+            inputPinLgn.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    prosesLogin();
+                }
+            });
+        }
+    }, 500); // Beri jeda 0.5 detik agar elemen form pasti sudah ter-render
 </script>
 </body>
 </html>
