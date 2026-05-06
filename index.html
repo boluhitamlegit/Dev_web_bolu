@@ -218,8 +218,6 @@
             .hide-mobile { display: none; }
             .btn-gembok { padding: 8px 12px; font-size: 14px; }
             .footer { margin-top: 0px; padding-bottom: 20px; }
-            
-            /* --- LAYOUT CARDS & HEADER --- */
             .page-container { padding: 15px 10px; }
             .card { padding: 20px 15px; border-radius: 16px;}
             .form-input-card { padding: 20px 15px; }
@@ -235,8 +233,6 @@
             .pesanan-item-row > input[type="text"] { width: 100% !important; flex: 0 0 100% !important; margin-bottom: 2px !important; }
             .pesanan-item-row .input-group { flex: 1 !important; max-width: none !important; }
             .pesanan-item-row button { width: 50px !important; flex: 0 0 50px !important; margin-top: 0 !important; }
-
-            /* --- TABEL RESPONSIVE --- */
             .table-responsive { border: none; background: transparent; overflow-x: hidden; }
             .table-responsive table, .table-responsive thead, .table-responsive tbody, .table-responsive th, .table-responsive td, .table-responsive tr { display: block; width: 100%; }
             .table-responsive thead { display: none; }
@@ -1213,12 +1209,12 @@
                 p.loyang += getVal(lap.qty);
             }
         });
-        initTabelHPP(); // Update & render ulang HPP berdasarkan data baru
+        initTabelHPP(); 
     }
 
     function populateLogProduk() {
         let selectLog = document.getElementById('log-produk');
-        let selectChk = document.getElementById('chk-produk'); // Dropdown untuk checklist page
+        let selectChk = document.getElementById('chk-produk'); 
         
         let optionsHtml = '<option value="">-- Pilih Produk --</option>';
         produkBolu.forEach(p => { optionsHtml += `<option value="${p.nama}">${p.nama}</option>`; });
@@ -1260,7 +1256,7 @@
         
         saveData();
         renderLaporanPenggunaan();
-        updateHPPFromLaporan(); // PENTING: Update HPP Otomatis
+        updateHPPFromLaporan();
         
         showToast("Data Penggunaan Berhasil Disimpan & HPP Diperbarui", "success");
         
@@ -1270,8 +1266,6 @@
 
         document.getElementById('log-no-adonan').value = '';
         document.getElementById('log-qty').value = '';
-        
-        // Memanggil fungsi ini agar No. Adonan otomatis bergeser ke nomor selanjutnya
         updateAutoNoAdonan();
     }
 
@@ -1283,12 +1277,9 @@
             tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-folder-open"></i><br>Belum ada laporan penggunaan bahan.</td></tr>`;
             return;
         }
-
-        // 1. Buat variabel penampung sementara
         let htmlContent = ''; 
 
         laporanPenggunaan.forEach((l, i) => {
-            // 2. Tambahkan ke variabel penampung, BUKAN ke DOM
             htmlContent += `<tr>
                 <td data-label="No. Adonan" style="font-weight:800;">${escapeHTML(l.no)}</td>
                 <td data-label="Tanggal">${escapeHTML(l.tgl)}</td>
@@ -1301,8 +1292,6 @@
                 </td>
             </tr>`;
         });
-        
-        // 3. Render ke layar HANYA SATU KALI
         tbody.innerHTML = htmlContent; 
     }
     
@@ -1390,8 +1379,6 @@
                     ]);
                 }
             });
-
-            // Cetak Tabel ke PDF
             doc.autoTable({ 
                 startY: 65, 
                 head: [['Nama Bahan', 'Harga Satuan', 'Butuh (kg/adonan)', 'Tersedia (kg/adonan)', 'Sisa (kg/adonan)', 'Jml Butuh', 'Jml Belanja']], 
@@ -1501,8 +1488,6 @@
 
         document.getElementById('preview-checklist-content').innerHTML = htmlPreview;
         document.getElementById('preview-checklist-card').style.display = 'block';
-        
-        // Scroll slightly ke preview
         document.getElementById('preview-checklist-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
@@ -2169,11 +2154,9 @@
             if (!indicator) return;
             
             if (doc.metadata.hasPendingWrites) {
-                // Awan berubah Merah jika ada data ngantri
                 indicator.style.color = "var(--danger)";
                 indicator.title = "Data Menunggu Jaringan...";
             } else {
-                // Awan berubah Hijau jika aman
                 indicator.style.color = "var(--success)";
                 indicator.title = "Aman Tersinkron ke Cloud";
             }
@@ -2568,9 +2551,6 @@
     function buatTokenBaru() { let acak = Math.random().toString(36).substring(2, 8).toUpperCase(); daftarToken.push(acak); saveData(); document.getElementById('generate-token-display').value = acak; document.getElementById('count-token-aktif').innerText = daftarToken.length; showToast("Token dibuat!", "success"); }
     function tambahCabangBaru() { let input = document.getElementById('input-cabang-baru'); let val = input.value.trim(); if(!val) return; if(daftarCabang.includes(val)) return showToast("Cabang sudah ada!", "error"); daftarCabang.push(val); input.value = ''; saveData(); bukaModalAdminAuth(); showToast("Cabang ditambahkan", "success"); }
     function hapusCabang(idx) { confirmDelete("Hapus cabang ini?", () => { daftarCabang.splice(idx, 1); saveData(); bukaModalAdminAuth(); }); }
-    // ==========================================
-    // FUNGSI GANTI PIN PEGAWAI
-    // ==========================================
     function bukaModalGantiPinUser() {
         document.getElementById('change-pin-old').value = '';
         document.getElementById('change-pin-new').value = '';
