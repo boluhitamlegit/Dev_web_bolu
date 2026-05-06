@@ -58,7 +58,7 @@
         .nav-item { background: transparent; color: var(--text-muted); border: 1px solid transparent; padding: 10px 20px; border-radius: 30px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition); height: 45px; }
         .nav-item:hover { color: var(--primary); background: var(--accent); }
         .nav-item.active { background: var(--secondary); color: var(--primary); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-        .owner-menu { display: none; }
+        .owner-menu { display: none; align-items: center; gap: 10px; flex-direction: row; }
         
         .btn-gembok { background: var(--surface); color: var(--primary); border: 1px solid var(--border); padding: 10px 20px; border-radius: var(--radius-md); font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm); }
         .btn-gembok:hover { background: var(--secondary); transform: translate(2px, 2px); box-shadow: var(--shadow-hover); }
@@ -190,7 +190,7 @@
         @media (max-width: 768px) {
             .hamburger-btn { display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 24px; color: var(--primary); cursor: pointer; padding: 5px; }
             
-            /* Gunakan mode Sidebar murni yang rapi, hapus mode bottom-bar yang bentrok */
+            .owner-menu { flex-direction: column !important; align-items: flex-start !important; width: 100%; gap: 5px; }
             .nav-menu { 
                 position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; 
                 background: var(--surface); border-left: 2px solid var(--border); border-top: none;
@@ -305,7 +305,7 @@
 
     <div id="toast-container"></div>
 
-<div id="mobile-overlay" class="mobile-overlay-menu" onclick="toggleMobileMenu()"></div>
+    <div id="mobile-overlay" class="mobile-overlay-menu" onclick="toggleMobileMenu()"></div>
 
     <header class="header" id="main-header" style="display:none;">
         <div class="brand">
@@ -319,23 +319,49 @@
             <button class="nav-item" onclick="bukaPage('page-pesanan', this); toggleMobileMenu()" data-tooltip="Kelola Pesanan Pelanggan"><i class="fas fa-clipboard-list"></i> <span>Pesanan</span></button>
             <button class="nav-item" onclick="bukaPage('page-checklist', this); toggleMobileMenu()" data-tooltip="Checklist Bahan Pegawai"><i class="fas fa-clipboard-check"></i> <span>Checklist Bahan</span></button>
             
-            <div class="owner-menu" id="owner-menu" style="display: none; align-items: center; gap: 10px;">
+            <div class="owner-menu" id="owner-menu">
                 <span class="hide-desktop" style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px;">MENU OWNER</span>
                 <button class="nav-item" onclick="bukaPage('page-dashboard', this); toggleMobileMenu()" data-tooltip="Laporan Finansial Owner"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
                 <button class="nav-item" onclick="bukaPage('page-kas', this); toggleMobileMenu()" data-tooltip="Buku Kas & Analitik"><i class="fas fa-wallet"></i> <span>Buku Kas</span></button>
             </div>
+
+            <div class="hide-desktop" style="width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px; display: flex; flex-direction: column; gap: 5px;">
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px;">AKUN SAYA</span>
+                <button class="nav-item" onclick="bukaModalGantiPinUser(); toggleMobileMenu()" style="width: 100%; justify-content: flex-start;">
+                    <i class="fas fa-cog" style="color: var(--primary);"></i> <span style="color: var(--primary);">Ganti PIN Saya</span>
+                </button>
+                <button class="nav-item" onclick="logoutUser(); toggleMobileMenu()" style="width: 100%; justify-content: flex-start;">
+                    <i class="fas fa-sign-out-alt" style="color: var(--danger);"></i> <span style="color: var(--danger);">Keluar (Logout)</span>
+                </button>
+            </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="btn" style="background: var(--surface); color: var(--primary); border-color: var(--border); font-weight: 800; display: flex; align-items: center; gap: 8px; padding: 8px 12px; min-height: 40px;" onclick="logoutUser()">
-                <i class="fas fa-user-circle" style="font-size: 18px; color: var(--secondary);"></i>
-                <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
-                    <span id="display-user-name" class="hide-mobile" style="font-size: 12px;">User</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <style>
+                @media (max-width: 768px) {
+                    .desktop-only-btn { display: none !important; }
+                }
+            </style>
+
+            <div id="sync-indicator" class="hide-mobile" style="font-size: 22px; color: var(--success); display: flex; align-items: center; cursor: help; margin-right: 5px;" title="Tersinkron ke Cloud">
+                <i class="fas fa-cloud"></i>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; background: var(--surface); border: 2px solid var(--border); padding: 0 14px 0 6px; border-radius: 30px; box-shadow: 2px 2px 0 var(--border); height: 40px; max-width: 160px;">
+                <div style="background: var(--secondary); border-radius: 50%; width: 26px; height: 26px; min-width: 26px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                    <i class="fas fa-user" style="color: var(--primary); font-size: 12px;"></i>
                 </div>
-                <i class="fas fa-sign-out-alt hide-mobile" style="margin-left: 5px; color: var(--danger);" title="Logout"></i>
+                <span id="display-user-name" style="font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">User</span>
+            </div>
+
+            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--primary); padding: 0; width: 40px; height: 40px; min-height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); box-shadow: 2px 2px 0 var(--border);" onclick="bukaModalGantiPinUser()" title="Ganti PIN Saya">
+                <i class="fas fa-cog" style="font-size: 16px;"></i>
             </button>
-            
-            <button class="hamburger-btn hide-desktop" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+
+            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--danger); padding: 0; width: 40px; height: 40px; min-height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--danger); box-shadow: 2px 2px 0 var(--danger);" onclick="logoutUser()" title="Keluar">
+                <i class="fas fa-sign-out-alt" style="font-size: 16px;"></i>
+            </button>
+
+            <button class="hamburger-btn hide-desktop" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         </div>
     </header>
     <div id="auth-screen" style="position: fixed; inset: 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
@@ -526,17 +552,37 @@
                 <div class="form-group">
                     <label>Jenis Satuan</label>
                     <select id="new-b-satuan" class="custom-select" onchange="updateBahanUnitLabel()">
-                    <option value="kg">Resep Gram (-> kg)</option>
-                    <option value="pcs">Resep Absolut (-> pcs)</option>
-                </select>
+                        <option value="kg">Resep Gram (-> kg)</option>
+                        <option value="pcs">Resep Absolut (-> pcs)</option>
+                    </select>
                 </div>
             </div>
-
             <div class="resep-container" style="background: var(--accent); padding: 20px; border-radius: var(--radius-md); margin-top: 20px; margin-bottom: 25px; border: 1px solid var(--border);">
                 <label style="font-weight:800; font-size:13px; color:var(--primary); display:block; margin-bottom:15px; text-transform: uppercase;">Kebutuhan di tiap Bolu (per 1 Adonan) (kg / adonan):</label>
                 <div id="form-bahan-dinamis" class="form-grid"></div>
             </div>
             <button class="btn btn-success" style="width: 100%;" onclick="simpanBahanBaru()"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud</button>
+        </div>
+    </div>
+
+    <div id="modal-ganti-pin-user" class="modal-overlay">
+        <div class="modal-box" style="max-width: 400px;">
+            <button class="btn-close" onclick="tutupModal('modal-ganti-pin-user')">&times;</button>
+            <h2><i class="fas fa-key" style="color:var(--primary);"></i> Ganti PIN Saya</h2>
+            <p>Silakan buat PIN baru yang mudah Anda ingat.</p>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>PIN Saat Ini (1234)</label>
+                <input type="password" id="change-pin-old" placeholder="Masukkan PIN lama..." style="letter-spacing: 4px;">
+            </div>
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label>PIN Baru</label>
+                <input type="password" id="change-pin-new" placeholder="Masukkan PIN baru..." style="letter-spacing: 4px;">
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%;" onclick="eksekusiGantiPin()">
+                <i class="fas fa-save"></i> Perbarui PIN Saya
+            </button>
         </div>
     </div>
 
@@ -899,21 +945,28 @@
             return false;
         }
     }
-    let isModeEditHPP = false;
     let isFirebaseReady = false;
+    let isPersistenceEnabled = false;
+
     try {
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         db = firebase.firestore();
-        
-       
         db.enablePersistence({ synchronizeTabs: true })
-            .catch(function(err) {
-                console.warn("Peringatan: Gagal mengaktifkan cache offline Firebase:", err.code);
+            .then(() => {
+                isPersistenceEnabled = true;
+                console.log("Persistence aktif: Data tersimpan di storage lokal.");
+            })
+            .catch((err) => {
+                if (err.code == 'failed-precondition') {
+                    showToast("Peringatan: Banyak tab terbuka. Sinkronisasi offline terbatas.", "error");
+                } else if (err.code == 'unimplemented') {
+                    showToast("Browser tidak mendukung penyimpanan offline (Incognito?).", "error");
+                }
             });
         
         isFirebaseReady = true;
     } catch (e) {
-        console.warn("Koneksi Firebase gagal. Menggunakan penyimpanan Offline (LocalStorage).");
+        console.warn("Gagal inisialisasi Firebase.");
     }
 
     const STORAGE_KEY = 'boluSakinahData_CloudV6';
@@ -1038,19 +1091,28 @@
 
     let saveTimeout;
     function saveData() {
-        
-        setTimeout(() => {
-            saveToLocal();
-        }, 0);
+        setTimeout(() => { saveToLocal(); }, 0);
         
         if(!isFirebaseReady) return;
+        if (!navigator.onLine) {
+            let indicator = document.getElementById('sync-indicator');
+            if(indicator) {
+                indicator.style.color = "var(--danger)";
+                indicator.title = "Offline (Tersimpan Lokal)";
+            }
+        }
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
-            db.collection('bolu_sakinah').doc('produksi').set(cleanData({ produkBolu, bahanBaku, pesanan, laporanPenggunaan, checklistHistory })).catch(e=>console.warn(e));
-            db.collection('bolu_sakinah').doc('kas').set(cleanData({ kas })).catch(e=>console.warn(e));
-            db.collection('bolu_sakinah').doc('laba').set(cleanData({ ownerBeban })).catch(e=>console.warn(e));
-            db.collection('bolu_sakinah').doc('auth_data').set(cleanData({ daftarUser, daftarCabang, daftarToken })).catch(e=>console.warn(e));
-        }, 1500); 
+            const dataToSave = cleanData({ produkBolu, bahanBaku, pesanan, laporanPenggunaan, checklistHistory });
+            db.collection('bolu_sakinah').doc('produksi').set(dataToSave, { merge: true })
+                .then(() => {
+                    console.log("Cloud Sync Success");
+                })
+                .catch(e => {
+                    console.error("Cloud Sync Failed", e);
+                });
+   
+        }, 2000); 
     }
 
     function loadData() {
@@ -1130,7 +1192,7 @@
         } catch (error) {
             console.error("Terjadi bentrokan data lama:", error);
         } finally {
-            hideLoading(); 
+            hideLoading(); monitorSyncStatus();
         }
     }
     function updateHPPFromLaporan() {
@@ -1168,7 +1230,6 @@
 
         if(!no || !tgl || !prod || qty <= 0 || !petugas) return showToast("Harap isi semua data form laporan dengan benar!", "error");
 
-        // --- TAMBAHKAN VALIDASI DUPLIKAT DI SINI ---
         let isDuplicate = laporanPenggunaan.some(lap => lap.no.toLowerCase() === no.toLowerCase());
         if (isDuplicate) {
             document.getElementById('log-no-adonan').classList.add('invalid');
@@ -1176,7 +1237,7 @@
         } else {
             document.getElementById('log-no-adonan').classList.remove('invalid');
         }
-        // -------------------------------------------
+    
 
         laporanPenggunaan.push({
             id: "lap_" + Date.now(),
@@ -2088,7 +2149,23 @@
             logActivity("DELETE", "Menghapus transaksi dari Buku Kas"); 
         }); 
     }
-
+    function monitorSyncStatus() {
+        if (!isFirebaseReady) return;
+        db.collection('bolu_sakinah').doc('produksi').onSnapshot({ includeMetadataChanges: true }, (doc) => {
+            const indicator = document.getElementById('sync-indicator');
+            if (!indicator) return;
+            
+            if (doc.metadata.hasPendingWrites) {
+                // Awan berubah Merah jika ada data ngantri
+                indicator.style.color = "var(--danger)";
+                indicator.title = "Data Menunggu Jaringan...";
+            } else {
+                // Awan berubah Hijau jika aman
+                indicator.style.color = "var(--success)";
+                indicator.title = "Aman Tersinkron ke Cloud";
+            }
+        });
+    }
     function bukaModalProduk() { 
         const container = document.getElementById('form-resep-dinamis'); 
         container.innerHTML = ''; 
@@ -2167,31 +2244,6 @@
         showToast('Bahan berhasil ditambahkan dan disinkronkan'); 
     }
 
-
-    function bukaModalGantiPin() {
-        document.getElementById('pin-lama').value = '';
-        document.getElementById('pin-baru').value = '';
-        const modal = document.getElementById('ganti-pin-modal');
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => modal.classList.add('show'));
-    }
-
-    function simpanPinBaru() {
-        let lama = document.getElementById('pin-lama').value;
-        let baru = document.getElementById('pin-baru').value;
-        let pLamaLower = lama.toLowerCase();
-        let validLama = (lama === window.appPin || pLamaLower === "ghazy2184" || pLamaLower === "ghazy abiyyu maulana 2184");
-        
-        if (!validLama) { return showToast("PIN Lama / Master Key salah!", "error"); }
-        if (baru.length < 4) { return showToast("PIN Baru minimal 4 karakter!", "error"); }
-
-        window.appPin = baru;
-        localStorage.setItem('bolu_pin', window.appPin);
-        if (isFirebaseReady) { db.collection('bolu_sakinah').doc('settings').set({ pin: window.appPin }, { merge: true }).catch(e => console.warn("Gagal simpan PIN ke Cloud", e)); }
-
-        showToast("PIN Berhasil diganti!", "success");
-        tutupModal('ganti-pin-modal');
-    }
 
     function bukaPage(pageId, element) { 
         document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active')); 
@@ -2284,7 +2336,8 @@
         }
         
     };
-
+    let failCount = 0;
+    let lockUntil = 0;
     function switchAuthMode(mode) {
         if (mode === 'register') {
             document.getElementById('form-login-box').style.display = 'none';
@@ -2298,12 +2351,8 @@
         }
     }
 
-    let failCount = 0;
-    let lockUntil = 0;
 
-    function switchAuthMode(mode) {
 
-    }
 
     function prosesLogin() {
         if (Date.now() < lockUntil) {
@@ -2355,8 +2404,8 @@
 
         let ownerMenu = document.getElementById('owner-menu');
         if (userObj.role === "owner") {
-            ownerMenu.style.display = window.innerWidth <= 768 ? 'flex' : 'flex';
-            if (window.innerWidth <= 768) ownerMenu.style.flexDirection = 'column';
+            ownerMenu.style.display = 'flex';
+            
             bukaPage('page-dashboard', document.querySelectorAll('.nav-item[onclick*="page-dashboard"]')[0]);
             showToast(`Selamat datang Owner, ${userObj.username}`, 'success');
         } else {
@@ -2449,7 +2498,9 @@
                 ? '<span style="background:var(--primary); color:var(--secondary); padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800; margin-left:5px;">OWNER</span>' 
                 : '<span style="background:var(--accent); color:var(--text-muted); padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800; margin-left:5px;">PEGAWAI</span>';
 
-            let infoPin = `<span style="background: #fff3cd; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 800; border: 1px dashed #f59e0b;"><i class="fas fa-key"></i> PIN: ${escapeHTML(u.pin)}</span>`;
+            let infoPin = `<button class="btn" style="background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 6px; font-weight: 800; border: 1px dashed #ef4444; font-size: 11px; cursor: pointer;" onclick="resetPinPegawai(${i}, '${escapeHTML(u.username)}')">
+                <i class="fas fa-sync-alt"></i> Reset PIN ke 1234
+            </button>`;
 
             pegawaiHtml += `<li style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border-light); align-items:center; background: ${u.role === 'owner' ? '#f8fafc' : '#fff'};">
                 <div style="line-height: 1.6;">
@@ -2493,11 +2544,63 @@
             daftarUser.splice(idx, 1); saveData(); bukaModalAdminAuth();
         });
     }
-
+    function resetPinPegawai(idx, namaPegawai) {
+        if (confirm(`Apakah Anda yakin ingin me-reset PIN milik ${namaPegawai} menjadi 1234?`)) {
+            daftarUser[idx].pin = "1234";
+            saveData();
+            showToast(`PIN ${namaPegawai} berhasil direset ke 1234`, "success");
+            bukaModalAdminAuth();
+        }
+    }
     function buatTokenBaru() { let acak = Math.random().toString(36).substring(2, 8).toUpperCase(); daftarToken.push(acak); saveData(); document.getElementById('generate-token-display').value = acak; document.getElementById('count-token-aktif').innerText = daftarToken.length; showToast("Token dibuat!", "success"); }
     function tambahCabangBaru() { let input = document.getElementById('input-cabang-baru'); let val = input.value.trim(); if(!val) return; if(daftarCabang.includes(val)) return showToast("Cabang sudah ada!", "error"); daftarCabang.push(val); input.value = ''; saveData(); bukaModalAdminAuth(); showToast("Cabang ditambahkan", "success"); }
     function hapusCabang(idx) { confirmDelete("Hapus cabang ini?", () => { daftarCabang.splice(idx, 1); saveData(); bukaModalAdminAuth(); }); }
+    // ==========================================
+    // FUNGSI GANTI PIN PEGAWAI
+    // ==========================================
+    function bukaModalGantiPinUser() {
+        document.getElementById('change-pin-old').value = '';
+        document.getElementById('change-pin-new').value = '';
+        const modal = document.getElementById('modal-ganti-pin-user');
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('show'));
+    }
 
+    function eksekusiGantiPin() {
+        let pinLama = document.getElementById('change-pin-old').value;
+        let pinBaru = document.getElementById('change-pin-new').value;
+
+        if (!pinLama || !pinBaru) return showToast("Semua kolom harus diisi!", "error");
+        if (pinBaru.length < 4) return showToast("PIN baru minimal 4 digit!", "error");
+
+        let userIdx = daftarUser.findIndex(u => u.id === sesiAktif.id);
+
+        if (userIdx !== -1) {
+            if (daftarUser[userIdx].pin !== pinLama) {
+                return showToast("PIN lama yang Anda masukkan salah!", "error");
+            }
+
+            daftarUser[userIdx].pin = pinBaru;
+            
+            if (isFirebaseReady) {
+                db.collection('bolu_sakinah').doc('auth_data').set({
+                    daftarUser: daftarUser,
+                    daftarCabang: daftarCabang,
+                    daftarToken: daftarToken
+                }, { merge: true }).then(() => {
+                    showToast("PIN berhasil diperbarui!", "success");
+                    tutupModal('modal-ganti-pin-user');
+                    saveToLocal();
+                }).catch(e => {
+                    showToast("Gagal menyambung ke Cloud", "error");
+                });
+            } else {
+                saveToLocal();
+                showToast("PIN tersimpan secara lokal", "success");
+                tutupModal('modal-ganti-pin-user');
+            }
+        }
+    }
     function updateAutoNoAdonan() {
         let tglHPP = document.getElementById('log-tanggal') ? document.getElementById('log-tanggal').value : null;
         if(tglHPP && document.getElementById('log-no-adonan')) {
