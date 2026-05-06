@@ -370,15 +370,15 @@
             <button class="hamburger-btn hide-desktop" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; margin-left: 2px;" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         </div>
     </header>
-    <div id="auth-screen" style="position: fixed; inset: 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div id="auth-screen" style="position: fixed; inset: 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; flex-direction: column;">
         
         <div id="form-login-box" class="modal-box" style="box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: none; border-radius: 28px; width: 100%; max-width: 400px; padding: 45px 35px; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 35px;">
-                <div style="background: linear-gradient(135deg, var(--secondary) 0%, #85d628 100%); width: 75px; height: 75px; border-radius: 22px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 18px; box-shadow: 0 10px 20px rgba(185, 255, 102, 0.3);">
-                    <i class="fas fa-cookie-bite" style="font-size: 38px; color: var(--primary);"></i>
+                <div style="background: var(--secondary); width: 70px; height: 70px; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(185, 255, 102, 0.3);">
+                    <i class="fas fa-cookie-bite" style="font-size: 32px; color: var(--primary);"></i>
                 </div>
-                <h2 style="font-size: 26px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; margin: 0 0 6px 0;">Bolu Sakinah</h2>
-                <p style="color: var(--text-muted); font-size: 13.5px; font-weight: 500; margin: 0;">Sistem Manajemen Operasional</p>
+                <h2 style="font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 8px 0; letter-spacing: -0.5px;">Bolu Sakinah</h2>
+                <p style="margin:0; font-size: 13px; color: var(--text-muted); font-weight: 500;">Sistem Manajemen Operasional</p>
             </div>
             
             <div class="form-group" style="margin-bottom: 20px;">
@@ -395,7 +395,9 @@
                     <span class="input-prefix" style="color: var(--text-muted);"><i class="fas fa-lock"></i></span>
                     <input type="password" id="login-pin" class="has-prefix" placeholder="••••••" autocomplete="off" style="border: 1px solid #e2e8f0; border-radius: 14px; height: 54px; font-size: 20px; letter-spacing: 4px; background: #f8fafc; transition: all 0.3s;">
                 </div>
-            </div> <div style="text-align: right; margin-bottom: 30px;">
+            </div> 
+            
+            <div style="text-align: right; margin-bottom: 30px;">
                 <a href="#" onclick="alert('Lupa PIN? Silahkan hubungi Owner / Admin untuk mereset akun Anda.'); return false;" style="color: var(--text-muted); font-size: 12.5px; font-weight: 600; text-decoration: none; transition: color 0.2s;">Lupa PIN?</a>
             </div>
             
@@ -444,6 +446,15 @@
                 Kembali ke Login
             </button>
         </div>
+
+        <div style="margin-top: 30px; text-align: center; color: var(--text-muted); font-family: 'Plus Jakarta Sans', sans-serif;">
+            <div style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">
+                &copy; 2026 <span style="color: var(--primary);">Bolu Sakinah</span>. All rights reserved.
+            </div>
+            <div style="margin-top: 8px; font-size: 11px; font-weight: 600; opacity: 0.7;">
+                Sistem Manajemen Operasional &bull; <span style="color: var(--primary); letter-spacing: 1px;">GHAZY</span>
+            </div>
+        </div>
     </div>
 
     <div id="admin-auth-modal" class="modal-overlay">
@@ -480,7 +491,6 @@
                             <input type="text" id="generate-token-display" readonly style="font-weight: 800; text-align:center; letter-spacing: 2px; background: #fff;" placeholder="-----">
                             <button class="btn btn-primary" onclick="buatTokenBaru()">Buat</button>
                         </div>
-                        <div style="font-size: 12px; font-weight:800; color:var(--text-muted);">Token belum terpakai: <span id="count-token-aktif" style="color:var(--danger); font-size: 14px;">0</span></div>
                     </div>
 
                     <div style="background: var(--surface); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border); flex: 1;">
@@ -578,7 +588,7 @@
             <p>Silakan buat PIN baru yang mudah Anda ingat.</p>
             
             <div class="form-group" style="margin-bottom: 15px;">
-                <label>PIN Saat Ini (1234)</label>
+                <label>PIN Saat Ini</label>
                 <input type="password" id="change-pin-old" placeholder="Masukkan PIN lama..." style="letter-spacing: 4px;">
             </div>
             <div class="form-group" style="margin-bottom: 25px;">
@@ -916,6 +926,7 @@
     let sesiAktif = null; 
     let db;
     let isPdfLoaded = false;
+    let isModeEditHPP = false;
     
     function loadScript(src) {
         return new Promise((resolve, reject) => {
@@ -1088,14 +1099,19 @@
             overlay.classList.toggle('open');
         }
     }
-    function saveToLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ produkBolu, bahanBaku, pesanan, kas, ownerBeban, laporanPenggunaan, checklistHistory })); }
+    function saveToLocal() { 
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
+            produkBolu, bahanBaku, pesanan, kas, ownerBeban, laporanPenggunaan, checklistHistory,
+            daftarUser, daftarCabang, daftarToken
+        })); 
+    }
 
     function logActivity(action, note) {
         if(!isFirebaseReady) return;
         db.collection('bolu_sakinah_log').add({ action, note, timestamp: firebase.firestore.FieldValue.serverTimestamp(), user: "System", date: new Date().toISOString() }).catch(e => console.warn(e));
     }
 
-    let saveTimeout;
+let saveTimeout;
     function saveData() {
         setTimeout(() => { saveToLocal(); }, 0);
         
@@ -1107,16 +1123,22 @@
                 indicator.title = "Offline (Tersimpan Lokal)";
             }
         }
+        
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
             const dataToSave = cleanData({ produkBolu, bahanBaku, pesanan, laporanPenggunaan, checklistHistory });
-            db.collection('bolu_sakinah').doc('produksi').set(dataToSave, { merge: true })
-                .then(() => {
-                    console.log("Cloud Sync Success");
-                })
-                .catch(e => {
-                    console.error("Cloud Sync Failed", e);
-                });
+            db.collection('bolu_sakinah').doc('produksi').set(dataToSave, { merge: true });
+
+            db.collection('bolu_sakinah').doc('kas').set({ kas: cleanData({kas}).kas }, { merge: true });
+   
+            db.collection('bolu_sakinah').doc('laba').set({ ownerBeban: ownerBeban }, { merge: true });
+            db.collection('bolu_sakinah').doc('auth_data').set({
+                daftarUser: daftarUser,
+                daftarCabang: daftarCabang,
+                daftarToken: daftarToken
+            }, { merge: true })
+            .then(() => console.log("Semua Data Berhasil Tersinkron ke Cloud"))
+            .catch(e => console.error("Cloud Sync Failed", e));
    
         }, 2000); 
     }
@@ -1170,6 +1192,9 @@
                 if(parsed.ownerBeban) ownerBeban = parsed.ownerBeban;
                 if(parsed.laporanPenggunaan) laporanPenggunaan = parsed.laporanPenggunaan;
                 if(parsed.checklistHistory) checklistHistory = parsed.checklistHistory;
+                if(parsed.daftarUser) daftarUser = parsed.daftarUser;
+                if(parsed.daftarCabang) daftarCabang = parsed.daftarCabang;
+                if(parsed.daftarToken) daftarToken = parsed.daftarToken;
             } catch(e) { console.error("Data load error", e); }
         } else {
             let todayStr = new Date().toISOString().slice(0,10);
@@ -2475,7 +2500,6 @@
     }
 
     function bukaModalAdminAuth() {
-        document.getElementById('count-token-aktif').innerText = daftarToken.length;
         
         let ulCabang = document.getElementById('list-cabang-admin');
         let cabangHtml = '';
@@ -2548,7 +2572,13 @@
             bukaModalAdminAuth();
         }
     }
-    function buatTokenBaru() { let acak = Math.random().toString(36).substring(2, 8).toUpperCase(); daftarToken.push(acak); saveData(); document.getElementById('generate-token-display').value = acak; document.getElementById('count-token-aktif').innerText = daftarToken.length; showToast("Token dibuat!", "success"); }
+    function buatTokenBaru() { 
+        let acak = Math.random().toString(36).substring(2, 8).toUpperCase(); 
+        daftarToken.push(acak); 
+        saveData(); 
+        document.getElementById('generate-token-display').value = acak; 
+        showToast("Token dibuat!", "success"); 
+    }
     function tambahCabangBaru() { let input = document.getElementById('input-cabang-baru'); let val = input.value.trim(); if(!val) return; if(daftarCabang.includes(val)) return showToast("Cabang sudah ada!", "error"); daftarCabang.push(val); input.value = ''; saveData(); bukaModalAdminAuth(); showToast("Cabang ditambahkan", "success"); }
     function hapusCabang(idx) { confirmDelete("Hapus cabang ini?", () => { daftarCabang.splice(idx, 1); saveData(); bukaModalAdminAuth(); }); }
     function bukaModalGantiPinUser() {
