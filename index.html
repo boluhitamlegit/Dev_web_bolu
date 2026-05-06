@@ -265,6 +265,22 @@
             
             .modal-box { padding: 30px 20px; }
         }
+        #sync-text { display: none !important; } 
+        
+        @media (min-width: 769px) {
+            .desktop-only-btn { display: flex !important; }
+            #owner-menu { flex-direction: row !important; align-items: center !important; width: auto !important; flex-wrap: nowrap !important; }
+            .header-right-actions { gap: 12px !important; }
+            #user-capsule { max-width: 250px !important; }
+        }
+
+        @media (max-width: 768px) {
+            .desktop-only-btn { display: none !important; }
+            .header { padding: 0 10px !important; } 
+            .brand { gap: 5px !important; font-size: 16px !important; white-space: nowrap; }
+            .brand i { padding: 4px !important; font-size: 14px !important; }
+            #user-capsule { max-width: 110px !important; }
+        }
     </style>
 </head>
 <body>
@@ -309,20 +325,20 @@
 
     <header class="header" id="main-header" style="display:none;">
         <div class="brand">
-            <i class="fas fa-cookie-bite"></i> Bolu Sakinah
+            <i class="fas fa-cookie-bite"></i> <span>Bolu Sakinah</span>
         </div>
         
         <div class="nav-menu" id="nav-menu-container">
-            <button class="hamburger-btn hide-desktop" style="position: absolute; top: 20px; right: 20px;" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
+            <button class="hamburger-btn hide-desktop" style="position: absolute; top: 15px; right: 15px; width: 40px; height: 40px;" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
 
-            <button class="nav-item active" onclick="bukaPage('page-hpp', this); toggleMobileMenu()" data-tooltip="Stok & Produksi"><i class="fas fa-calculator"></i> <span>Stok & Produksi</span></button>
-            <button class="nav-item" onclick="bukaPage('page-pesanan', this); toggleMobileMenu()" data-tooltip="Kelola Pesanan Pelanggan"><i class="fas fa-clipboard-list"></i> <span>Pesanan</span></button>
-            <button class="nav-item" onclick="bukaPage('page-checklist', this); toggleMobileMenu()" data-tooltip="Checklist Bahan Pegawai"><i class="fas fa-clipboard-check"></i> <span>Checklist Bahan</span></button>
+            <button class="nav-item active" onclick="bukaPage('page-hpp', this); toggleMobileMenu()"><i class="fas fa-calculator"></i> <span>Stok & Produksi</span></button>
+            <button class="nav-item" onclick="bukaPage('page-pesanan', this); toggleMobileMenu()"><i class="fas fa-clipboard-list"></i> <span>Pesanan</span></button>
+            <button class="nav-item" onclick="bukaPage('page-checklist', this); toggleMobileMenu()"><i class="fas fa-clipboard-check"></i> <span>Checklist Bahan</span></button>
             
             <div class="owner-menu" id="owner-menu">
                 <span class="hide-desktop" style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px;">MENU OWNER</span>
-                <button class="nav-item" onclick="bukaPage('page-dashboard', this); toggleMobileMenu()" data-tooltip="Laporan Finansial Owner"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
-                <button class="nav-item" onclick="bukaPage('page-kas', this); toggleMobileMenu()" data-tooltip="Buku Kas & Analitik"><i class="fas fa-wallet"></i> <span>Buku Kas</span></button>
+                <button class="nav-item" onclick="bukaPage('page-dashboard', this); toggleMobileMenu()"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
+                <button class="nav-item" onclick="bukaPage('page-kas', this); toggleMobileMenu()"><i class="fas fa-wallet"></i> <span>Buku Kas</span></button>
             </div>
 
             <div class="hide-desktop" style="width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px; display: flex; flex-direction: column; gap: 5px;">
@@ -336,32 +352,26 @@
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <style>
-                @media (max-width: 768px) {
-                    .desktop-only-btn { display: none !important; }
-                }
-            </style>
-
-            <div id="sync-indicator" class="hide-mobile" style="font-size: 22px; color: var(--success); display: flex; align-items: center; cursor: help; margin-right: 5px;" title="Tersinkron ke Cloud">
+        <div class="header-right-actions" style="display: flex; align-items: center; gap: 6px;">
+            <div id="sync-indicator" class="hide-mobile" style="font-size: 20px; color: var(--success); display: flex; align-items: center; cursor: help;" title="Tersinkron ke Cloud">
                 <i class="fas fa-cloud"></i>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px; background: var(--surface); border: 2px solid var(--border); padding: 0 14px 0 6px; border-radius: 30px; box-shadow: 2px 2px 0 var(--border); height: 40px; max-width: 160px;">
-                <div style="background: var(--secondary); border-radius: 50%; width: 26px; height: 26px; min-width: 26px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
-                    <i class="fas fa-user" style="color: var(--primary); font-size: 12px;"></i>
+
+            <div id="user-capsule" style="display: flex; align-items: center; gap: 6px; background: var(--surface); border: 2px solid var(--border); padding: 0 10px 0 4px; border-radius: 30px; box-shadow: 2px 2px 0 var(--border); height: 36px;">
+                <div style="background: var(--secondary); border-radius: 50%; width: 24px; height: 24px; min-width: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                    <i class="fas fa-user" style="color: var(--primary); font-size: 11px;"></i>
                 </div>
-                <span id="display-user-name" style="font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">User</span>
+                <span id="display-user-name" style="font-size: 12.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">User</span>
             </div>
 
-            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--primary); padding: 0; width: 40px; height: 40px; min-height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); box-shadow: 2px 2px 0 var(--border);" onclick="bukaModalGantiPinUser()" title="Ganti PIN Saya">
-                <i class="fas fa-cog" style="font-size: 16px;"></i>
+            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--primary); padding: 0; width: 36px; height: 36px; min-height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); box-shadow: 2px 2px 0 var(--border);" onclick="bukaModalGantiPinUser()" title="Ganti PIN Saya">
+                <i class="fas fa-cog" style="font-size: 14px;"></i>
+            </button>
+            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--danger); padding: 0; width: 36px; height: 36px; min-height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--danger); box-shadow: 2px 2px 0 var(--danger);" onclick="logoutUser()" title="Keluar">
+                <i class="fas fa-sign-out-alt" style="font-size: 14px;"></i>
             </button>
 
-            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--danger); padding: 0; width: 40px; height: 40px; min-height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--danger); box-shadow: 2px 2px 0 var(--danger);" onclick="logoutUser()" title="Keluar">
-                <i class="fas fa-sign-out-alt" style="font-size: 16px;"></i>
-            </button>
-
-            <button class="hamburger-btn hide-desktop" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+            <button class="hamburger-btn hide-desktop" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; margin-left: 2px;" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         </div>
     </header>
     <div id="auth-screen" style="position: fixed; inset: 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
@@ -1665,8 +1675,11 @@
             if(snap.empty) html += '<li>Belum ada data aktivitas.</li>';
             snap.forEach(doc => {
                 let d = doc.data(); let time = d.timestamp ? new Date(d.timestamp.toDate()).toLocaleString('id-ID') : d.date;
-                let color = d.action === 'DELETE' ? 'var(--danger)' : (d.action === 'CREATE' ? 'var(--secondary)' : 'var(--primary)');
-                html += `<li style="padding: 12px 0; border-bottom: 1px solid var(--border-light);"><strong style="color:var(--primary); background:${color}; padding:2px 8px; border-radius:4px; font-size:12px;">${d.action}</strong> - ${d.note} <br><small style="color:var(--text-muted); display:inline-block; margin-top:5px;"><i class="far fa-clock"></i> ${time}</small></li>`;
+                let bgColor = d.action === 'DELETE' ? 'var(--danger)' : (d.action === 'CREATE' ? 'var(--secondary)' : 'var(--primary)');
+                let txtColor = d.action === 'CREATE' ? 'var(--primary)' : 'var(--surface)';
+                if (d.action === 'INTEGRATION') txtColor = 'var(--secondary)'; 
+                
+                html += `<li style="padding: 12px 0; border-bottom: 1px solid var(--border-light);"><strong style="color:${txtColor}; background:${bgColor}; padding:2px 8px; border-radius:4px; font-size:12px;">${d.action}</strong> - ${d.note} <br><small style="color:var(--text-muted); display:inline-block; margin-top:5px;"><i class="far fa-clock"></i> ${time}</small></li>`;
             }); html += '</ul>';
             document.getElementById('activity-log-content').innerHTML = html; hideLoading();
             document.getElementById('activity-modal').style.display = 'flex'; requestAnimationFrame(() => document.getElementById('activity-modal').classList.add('show'));
