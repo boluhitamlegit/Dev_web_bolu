@@ -50,7 +50,14 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; padding-top: 75px; color: var(--text-main); font-size: 14px; line-height: 1.6; }
    
-        .header { background: var(--surface); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; border-bottom: 2px solid var(--border); height: 75px; }
+        .header { 
+        background: rgba(255, 255, 255, 0.85); 
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px);
+        display: flex; justify-content: space-between; align-items: center; 
+        padding: 0 25px; position: fixed; top: 0; left: 0; right: 0; width: 100%; 
+        z-index: 1000; border-bottom: 2px solid var(--border); height: 75px; 
+        }
         .brand { color: var(--primary); font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
         .brand i { color: var(--secondary); padding: 5px; background: var(--primary); border-radius: 8px; border: 1px solid var(--primary); }
         
@@ -181,8 +188,17 @@
         .spinner { border: 4px solid var(--accent); border-top: 4px solid var(--primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom:20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); font-weight: 700; background: var(--accent); border-radius: var(--radius-md); border: 2px dashed var(--border); }
-        .empty-state i { font-size: 45px; color: var(--primary); margin-bottom: 20px; background: var(--secondary); padding: 15px; border-radius: 50%; border: 1px solid var(--primary); box-shadow: 2px 2px 0 var(--primary); }
+        .empty-state { 
+        text-align: center; padding: 60px 20px; 
+        color: var(--text-muted); font-weight: 600; font-size: 14px;
+        background: #FAFAFA; border-radius: var(--radius-md); 
+        border: 2px dashed #CBD5E1; 
+        }
+        .empty-state i { 
+            font-size: 40px; color: var(--primary); margin-bottom: 15px; 
+            background: var(--secondary); padding: 18px; border-radius: 20px; 
+            border: 2px solid var(--primary); box-shadow: 4px 4px 0 var(--primary); 
+        }
 
         .footer { text-align: center; padding: 15px 10px; background: var(--surface); border-top: 2px solid var(--border); color: var(--text-muted); font-weight: 700; font-size: 12px; margin-top: 10px; }
         .footer b { color: var(--primary); }
@@ -277,6 +293,39 @@
             .brand i { padding: 4px !important; font-size: 14px !important; }
             #user-capsule { max-width: 110px !important; }
         }
+        input[type="number"], input[type="text"], select {
+        font-size: 16px !important; 
+        }
+        @media (max-width: 768px) {
+        .page-container { padding: 10px 10px 80px 10px !important; }
+        .stat-box h1 { font-size: 22px !important; }
+        .btn { height: 52px; }
+        }
+        .modal-overlay { 
+            backdrop-filter: none !important; 
+            -webkit-backdrop-filter: none !important;
+            background: rgba(25, 26, 35, 0.95) !important; 
+        }
+        button, .nav-item, a, input, select { 
+            touch-action: manipulation !important; 
+        }
+        :root { 
+            --transition: transform 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out, opacity 0.2s ease-out; 
+        }
+        .btn {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn:active { 
+            transform: translate(3px, 3px) !important; 
+            box-shadow: 0px 0px 0px transparent !important; 
+        }
+        input:focus, select:focus { 
+            border-color: var(--primary); 
+            background: var(--surface); 
+            box-shadow: 0 0 0 4px rgba(185, 255, 102, 0.4), 2px 2px 0 var(--border) !important; 
+            outline: none; 
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -327,16 +376,16 @@
         <div class="nav-menu" id="nav-menu-container">
             <button class="hamburger-btn hide-desktop" style="position: absolute; top: 15px; right: 15px; width: 40px; height: 40px;" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
 
-            <button class="nav-item active" onclick="bukaPage('page-hpp', this); toggleMobileMenu()"><i class="fas fa-calculator"></i> <span>Stok & Produksi</span></button>
-            <button class="nav-item" onclick="bukaPage('page-pesanan', this); toggleMobileMenu()"><i class="fas fa-clipboard-list"></i> <span>Pesanan</span></button>
+            <button class="nav-item active" onclick="bukaPage('page-pesanan', this); toggleMobileMenu()"><i class="fas fa-clipboard-list"></i> <span>Pesanan</span></button>
             <button class="nav-item" onclick="bukaPage('page-checklist', this); toggleMobileMenu()"><i class="fas fa-clipboard-check"></i> <span>Checklist Bahan</span></button>
             
             <div class="owner-menu" id="owner-menu">
                 <span class="hide-desktop" style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px;">MENU OWNER</span>
+                <button class="nav-item" onclick="bukaPage('page-hpp', this); toggleMobileMenu()"><i class="fas fa-calculator"></i> <span>Stok & Produksi</span></button>
                 <button class="nav-item" onclick="bukaPage('page-dashboard', this); toggleMobileMenu()"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
                 <button class="nav-item" onclick="bukaPage('page-kas', this); toggleMobileMenu()"><i class="fas fa-wallet"></i> <span>Buku Kas</span></button>
+                <button class="nav-item" onclick="bukaPage('page-pengaturan', this); toggleMobileMenu()"><i class="fas fa-cog"></i> <span>Pengaturan</span></button>
             </div>
-
             <div class="hide-desktop" style="width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px; display: flex; flex-direction: column; gap: 5px;">
                 <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px;">AKUN SAYA</span>
                 <button class="nav-item" onclick="bukaModalGantiPinUser(); toggleMobileMenu()" style="width: 100%; justify-content: flex-start;">
@@ -404,10 +453,6 @@
             <button class="btn btn-primary" style="width: 100%; font-size: 16px; height: 54px; border-radius: 14px; margin-bottom: 25px; box-shadow: 0 8px 15px rgba(25, 26, 35, 0.15); transition: all 0.3s; border: none;" onclick="prosesLogin()">
                 Masuk Sistem <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
             </button>
-            
-            <div style="text-align: center; font-size: 13.5px; font-weight: 500; color: var(--text-muted);">
-                Belum punya akun? <a href="#" onclick="switchAuthMode('register')" style="color: var(--primary); font-weight: 800; text-decoration: none; margin-left: 5px;">Daftar Pegawai</a>
-            </div>
         </div>
 
         <div id="form-register-box" class="modal-box" style="display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: none; border-radius: 28px; width: 100%; max-width: 400px; padding: 45px 35px; background: #ffffff;">
@@ -484,12 +529,14 @@
                     </div>
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <div style="background: #fafff0; padding: 20px; border-radius: var(--radius-md); border: 2px dashed var(--secondary);">
-                        <h3 style="margin: 0 0 10px 0; font-size: 14px;"><i class="fas fa-ticket-alt"></i> Token Pendaftaran Pegawai</h3>
-                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                            <input type="text" id="generate-token-display" readonly style="font-weight: 800; text-align:center; letter-spacing: 2px; background: #fff;" placeholder="-----">
-                            <button class="btn btn-primary" onclick="buatTokenBaru()">Buat</button>
+                <div style="background: #fafff0; padding: 20px; border-radius: var(--radius-md); border: 2px dashed var(--secondary);">
+                        <h3 style="margin: 0 0 10px 0; font-size: 14px;"><i class="fas fa-user-plus"></i> Tambah Akun Pegawai</h3>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">PIN otomatis disetel ke <b>1234</b></p>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <input type="text" id="new-pegawai-user" placeholder="Username Pegawai..." style="background: #fff; width: 100%;">
+                            <select id="new-pegawai-cabang" class="custom-select" style="background: #fff; width: 100%;">
+                                </select>
+                            <button class="btn btn-success" onclick="tambahPegawaiBaru()"><i class="fas fa-check"></i> Buat Akun Pegawai</button>
                         </div>
                     </div>
 
@@ -602,7 +649,7 @@
         </div>
     </div>
 
-    <div id="page-hpp" class="page-container active">
+    <div id="page-hpp" class="page-container">
         <div class="card form-input-card">
             <div class="card-header" style="border-bottom: none; margin-bottom: 10px;">
                 <h2><i class="fas fa-clipboard-check"></i> Form Input Penggunaan Bahan</h2>
@@ -749,7 +796,7 @@
         </div>
     </div>
 
-    <div id="page-pesanan" class="page-container">
+    <div id="page-pesanan" class="page-container active">
         <div class="card">
             <div class="card-header">
                 <h2><i class="fas fa-users"></i> Rekap Pesanan Pelanggan</h2>
@@ -778,24 +825,33 @@
     </div>
 
     <div id="page-dashboard" class="page-container">
-        
-        <div class="card owner-card" style="border-top-width: 4px;">
+        <div class="card owner-card" style="border-top: 4px solid var(--secondary);">
             <div class="card-header" style="margin-bottom: 20px; border-bottom: none; padding-bottom: 0;">
                 <h2><i class="fas fa-calendar-day"></i> Ringkasan Hari Ini (<span id="daily-date"></span>)</h2>
             </div>
             <div class="grid-owner" style="margin-bottom: 0;">
                 <div class="stat-box bg-white">
-                    <h3><i class="fas fa-arrow-down stat-icon"></i> Kas Masuk (Harian)</h3>
+                    <h3><i class="fas fa-arrow-down stat-icon"></i> Kas Masuk</h3>
                     <h1 id="daily-kas" style="color:var(--primary)">Rp 0</h1>
                 </div>
                 <div class="stat-box bg-white">
-                    <h3><i class="fas fa-arrow-up stat-icon"></i> Pengeluaran (Harian)</h3>
+                    <h3><i class="fas fa-arrow-up stat-icon"></i> Pengeluaran</h3>
                     <h1 id="daily-out" style="color:var(--danger)">Rp 0</h1>
                 </div>
                 <div class="stat-box bg-orange">
-                    <h3><i class="fas fa-wallet stat-icon"></i> Laba Sistem (Harian)</h3>
+                    <h3><i class="fas fa-wallet stat-icon"></i> Laba Harian</h3>
                     <h1 id="daily-laba">Rp 0</h1>
                 </div>
+            </div>
+        </div>
+
+        <div class="card owner-card">
+            <div class="card-header"><h2><i class="fas fa-calculator"></i> Input Beban Keuangan (Hari Ini)</h2></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Penjualan Kotor</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-penjualan" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+                <div class="form-group"><label>Biaya Gas</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-gas" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+                <div class="form-group"><label>Upah Pegawai</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-upah" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+                <div class="form-group"><label>Retur Barang</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-retur" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
             </div>
         </div>
 
@@ -820,27 +876,8 @@
                 </button>
             </div>
         </div>
-
-        <div class="card owner-card">
-            <div class="card-header"><h2><i class="fas fa-database"></i> Manajemen Master Data</h2></div>
-            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <button class="btn btn-success" onclick="bukaModalProduk()"><i class="fas fa-plus-circle"></i> Tambah Bolu Sakinah Baru</button>
-                <button class="btn btn-gold" onclick="bukaModalBahan()"><i class="fas fa-box-open"></i> Tambah Bahan Baku</button>
-                <button class="btn" style="background: var(--surface); color: var(--primary);" onclick="bukaModalAdminAuth()"><i class="fas fa-users-cog"></i> Manajemen Pegawai</button>
-                <button class="btn" style="background: var(--accent); color: var(--primary);" onclick="bukaActivityLog()"><i class="fas fa-history"></i> Log Aktivitas Cloud</button>
-            </div>
-        </div>
-
-        <div class="card owner-card">
-            <div class="card-header"><h2><i class="fas fa-calculator"></i> Input Beban Keuangan (Hari Ini)</h2></div>
-            <div class="form-grid">
-                <div class="form-group"><label>Penjualan Kotor</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-penjualan" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
-                <div class="form-group"><label>Biaya Gas</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-gas" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
-                <div class="form-group"><label>Upah Pegawai</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-upah" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
-                <div class="form-group"><label>Retur Barang</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-retur" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
-            </div>
-        </div>
     </div>
+
 
     <div id="page-kas" class="page-container">
         
@@ -891,6 +928,29 @@
             </div>
         </div>
     </div>
+    <div id="page-pengaturan" class="page-container">
+    <div class="card owner-card" style="border-top: 4px solid var(--primary);">
+        <div class="card-header">
+            <h2><i class="fas fa-tools"></i> Pengaturan Master Data</h2>
+            <p style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Kelola data produk, bahan baku, dan akses pegawai.</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <button class="btn btn-success" onclick="bukaModalProduk()" style="height: 60px;">
+                <i class="fas fa-plus-circle"></i> Tambah Bolu Baru
+            </button>
+            <button class="btn btn-gold" onclick="bukaModalBahan()" style="height: 60px;">
+                <i class="fas fa-box-open"></i> Tambah Bahan Baku
+            </button>
+            <button class="btn" style="background: var(--surface); color: var(--primary); height: 60px;" onclick="bukaModalAdminAuth()">
+                <i class="fas fa-users-cog"></i> Manajemen Pegawai
+            </button>
+            <button class="btn" style="background: var(--accent); color: var(--primary); height: 60px;" onclick="bukaActivityLog()">
+                <i class="fas fa-history"></i> Log Aktivitas Cloud
+            </button>
+        </div>
+    </div>
+</div>
     <footer class="footer">
         <div>&copy; 2026 <b>Bolu Sakinah</b>. All rights reserved.</div>
         <div style="margin-top: 8px; font-size: 11.5px; opacity: 0.8;">
@@ -2349,28 +2409,20 @@ let saveTimeout;
         loadData(); 
         let currentMonthStr = new Date().toISOString().slice(0,7); 
         document.getElementById('filter-bulan').value = currentMonthStr; 
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.setAttribute('inputmode', 'numeric');
+            input.setAttribute('pattern', '[0-9]*');
+        });
 
         const welcomeModal = document.getElementById('welcome-modal');
         if(welcomeModal) {
             welcomeModal.style.display = 'flex';
             requestAnimationFrame(() => welcomeModal.classList.add('show'));
         }
-        
     };
     let failCount = 0;
     let lockUntil = 0;
-    function switchAuthMode(mode) {
-        if (mode === 'register') {
-            document.getElementById('form-login-box').style.display = 'none';
-            document.getElementById('form-register-box').style.display = 'block';
-            let selCabang = document.getElementById('reg-cabang');
-            selCabang.innerHTML = '<option value="">-- Pilih Cabang --</option>';
-            daftarCabang.forEach(c => selCabang.innerHTML += `<option value="${c}">${c}</option>`);
-        } else {
-            document.getElementById('form-register-box').style.display = 'none';
-            document.getElementById('form-login-box').style.display = 'block';
-        }
-    }
+
 
 
 
@@ -2426,15 +2478,13 @@ let saveTimeout;
         let ownerMenu = document.getElementById('owner-menu');
         if (userObj.role === "owner") {
             ownerMenu.style.display = 'flex';
-            
             bukaPage('page-dashboard', document.querySelectorAll('.nav-item[onclick*="page-dashboard"]')[0]);
             showToast(`Selamat datang Owner, ${userObj.username}`, 'success');
         } else {
             ownerMenu.style.display = 'none';
-            bukaPage('page-hpp', document.querySelectorAll('.nav-item[onclick*="page-hpp"]')[0]);
+            bukaPage('page-pesanan', document.querySelectorAll('.nav-item[onclick*="page-pesanan"]')[0]);
             showToast(`Login berhasil. Halo ${userObj.username}`, 'success');
         }
-        
         updateAutoNoAdonan(); 
     }
 
@@ -2467,36 +2517,10 @@ let saveTimeout;
         
         document.getElementById('auth-screen').style.display = 'flex';
         document.getElementById('main-header').style.display = 'none';
-        
-        switchAuthMode('login');
+        document.getElementById('form-login-box').style.display = 'block';
         
         if(karenaTimeout) showToast("Sesi habis (12 Jam). Silakan login kembali.", "error");
         else showToast("Berhasil Logout", "success");
-    }
-
-    function prosesRegister() {
-        let token = document.getElementById('reg-token').value.trim().toUpperCase();
-        let cabang = document.getElementById('reg-cabang').value;
-        let u = document.getElementById('reg-user').value.trim();
-        let p = document.getElementById('reg-pin').value.trim();
-
-        if (!token || !cabang || !u || !p) return showToast("Harap isi semua form pendaftaran!", "error");
-        if (p.length < 4) return showToast("PIN minimal 4 digit!", "error");
-
-        let tokenIndex = daftarToken.findIndex(x => x === token);
-        if (tokenIndex === -1) return showToast("Token tidak valid atau sudah terpakai!", "error");
-
-        if (daftarUser.some(x => x.username.toLowerCase() === u.toLowerCase())) {
-            return showToast("Username ini sudah digunakan, pilih nama lain!", "error");
-        }
-
-        daftarToken.splice(tokenIndex, 1);
-        daftarUser.push({ id: "usr_" + Date.now(), username: u, pin: p, cabang: cabang, role: "pegawai", tgl_daftar: new Date().toISOString().slice(0,10) });
-
-        saveData();
-        showToast("Pendaftaran berhasil! Silahkan Login.", "success");
-        switchAuthMode('login');
-        document.getElementById('login-user').value = u;
     }
 
     function bukaModalAdminAuth() {
@@ -2509,7 +2533,11 @@ let saveTimeout;
             </li>`;
         });
         ulCabang.innerHTML = cabangHtml; 
-
+        let selCabangPegawai = document.getElementById('new-pegawai-cabang');
+        if(selCabangPegawai) {
+            selCabangPegawai.innerHTML = '<option value="">-- Pilih Cabang --</option>';
+            daftarCabang.forEach(c => selCabangPegawai.innerHTML += `<option value="${c}">${c}</option>`);
+        }
         let ulPegawai = document.getElementById('list-akun-pegawai');
         let pegawaiHtml = ''; 
         
@@ -2553,7 +2581,22 @@ let saveTimeout;
         bukaModalAdminAuth(); 
         showToast("Akun Owner Baru Berhasil Ditambahkan!", "success");
     }
+    function tambahPegawaiBaru() {
+        let u = document.getElementById('new-pegawai-user').value.trim();
+        let c = document.getElementById('new-pegawai-cabang').value;
+        let p = "1234"; 
 
+        if(!u || !c) return showToast("Username dan Cabang harus diisi!", "error");
+        if(daftarUser.some(x => x.username.toLowerCase() === u.toLowerCase())) return showToast("Username sudah dipakai, pilih nama lain!", "error");
+
+        daftarUser.push({ id: "usr_" + Date.now(), username: u, pin: p, cabang: c, role: "pegawai", tgl_daftar: new Date().toISOString().slice(0,10) });
+        saveData();
+        
+        document.getElementById('new-pegawai-user').value = '';
+        
+        bukaModalAdminAuth();
+        showToast("Akun Pegawai Baru Berhasil Dibuat!", "success");
+    }
     function hapusPegawai(idx, role) {
         if(role === 'owner') {
             let ownerCount = daftarUser.filter(x => x.role === 'owner').length;
@@ -2572,13 +2615,7 @@ let saveTimeout;
             bukaModalAdminAuth();
         }
     }
-    function buatTokenBaru() { 
-        let acak = Math.random().toString(36).substring(2, 8).toUpperCase(); 
-        daftarToken.push(acak); 
-        saveData(); 
-        document.getElementById('generate-token-display').value = acak; 
-        showToast("Token dibuat!", "success"); 
-    }
+
     function tambahCabangBaru() { let input = document.getElementById('input-cabang-baru'); let val = input.value.trim(); if(!val) return; if(daftarCabang.includes(val)) return showToast("Cabang sudah ada!", "error"); daftarCabang.push(val); input.value = ''; saveData(); bukaModalAdminAuth(); showToast("Cabang ditambahkan", "success"); }
     function hapusCabang(idx) { confirmDelete("Hapus cabang ini?", () => { daftarCabang.splice(idx, 1); saveData(); bukaModalAdminAuth(); }); }
     function bukaModalGantiPinUser() {
