@@ -463,7 +463,7 @@
     <div id="mobile-overlay" class="mobile-overlay-menu" onclick="toggleMobileMenu()"></div>
 
     <header class="header" id="main-header" style="display:none;">
-        <div class="brand">
+        <div class="brand" onclick="goHome()" style="cursor: pointer;">
             <i class="fas fa-cookie-bite"></i> <span>Bolu Sakinah</span>
         </div>
         
@@ -2660,8 +2660,8 @@ let saveTimeout;
             showToast(`Selamat datang Owner, ${userObj.username}`, 'success');
         } else {
             ownerMenu.style.display = 'none';
-            bukaPage('page-pesanan', document.querySelectorAll('.nav-item[onclick*="page-pesanan"]')[0]);
-            showToast(`Login berhasil. Halo ${userObj.username}`, 'success');
+            bukaPage('page-checklist', document.querySelectorAll('.nav-item[onclick*="page-checklist"]')[0]);
+            showToast(`Login berhasil. Halo ${userObj.username}`, 'success');   
         }
         updateAutoNoAdonan(); 
     }
@@ -2950,6 +2950,17 @@ let saveTimeout;
             showToast("Data Stok & Harga berhasil diperbarui!", "success");
             logActivity("UPDATE", "Memperbarui Database Stok dan Harga Bahan Baku");
         }, 500);
+    }
+    function goHome() {
+        if (!sesiAktif) return;
+        let targetPage = sesiAktif.role === 'owner' ? 'page-dashboard' : 'page-checklist';
+        let targetBtn = null;
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(targetPage)) {
+                targetBtn = btn;
+            }
+        });
+        bukaPage(targetPage, targetBtn);
     }
 </script>
 </body>
