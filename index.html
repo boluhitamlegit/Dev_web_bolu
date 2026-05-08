@@ -592,19 +592,76 @@
             <button class="btn btn-primary" style="width: 100%;" onclick="simpanProdukBaru()"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud</button>
         </div>
     </div>
-     <div id="edit-resep-modal" class="modal-overlay">
-                <div class="modal-box">
-                    <button class="btn-close" onclick="tutupModal('edit-resep-modal')" title="Tutup">&times;</button>
-                    <h2><i class="fas fa-flask" style="color:var(--primary);"></i> Edit Formula Resep</h2>
-                    <p style="margin-bottom: 10px;">Atur takaran bahan <b id="nama-bahan-edit-judul" style="color:var(--primary);"></b> per 1 Adonan.</p>
-                    
-                    <input type="hidden" id="edit-bahan-id">
-                    <div id="form-edit-resep-dinamis" class="form-grid" style="margin-top: 20px; background: var(--accent); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
-                    </div>
-                    
-                    <button class="btn btn-success" style="width: 100%; margin-top: 20px;" onclick="simpanEditResep()"><i class="fas fa-save"></i> Simpan Formula</button>
-                </div>
+     <div id="manajemen-resep-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-close" onclick="tutupModal('manajemen-resep-modal')" title="Tutup">&times;</button>
+            <h2><i class="fas fa-book-open" style="color:var(--primary);"></i> Manajemen Resep Varian</h2>
+            <p style="margin-bottom: 15px; font-size: 13px; color: var(--text-muted);">Pilih varian bolu untuk mengedit hasil loyang, isi pcs, dan takaran bahan per 1 adonan.</p>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Pilih Varian Bolu</label>
+                <select id="select-edit-bolu" class="custom-select" onchange="loadDataResepBolu()">
+                </select>
             </div>
+
+            <div id="area-edit-resep" style="display: none;">
+                <div class="form-grid" style="margin-bottom: 20px; background: #fafff0; padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--secondary);">
+                    <div class="form-group">
+                        <label>1 Adonan = ? Loyang</label>
+                        <div class="input-group full-width">
+                            <input type="number" id="edit-r-loyang" min="1" class="has-unit text-right">
+                            <span class="input-unit">loyang</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>1 Loyang = ? Pcs (Isi)</label>
+                        <div class="input-group full-width">
+                            <input type="number" id="edit-r-pcs" min="1" class="has-unit text-right">
+                            <span class="input-unit">pcs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resep-container" style="background: var(--accent); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                    <label style="font-weight:800; font-size:13px; color:var(--primary); display:block; margin-bottom:15px; text-transform: uppercase;">Takaran Bahan per 1 Adonan:</label>
+                    <div id="form-edit-resep-dinamis" class="form-grid"></div>
+                </div>
+                
+                <button class="btn btn-success" style="width: 100%; margin-top: 20px;" onclick="simpanPerubahanResep()"><i class="fas fa-save"></i> Simpan Perubahan Resep</button>
+            </div>
+        </div>
+    </div>
+    <div id="manajemen-bahan-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 700px; width: 95%;">
+            <button class="btn-close" onclick="tutupModal('manajemen-bahan-modal')" title="Tutup">&times;</button>
+            <h2><i class="fas fa-boxes" style="color:var(--primary);"></i> Manajemen Stok & Harga</h2>
+            <p style="margin-bottom: 20px; font-size: 13px; color: var(--text-muted);">Perbarui harga beli terbaru dan jumlah stok tersedia di gudang untuk perhitungan HPP yang akurat.</p>
+            
+            <div class="input-group" style="margin-bottom: 15px; max-width: 100%;">
+                <span class="input-prefix"><i class="fas fa-search"></i></span>
+                <input type="text" id="search-manage-bahan" placeholder="Cari nama bahan..." oninput="renderListManageBahan()" class="has-prefix" style="width: 100%;">
+            </div>
+
+            <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: #f9f9f9;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background: var(--accent); z-index: 5;">
+                        <tr>
+                            <th style="padding: 12px; font-size: 11px; text-align: left;">Nama Bahan</th>
+                            <th style="padding: 12px; font-size: 11px; text-align: right; width: 150px;">Harga Satuan</th>
+                            <th style="padding: 12px; font-size: 11px; text-align: right; width: 130px;">Stok Tersedia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-manage-bahan-body">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 25px; display: flex; gap: 10px;">
+                <button class="btn" style="flex: 1; background: var(--accent);" onclick="tutupModal('manajemen-bahan-modal')">Batal</button>
+                <button class="btn btn-primary" style="flex: 2;" onclick="simpanPerubahanBahan()"><i class="fas fa-save"></i> Simpan Semua Perubahan</button>
+            </div>
+        </div>
+    </div>
     <div id="bahan-modal" class="modal-overlay">
         <div class="modal-box">
             <button class="btn-close" onclick="tutupModal('bahan-modal')" title="Tutup">&times;</button>
@@ -706,9 +763,6 @@
                     <h2><i class="fas fa-boxes"></i> Kalkulasi Kebutuhan & HPP</h2>
                     <span style="font-size: 13px; color: var(--text-muted); font-weight: 600; display: inline-block; margin-top: 5px;">Data <b style="color:var(--primary); background: var(--secondary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--primary);">Butuh</b> terintegrasi otomatis dari form di atas.</span>
                 </div>
-                <button id="btn-toggle-hpp" class="btn" style="background: var(--surface); border: 2px solid var(--primary);" onclick="toggleModeHPP()">
-                    <i class="fas fa-lock"></i> Mode Fix Aktif
-                </button>
             </div>
             <div class="table-responsive">
                 <table>
@@ -941,6 +995,12 @@
             </button>
             <button class="btn btn-gold" onclick="bukaModalBahan()" style="height: 60px;">
                 <i class="fas fa-box-open"></i> Tambah Bahan Baku
+            </button>
+            <button class="btn btn-primary" onclick="bukaModalManajemenResep()" style="height: 60px;">
+                <i class="fas fa-clipboard-list"></i> Manajemen Resep & Bolu
+            </button>
+            <button class="btn btn-gold" onclick="bukaModalManajemenBahan()" style="height: 60px;">
+                <i class="fas fa-warehouse"></i> Manajemen Stok & Harga
             </button>
             <button class="btn" style="background: var(--surface); color: var(--primary); height: 60px;" onclick="bukaModalAdminAuth()">
                 <i class="fas fa-users-cog"></i> Manajemen Pegawai
@@ -1760,19 +1820,15 @@ let saveTimeout;
         const tBahan = document.getElementById('tabel-bahan-body');
         if(!tBahan) return; 
         tBahan.innerHTML = '';
-        
-        let lockStyle = isModeEditHPP ? "" : 'readonly style="border:none; box-shadow:none; background:transparent; pointer-events:none; font-size:15px; font-weight:800;"';
+        let lockStyle = 'readonly style="border:none; box-shadow:none; background:transparent; pointer-events:none; font-size:15px; font-weight:800;"';
         
         bahanBaku.forEach((b, i) => {
             let unit = unt(b);
             let roundedHarga = Math.ceil(b.harga / 50) * 50; 
-            
-            let btnEditFormula = isModeEditHPP && !b.isMikaS ? `<button class="btn" style="padding:4px 8px; font-size:11px; margin-top:5px; background:var(--accent); width:100%;" onclick="bukaModalEditResep('${b.id}')"><i class="fas fa-edit"></i> Edit Formula Adonan</button>` : '';
 
             tBahan.innerHTML += `<tr>
                 <td data-label="Nama Bahan">
                     <input type="text" class="wide" value="${b.nama}" onchange="bahanBaku[${i}].nama=this.value; saveData()" ${lockStyle}>
-                    ${btnEditFormula}
                 </td>
                 <td data-label="Harga Satuan">
                     <div class="input-group">
@@ -1889,47 +1945,75 @@ let saveTimeout;
     }
 
 
-    function bukaModalEditResep(bahanId) {
-        let b = bahanBaku.find(x => x.id === bahanId);
-        if(!b) return;
+    function bukaModalManajemenResep() {
+        let selectBolu = document.getElementById('select-edit-bolu');
+        selectBolu.innerHTML = '<option value="">-- Pilih Bolu --</option>';
+        produkBolu.forEach(p => {
+            selectBolu.innerHTML += `<option value="${p.id}">${p.nama}</option>`;
+        });
+        
+        document.getElementById('area-edit-resep').style.display = 'none';
+        document.getElementById('manajemen-resep-modal').style.display = 'flex';
+        requestAnimationFrame(() => document.getElementById('manajemen-resep-modal').classList.add('show'));
+    }
 
-        document.getElementById('edit-bahan-id').value = bahanId;
-        document.getElementById('nama-bahan-edit-judul').innerText = b.nama;
+    function loadDataResepBolu() {
+        let boluId = document.getElementById('select-edit-bolu').value;
+        let areaResep = document.getElementById('area-edit-resep');
+        
+        if(!boluId) {
+            areaResep.style.display = 'none';
+            return;
+        }
+
+        let p = produkBolu.find(x => x.id === boluId);
+        if(!p) return;
+        document.getElementById('edit-r-loyang').value = p.rAdonan;
+        document.getElementById('edit-r-pcs').value = p.rPcs;
 
         const container = document.getElementById('form-edit-resep-dinamis');
         container.innerHTML = '';
-        let satuanResep = b.isKg ? "gram" : "pcs";
-
-        produkBolu.forEach(p => {
-            let nilaiSekarang = b.resep[p.id] || 0;
-            container.innerHTML += `
-                <div class="form-group">
-                    <label>${p.nama}</label>
-                    <div class="input-group full-width">
-                        <input type="number" id="edit-res-${p.id}" value="${nilaiSekarang}" class="has-unit text-right" style="padding-right: 100px;">
-                        <span class="input-unit">${satuanResep}/adonan</span>
-                    </div>
-                </div>`;
+        bahanBaku.forEach(b => {
+            if(!b.isMikaS) {
+                let nilaiSekarang = b.resep[p.id] || 0;
+                let satuanResep = b.isKg ? "gram" : "pcs";
+                
+                container.innerHTML += `
+                    <div class="form-group">
+                        <label>${b.nama}</label>
+                        <div class="input-group full-width">
+                            <input type="number" id="edit-bahan-${b.id}" value="${nilaiSekarang}" class="has-unit text-right" style="padding-right: 90px;">
+                            <span class="input-unit">${satuanResep}</span>
+                        </div>
+                    </div>`;
+            }
         });
 
-        document.getElementById('edit-resep-modal').style.display = 'flex';
-        requestAnimationFrame(() => document.getElementById('edit-resep-modal').classList.add('show'));
+        areaResep.style.display = 'block';
     }
 
-    function simpanEditResep() {
-        let bahanId = document.getElementById('edit-bahan-id').value;
-        let bIndex = bahanBaku.findIndex(x => x.id === bahanId);
-        if(bIndex === -1) return;
+    function simpanPerubahanResep() {
+        let boluId = document.getElementById('select-edit-bolu').value;
+        let pIndex = produkBolu.findIndex(x => x.id === boluId);
+        
+        if(pIndex === -1) return showToast("Pilih bolu terlebih dahulu!", "error");
 
-        produkBolu.forEach(p => {
-            let val = parseFloat(document.getElementById(`edit-res-${p.id}`).value) || 0;
-            bahanBaku[bIndex].resep[p.id] = val;
+        let loyangBaru = parseFloat(document.getElementById('edit-r-loyang').value) || 1;
+        let pcsBaru = parseFloat(document.getElementById('edit-r-pcs').value) || 1;
+        produkBolu[pIndex].rAdonan = loyangBaru;
+        produkBolu[pIndex].rPcs = pcsBaru;
+        bahanBaku.forEach(b => {
+            if(!b.isMikaS) {
+                let val = parseFloat(document.getElementById(`edit-bahan-${b.id}`).value) || 0;
+                b.resep[boluId] = val;
+            }
         });
 
-        tutupModal('edit-resep-modal');
+        tutupModal('manajemen-resep-modal');
         calcHPP(); 
-        saveData(); 
-        showToast("Formula resep berhasil diperbarui!", "success");
+        saveData();
+        logActivity("UPDATE", `Mengubah resep & takaran untuk ${produkBolu[pIndex].nama}`);
+        showToast("Resep & takaran berhasil diperbarui!", "success");
     }
     function renderPesanan() {
         let todayStr = new Date().toISOString().slice(0,10);
@@ -2664,13 +2748,21 @@ let saveTimeout;
     function updateAutoNoAdonan() {
         let tglHPP = document.getElementById('log-tanggal') ? document.getElementById('log-tanggal').value : null;
         if(tglHPP && document.getElementById('log-no-adonan')) {
+            let parts = tglHPP.split('-'); 
+            let prefixHPP = parts[2] + parts[1] + "-"; 
+
             let hitungHPP = laporanPenggunaan.filter(x => x.tgl === tglHPP).length;
-            document.getElementById('log-no-adonan').value = "A-" + ((hitungHPP + 1) < 10 ? "0" + (hitungHPP + 1) : (hitungHPP + 1));
+            let urutanHPP = (hitungHPP + 1) < 10 ? "0" + (hitungHPP + 1) : (hitungHPP + 1);
+            document.getElementById('log-no-adonan').value = prefixHPP + urutanHPP;
         }
         let tglChk = document.getElementById('chk-tanggal') ? document.getElementById('chk-tanggal').value : null;
         if(tglChk && document.getElementById('chk-no-adonan')) {
+            let parts = tglChk.split('-');
+            let prefixChk = parts[2] + parts[1] + "-"; 
+
             let hitungChk = checklistHistory.filter(x => x.tgl === tglChk).length;
-            document.getElementById('chk-no-adonan').value = "A-" + ((hitungChk + 1) < 10 ? "0" + (hitungChk + 1) : (hitungChk + 1));
+            let urutanChk = (hitungChk + 1) < 10 ? "0" + (hitungChk + 1) : (hitungChk + 1);
+            document.getElementById('chk-no-adonan').value = prefixChk + urutanChk;
         }
     }
     setTimeout(() => {
@@ -2701,6 +2793,69 @@ let saveTimeout;
                 .then(reg => console.log('✅ PWA Ready: Service Worker berhasil didaftarkan.'))
                 .catch(err => console.warn('⚠️ PWA Gagal:', err));
         });
+    }
+    function bukaModalManajemenBahan() {
+        if(document.getElementById('search-manage-bahan')) document.getElementById('search-manage-bahan').value = '';
+        renderListManageBahan();
+        document.getElementById('manajemen-bahan-modal').style.display = 'flex';
+        requestAnimationFrame(() => document.getElementById('manajemen-bahan-modal').classList.add('show'));
+    }
+
+    function renderListManageBahan() {
+        const tbody = document.getElementById('list-manage-bahan-body');
+        const searchQ = document.getElementById('search-manage-bahan').value.toLowerCase();
+        tbody.innerHTML = '';
+
+        bahanBaku.forEach((b, i) => {
+            if (b.nama.toLowerCase().includes(searchQ)) {
+                let unit = b.isKg ? "kg" : "pcs";
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid #eee; background: white;">
+                        <td style="padding: 12px; font-weight: 700; font-size: 14px; color: var(--primary);">${b.nama}</td>
+                        <td style="padding: 12px;">
+                            <div class="input-group">
+                                <span class="input-prefix" style="font-size:10px;">Rp</span>
+                                <input type="number" id="edit-m-harga-${i}" value="${b.harga}" class="has-prefix text-right" style="height: 38px; font-size: 14px;">
+                            </div>
+                        </td>
+                        <td style="padding: 12px;">
+                            <div class="input-group">
+                                <input type="number" id="edit-m-sedia-${i}" value="${b.sedia}" step="0.01" class="has-unit text-right" style="height: 38px; font-size: 14px;">
+                                <span class="input-unit" style="font-size:10px;">${unit}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+
+        if (tbody.innerHTML === '') {
+            tbody.innerHTML = '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">Bahan tidak ditemukan.</td></tr>';
+        }
+    }
+
+    function simpanPerubahanBahan() {
+        showLoading("Menyimpan Perubahan Stok & Harga...");
+        
+        bahanBaku.forEach((b, i) => {
+            const inputHarga = document.getElementById(`edit-m-harga-${i}`);
+            const inputSedia = document.getElementById(`edit-m-sedia-${i}`);
+            if (inputHarga && inputSedia) {
+                b.harga = parseFloat(inputHarga.value) || 0;
+                b.sedia = parseFloat(inputSedia.value) || 0;
+            }
+        });
+
+        saveData();
+        initTabelHPP(); 
+        calcHPP(); 
+        
+        setTimeout(() => {
+            hideLoading();
+            tutupModal('manajemen-bahan-modal');
+            showToast("Data Stok & Harga berhasil diperbarui!", "success");
+            logActivity("UPDATE", "Memperbarui Database Stok dan Harga Bahan Baku");
+        }, 500);
     }
 </script>
 </body>
