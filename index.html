@@ -537,6 +537,67 @@
                 border: 1px solid #e2e8f0 !important;
             }
         }
+        @media (max-width: 768px) {
+            .pesanan-item-row {
+                display: grid !important;
+                grid-template-columns: 1fr auto !important;
+                gap: 10px !important;
+                background: #ffffff !important;
+                padding: 12px !important;
+                border-radius: 12px !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 2px 2px 0px #e2e8f0 !important;
+                margin-bottom: 12px !important;
+                align-items: center !important;
+            }
+            .pesanan-item-row select,
+            .pesanan-item-row select.wide {
+                grid-column: 1 / -1 !important; 
+                width: 100% !important;
+                height: 48px !important;
+                margin: 0 !important;
+                border-radius: 8px !important;
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                background-color: #f8fafc !important;
+                font-size: 14px !important;
+            }
+            .pesanan-item-row .input-group {
+                grid-column: 1 / 2 !important;
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+            }
+            .pesanan-item-row .input-group input {
+                width: 100% !important;
+                height: 48px !important;
+                border-radius: 8px !important;
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                background-color: #f8fafc !important;
+                font-size: 15px !important;
+                font-weight: 800 !important;
+            }
+            .pesanan-item-row button.btn-danger {
+                grid-column: 2 / 3 !important;
+                width: 48px !important;
+                height: 48px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 8px !important;
+                background: #fee2e2 !important; 
+                color: var(--danger) !important;
+                border: 1px solid #fca5a5 !important;
+                box-shadow: none !important;
+            }
+            .pesanan-item-row button.btn-danger:active {
+                background: var(--danger) !important;
+                color: #ffffff !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1023,15 +1084,16 @@
             <div class="form-grid">
                 <div class="form-group"><label>No. Adonan </label><input type="text" id="chk-no-adonan" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
                 <div class="form-group"><label>Tanggal</label><input type="date" id="chk-tanggal" style="font-weight: 800;" onchange="updateAutoNoAdonan()"></div>
-               <div style="grid-column: 1 / -1; background: #f9fdf5; padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--secondary);">
-                    <label style="display:block; font-weight:800; margin-bottom:10px; font-size:12.5px; color:var(--primary); text-transform:uppercase;">Daftar Varian Bolu & Target Buat (Loyang)</label>
-                    
-                    <div id="chk-bolu-container" style="display: flex; flex-direction: column; gap: 10px;">
-                        </div>
-                    
-                    <button class="btn" style="margin-top: 15px; width: 100%; border: 2px dashed var(--border); background: var(--surface); color: var(--primary);" onclick="tambahItemChecklist()">
-                        <i class="fas fa-plus"></i> Tambah Varian Bolu
-                    </button>
+               <div class="form-group">
+                    <label>Nama Varian Bolu</label>
+                    <select id="chk-produk" class="custom-select" style="font-weight: 800;"></select>
+                </div>
+                <div class="form-group">
+                    <label>Target Buat (Loyang)</label>
+                    <div class="input-group full-width">
+                        <input type="number" id="chk-qty" class="text-right has-unit" placeholder="Cth: 20" min="1" style="font-weight: 800;">
+                        <span class="input-unit">loyang</span>
+                    </div>
                 </div>
                 <div class="form-group"><label>Nama Pegawai </label><input type="text" id="chk-petugas" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
             </div>
@@ -1628,7 +1690,6 @@ let saveTimeout;
         initTabelHPP(); 
     }
 
-    let checklistInputItems = [{ prod: "", qty: "" }];
     
     let hppInputItems = [{ prod: "", qty: "" }];
     function renderHppInput() {
@@ -1657,31 +1718,6 @@ let saveTimeout;
         });
     }
 
-    function renderChecklistInput() {
-        let container = document.getElementById('chk-bolu-container');
-        if(!container) return;
-        container.innerHTML = '';
-        
-        let optionsHtml = '<option value="">-- Pilih Bolu --</option>';
-        produkBolu.forEach(p => { optionsHtml += `<option value="${p.nama}">${p.nama}</option>`; });
-
-        checklistInputItems.forEach((item, idx) => {
-            container.innerHTML += `
-            <div class="pesanan-item-row">
-                <select class="custom-select wide" onchange="checklistInputItems[${idx}].prod=this.value">
-                    ${optionsHtml.replace(`value="${item.prod}"`, `value="${item.prod}" selected`)}
-                </select>
-                <div class="input-group">
-                    <input type="number" class="text-right has-unit" placeholder="Qty" value="${item.qty}" min="1" onchange="checklistInputItems[${idx}].qty=validateNumInput(this)">
-                    <span class="input-unit">Lyg</span>
-                </div>
-                <button class="btn-danger" onclick="hapusItemChecklist(${idx})">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            `;
-        });
-    }
     
 
     function tambahItemHpp() {
@@ -1697,33 +1733,21 @@ let saveTimeout;
         }
     }
 
-    function tambahItemChecklist() {
-        checklistInputItems.push({ prod: "", qty: "" });
-        renderChecklistInput();
-    }
-
-    function hapusItemChecklist(idx) {
-        if(checklistInputItems.length > 1) {
-            checklistInputItems.splice(idx, 1);
-            renderChecklistInput();
-        } else {
-            showToast("Minimal harus ada 1 form varian bolu!", "error");
-        }
-    }
-
     function populateLogProduk() {
         let selectLog = document.getElementById('log-produk');
         let optionsHtml = '<option value="">-- Pilih Produk --</option>';
         produkBolu.forEach(p => { optionsHtml += `<option value="${p.nama}">${p.nama}</option>`; });
         if(selectLog) selectLog.innerHTML = optionsHtml;
+        let selectChk = document.getElementById('chk-produk');
+        if(selectChk) selectChk.innerHTML = optionsHtml;
 
         let today = new Date().toISOString().slice(0,10);
         if(document.getElementById('log-tanggal')) document.getElementById('log-tanggal').value = today;
         if(document.getElementById('chk-tanggal')) document.getElementById('chk-tanggal').value = today;
+        
+        updateAutoNoAdonan(); 
         renderHppInput();
-        renderChecklistInput(); 
     }
-
     function renderLaporanPenggunaan() {
         let tbody = document.getElementById('tabel-laporan-penggunaan');
         if(!tbody) return;
@@ -1914,119 +1938,77 @@ let saveTimeout;
     }
 
     function generateChecklistPreview() {
+        updateAutoNoAdonan(); 
+        
         let no = document.getElementById('chk-no-adonan').value;
         let tgl = document.getElementById('chk-tanggal').value;
         let petugas = document.getElementById('chk-petugas').value;
+        let prodNama = document.getElementById('chk-produk').value;
+        let qtyLyg = getVal(document.getElementById('chk-qty').value);
 
-        if(!no || !tgl || !petugas) return showToast("Harap isi tanggal & petugas!", "error");
-
-        let validItems = checklistInputItems.filter(x => x.prod !== "" && getVal(x.qty) > 0);
-        if(validItems.length === 0) return showToast("Pilih minimal 1 varian bolu & isi jumlah loyangnya!", "error");
+        if(!no || !tgl || !petugas || !prodNama || qtyLyg <= 0) {
+            return showToast("Harap lengkapi semua data dan jumlah loyang!", "error");
+        }
 
         let isDuplicate = checklistHistory.some(chk => chk.no.toLowerCase() === no.toLowerCase());
-        if (isDuplicate) {
-            document.getElementById('chk-no-adonan').classList.add('invalid');
-            return showToast("Gagal! No. Adonan '" + no + "' sudah digunakan di history.", "error");
-        } else {
-            document.getElementById('chk-no-adonan').classList.remove('invalid');
-        }
-        let totalBahan = {}; 
-        let perProdukDetail = []; 
+        if (isDuplicate) return showToast("Gagal! No. Adonan sudah digunakan.", "error");
 
-        validItems.forEach(item => {
-            let prodObj = produkBolu.find(p => p.nama === item.prod);
-            if(prodObj) {
-                let qtyLoyang = getVal(item.qty);
-                let adonan = qtyLoyang / prodObj.rAdonan;
-                let totalPcs = qtyLoyang * prodObj.rPcs;
-                let listBahanBoluIni = [];
+        let prodObj = produkBolu.find(p => p.nama === prodNama);
+        let adonan = qtyLyg / prodObj.rAdonan;
+        let totalPcs = qtyLyg * prodObj.rPcs;
+        let listBahan = [];
 
-                bahanBaku.forEach(b => {
-                    let need = 0;
-                    if (b.isMikaS) {
-                        need = totalPcs / 6;
-                    } else {
-                        let gram = adonan * (b.resep[prodObj.id] || 0);
-                        need = b.isKg ? (gram / 1000) : gram;
-                    }
+        bahanBaku.forEach(b => {
+            let need = 0;
+            if (b.isMikaS) need = totalPcs / 6;
+            else {
+                let gram = adonan * (b.resep[prodObj.id] || 0);
+                need = b.isKg ? (gram / 1000) : gram;
+            }
 
-                    if (need > 0) {
-                        let unit = b.isKg ? 'kg' : 'pcs';
-                        let calcNeed = b.isKg ? need : Math.ceil(need);
-                        let formatNeed = b.isKg ? calcNeed.toFixed(3) : calcNeed;
-                        listBahanBoluIni.push({ nama: b.nama, butuh: formatNeed, unit: unit });
-                        
-                        if(!totalBahan[b.nama]) totalBahan[b.nama] = { val: 0, unit: unit };
-                        totalBahan[b.nama].val += calcNeed;
-                    }
-                });
-                
-                perProdukDetail.push({ prod: item.prod, qty: qtyLoyang, bahan: listBahanBoluIni });
+            if (need > 0) {
+                let unit = b.isKg ? 'kg' : 'pcs';
+                let calcNeed = b.isKg ? need.toFixed(3) : Math.ceil(need);
+                listBahan.push({ nama: b.nama, butuh: calcNeed, unit: unit });
             }
         });
 
-        let listTotalBahan = [];
-        Object.keys(totalBahan).forEach(nama => {
-            let bObj = totalBahan[nama];
-            let formatNeed = bObj.unit === 'kg' ? bObj.val.toFixed(3) : Math.ceil(bObj.val);
-            listTotalBahan.push({ nama: nama, butuh: formatNeed, unit: bObj.unit });
-        });
-
-        let namaProdukGabungan = validItems.map(x => x.prod).join(", ");
-        let totalLoyangGabungan = validItems.reduce((sum, x) => sum + getVal(x.qty), 0);
-
         currentChecklistData = {
             id: "chk_" + Date.now(), tgl: tgl, no: no, petugas: petugas,
-            prod: namaProdukGabungan.length > 25 ? namaProdukGabungan.substring(0, 25) + "..." : namaProdukGabungan,
-            qty: totalLoyangGabungan, detailProduk: perProdukDetail, items: listTotalBahan,
+            prod: prodNama, qty: qtyLyg, items: listBahan,
             waktu_generate: new Date().toLocaleString('id-ID')
         };
+
         let htmlPreview = `
             <div style="text-align:center; border-bottom: 2px solid var(--primary); padding-bottom:10px; margin-bottom:15px;">
-                <h3 style="margin:0; text-transform:uppercase; font-size:18px;">PENGGUNAAN BAHAN</h3>
-                <h4 style="margin:5px 0 0 0; font-weight:800; font-size:14px;">Bolu Sakinah</h4>
+                <h3 style="margin:0;">PENGGUNAAN BAHAN</h3>
+                <h4 style="margin:5px 0 0 0;">Bolu Sakinah</h4>
             </div>
-            <table style="width:100%; font-size:13px; font-weight:600; margin-bottom:15px;">
-                <tr><td style="padding:2px 0;">Tgl/Jam</td><td>: ${currentChecklistData.waktu_generate}</td></tr>
-                <tr><td style="padding:2px 0;">Pegawai</td><td>: ${petugas}</td></tr>
-                <tr><td style="padding:2px 0;">Adonan</td><td>: ${no}</td></tr>
-            </table>
-            <div style="border-top: 1px dashed var(--primary); margin:15px 0;"></div>
+            <p><b>No:</b> ${no} | <b>Bolu:</b> ${prodNama} (${qtyLyg} Lyg)</p>
+            <div style="border-top: 1px dashed var(--primary); margin:10px 0;"></div>
+            <ul style="list-style: none; padding:0;">
         `;
-
-        perProdukDetail.forEach(dp => {
-            htmlPreview += `<div style="font-weight:800; margin-bottom:5px; color:var(--primary); font-size:14px;">[${dp.qty} Lyg] ${dp.prod}</div>`;
-            htmlPreview += `<ul style="list-style: none; padding:0; margin:0 0 15px 0;">`;
-            dp.bahan.forEach(item => { htmlPreview += `<li style="display:flex; justify-content:space-between; margin-bottom:3px; padding-left:10px; font-size:13px;"><span>- ${item.nama}</span><span style="font-weight:700;">${item.butuh} ${item.unit}</span></li>`; });
-            htmlPreview += `</ul>`;
-        });
-
-        htmlPreview += `<div style="border-top: 2px solid var(--primary); margin:15px 0;"></div>`;
-        htmlPreview += `<div style="font-weight:800; margin-bottom:10px; font-size: 15px; color: var(--danger);">TOTAL SEMUA BAHAN:</div>`;
-        htmlPreview += `<ul style="list-style: none; padding:0; margin:0;">`;
         
-        listTotalBahan.forEach((item) => {
-            htmlPreview += `<li style="display:flex; align-items:center; gap:10px; margin-bottom:8px; border-bottom:1px dashed var(--border); padding-bottom:5px;"><input type="checkbox" style="width:18px; height:18px; margin:0; cursor:pointer;"><span style="font-weight:700; font-size:14.5px;">${item.nama}</span><span style="margin-left:auto; font-weight:800; color:var(--primary); font-size:14.5px;">${item.butuh} ${item.unit}</span></li>`;
+        listBahan.forEach(item => {
+            htmlPreview += `<li style="display:flex; align-items:center; gap:10px; margin-bottom:8px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
+                <input type="checkbox" style="width:18px; height:18px;">
+                <span style="font-weight:700;">${item.nama}</span>
+                <span style="margin-left:auto; font-weight:800;">${item.butuh} ${item.unit}</span>
+            </li>`;
         });
-
         htmlPreview += `</ul>`;
 
         document.getElementById('preview-checklist-content').innerHTML = htmlPreview;
         document.getElementById('preview-checklist-card').style.display = 'block';
-        document.getElementById('preview-checklist-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
     function simpanChecklistData() {
-        if (!currentChecklistData) return showToast("Tidak ada data aktif!", "error");
+        if (!currentChecklistData) return showToast("Tidak ada data!", "error");
         checklistHistory.push(currentChecklistData);
         saveData();
         renderChecklistHistory();
-
-        let indexTerakhir = checklistHistory.length - 1;
-        cetakChecklistStrukPDF(indexTerakhir); 
-        document.getElementById('chk-no-adonan').value = '';
-        checklistInputItems = [{ prod: "", qty: "" }];
-        renderChecklistInput();
+        cetakChecklistStrukPDF(checklistHistory.length - 1);
+        document.getElementById('chk-produk').value = '';
+        document.getElementById('chk-qty').value = '';
         document.getElementById('preview-checklist-card').style.display = 'none';
         currentChecklistData = null;
         updateAutoNoAdonan();
@@ -2035,75 +2017,26 @@ let saveTimeout;
     async function cetakChecklistStrukPDF(idx) {
         let ready = await initPdfModules();
         if (!ready) return;
-
         let chk = checklistHistory[idx];
-        if(!chk || !chk.items) return showToast("Data tidak valid!", "error");
+        showLoading('Menyiapkan Struk...');
 
-        showLoading('Menyiapkan Struk Printer Kasir...');
         setTimeout(() => {
             const { jsPDF } = window.jspdf;
-            let headerHeight = 55; 
-            let detailHeight = 0;
-            if (chk.detailProduk) {
-                chk.detailProduk.forEach(dp => {
-                    detailHeight += 10; 
-                    detailHeight += (dp.bahan.length * 6); 
-                    detailHeight += 5; 
-                });
-            }
-            
-            let totalBahanHeight = 15 + (chk.items.length * 6); 
-            let footerHeight = 25; 
-            
-            let totalPanjangKertas = headerHeight + detailHeight + totalBahanHeight + footerHeight;
+            let totalPanjang = 60 + (chk.items.length * 7);
+            const doc = new jsPDF('p', 'mm', [58, totalPanjang]);
 
-            const doc = new jsPDF('p', 'mm', [58, totalPanjangKertas]);
-
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10); doc.setFont("helvetica", "bold");
             doc.text("PENGGUNAAN BAHAN", 29, 10, {align: 'center'});
-            doc.setFontSize(9);
-            doc.text("BOLU SAKINAH", 29, 15, {align: 'center'});
+            doc.setFontSize(8); doc.text("BOLU SAKINAH", 29, 14, {align: 'center'});
             
-            doc.setFontSize(7.5);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Tgl/Jam : ${chk.waktu_generate}`, 4, 25);
-            doc.text(`Pegawai : ${chk.petugas}`, 4, 29);
-            doc.text(`Adonan  : ${chk.no}`, 4, 33);
-            
-            doc.setLineDash([1, 1], 0);
-            doc.line(4, 37, 54, 37); 
+            doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
+            doc.text(`Tgl : ${chk.waktu_generate}`, 4, 22);
+            doc.text(`Petugas : ${chk.petugas}`, 4, 26);
+            doc.text(`Adonan : ${chk.no}`, 4, 30);
+            doc.text(`Bolu : ${chk.prod} (${chk.qty} Lyg)`, 4, 34);
+            doc.line(4, 36, 54, 36);
 
-            let currentY = 43;
-            if (chk.detailProduk) {
-                chk.detailProduk.forEach(dp => {
-                    doc.setFont("helvetica", "bold");
-                    doc.setFontSize(8);
-                    doc.text(`[${dp.qty} Lyg] ${dp.prod}`, 4, currentY);
-                    currentY += 5;
-
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(7.5);
-                    dp.bahan.forEach(b => {
-                        doc.text(`- ${b.nama}`, 6, currentY);
-                        doc.text(`${b.butuh} ${b.unit}`, 54, currentY, {align: 'right'});
-                        currentY += 5.5;
-                    });
-                    currentY += 2; 
-                });
-            }
-
-            doc.setLineDash([1, 1], 0);
-            doc.line(4, currentY, 54, currentY);
-            currentY += 6;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8.5);
-            doc.setTextColor(200, 0, 0); 
-            doc.text("TOTAL SEMUA BAHAN:", 4, currentY);
-            doc.setTextColor(0, 0, 0);
-            currentY += 6;
-
+            let currentY = 42;
             doc.setFontSize(8.5);
             chk.items.forEach(item => {
                 doc.rect(4, currentY - 2.5, 2.5, 2.5);
@@ -2111,19 +2044,10 @@ let saveTimeout;
                 doc.text(`${item.butuh} ${item.unit}`, 54, currentY, {align: 'right'});
                 currentY += 6;
             });
-            currentY += 5;
-            doc.line(4, currentY, 54, currentY);
-            currentY += 6;
-            doc.setFontSize(7);
-            doc.text("Petugas,", 10, currentY, {align: 'center'});
-            doc.text("Admin/Owner,", 45, currentY, {align: 'center'});
-            currentY += 12;
-            doc.text("(............)", 10, currentY, {align: 'center'});
-            doc.text("(............)", 45, currentY, {align: 'center'});
 
-            doc.save(`Struk_Bahan_${chk.no}.pdf`);
+            doc.save(`Checklist_${chk.no}.pdf`);
             hideLoading();
-            showToast('Struk Thermal Berhasil Dibuat!', 'success');
+            showToast('Struk Berhasil Dibuat!');
         }, 500);
     }
 
@@ -3121,23 +3045,24 @@ let saveTimeout;
         }
     }
     function updateAutoNoAdonan() {
-        let tglHPP = document.getElementById('log-tanggal') ? document.getElementById('log-tanggal').value : null;
-        if(tglHPP && document.getElementById('log-no-adonan')) {
-            let parts = tglHPP.split('-'); 
-            let prefixHPP = parts[2] + parts[1] + "-"; 
-
-            let hitungHPP = laporanPenggunaan.filter(x => x.tgl === tglHPP).length;
-            let urutanHPP = (hitungHPP + 1) < 10 ? "0" + (hitungHPP + 1) : (hitungHPP + 1);
-            document.getElementById('log-no-adonan').value = prefixHPP + urutanHPP;
-        }
         let tglChk = document.getElementById('chk-tanggal') ? document.getElementById('chk-tanggal').value : null;
-        if(tglChk && document.getElementById('chk-no-adonan')) {
+        let inputNo = document.getElementById('chk-no-adonan');
+        
+        if(tglChk && inputNo) {
             let parts = tglChk.split('-');
             let prefixChk = parts[2] + parts[1] + "-"; 
+            let maxUrutan = 0;
+            checklistHistory.forEach(item => {
+                if (item.tgl === tglChk && item.no && item.no.includes(prefixChk)) {
+                    let numPart = parseInt(item.no.split('-')[1]);
+                    if (!isNaN(numPart) && numPart > maxUrutan) {
+                        maxUrutan = numPart;
+                    }
+                }
+            });
 
-            let hitungChk = checklistHistory.filter(x => x.tgl === tglChk).length;
-            let urutanChk = (hitungChk + 1) < 10 ? "0" + (hitungChk + 1) : (hitungChk + 1);
-            document.getElementById('chk-no-adonan').value = prefixChk + urutanChk;
+            let nextNum = maxUrutan + 1;
+            inputNo.value = prefixChk + (nextNum < 10 ? "0" + nextNum : nextNum);
         }
     }
     setTimeout(() => {
