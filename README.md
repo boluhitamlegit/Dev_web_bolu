@@ -4,7 +4,7 @@
 ![Status](https://img.shields.io/badge/Status-Active_Development-success)
 ![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20PWA-orange)
 
-Aplikasi Web Manajemen Operasional komprehensif yang dirancang khusus untuk bisnis *bakery* (Bolu Sakinah). Sistem ini memfasilitasi manajemen pesanan, kalkulasi HPP (Harga Pokok Penjualan), pelacakan stok bahan baku, pencatatan buku kas, hingga pembuatan struk kasir/laporan PDF secara dinamis.
+Aplikasi Web Manajemen Operasional yang dirancang khusus untuk bisnis *bakery* (Bolu Sakinah). Sistem ini memfasilitasi manajemen pesanan, kalkulasi HPP (Harga Pokok Penjualan), pelacakan stok bahan baku, pencatatan buku kas, hingga pembuatan struk kasir/laporan PDF secara dinamis.
 
 Dibuat menggunakan antarmuka yang sangat responsif, mendukung tampilan *Mobile-First*, dan dilengkapi fitur *Cloud Sync* secara *Real-Time*.
 
