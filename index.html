@@ -465,8 +465,10 @@
                 position: relative !important;
             }
 
-            .table-responsive td[data-label="Pemesan"] {
-                padding-right: 48px !important; 
+            .table-responsive td[data-label="Pemesan"],
+            .table-responsive td[data-label="No. Adonan"],
+            .table-responsive td[data-label="Tgl & Waktu"] {
+                padding-right: 95px !important; 
             }
             .table-responsive td[data-label="Aksi"] {
                 position: absolute !important;
@@ -474,9 +476,12 @@
                 right: 15px !important;
                 padding: 0 !important;
                 border: none !important;
-                width: 38px !important;
+                width: auto !important; 
                 min-height: 38px !important;
                 background: transparent !important;
+                display: flex !important;
+                gap: 8px !important; 
+                justify-content: flex-end !important;
             }
             
             .table-responsive td[data-label="Aksi"]::before {
@@ -502,6 +507,25 @@
                 background: var(--danger) !important;
                 color: #ffffff !important;
             }
+            .table-responsive td[data-label="Aksi"] button.btn {
+                width: 38px !important;
+                height: 38px !important;
+                flex: 0 0 38px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            
+            .table-responsive td[data-label="Aksi"] button.btn:active {
+                background: var(--border) !important;
+                color: var(--surface) !important;
+            }
+
             .table-responsive td[data-label="Untuk Tanggal"] {
                 border-bottom: none !important; 
             }
@@ -1446,7 +1470,11 @@
                 tgl: Schema.str(l.tgl),
                 prod: Schema.str(l.prod),
                 qty: Schema.num(l.qty),
-                petugas: Schema.str(l.petugas)
+                petugas: Schema.str(l.petugas),
+                items: Schema.arr(l.items).map(item => ({
+                    prod: Schema.str(item.prod),
+                    qty: Schema.num(item.qty, 1)
+                }))
             }));
         }
 
@@ -1785,7 +1813,9 @@ let saveTimeout;
             let tableData = [];
             let grandTotalBiaya = 0;
             let akumulasiBahan = {};
-            lap.items.forEach(item => {
+            let listBoluCetak = lap.items || [{ prod: lap.prod, qty: lap.qty }];
+
+            listBoluCetak.forEach(item => {
                 let p = produkBolu.find(x => x.nama === item.prod);
                 if(p) {
                     let qtyLyg = getVal(item.qty);
@@ -1804,6 +1834,7 @@ let saveTimeout;
                     });
                 }
             });
+
             Object.keys(akumulasiBahan).forEach(id => {
                 let data = akumulasiBahan[id];
                 let jmlFinal = data.unit === 'kg' ? data.total : Math.ceil(data.total);
@@ -2237,11 +2268,14 @@ let saveTimeout;
             grandTotKebutuhan += jmlKeb; 
             grandTotPembelanjaan += jmlPem; 
         });
-        
-        document.getElementById('tot-kebutuhan').innerText = rp(grandTotKebutuhan); 
-        document.getElementById('tot-pembelanjaan').innerText = rp(grandTotPembelanjaan);
-        if(document.getElementById('tot-pembelanjaan-ringkasan')) {
-        document.getElementById('tot-pembelanjaan-ringkasan').innerText = rp(grandTotPembelanjaan);
+        if (document.getElementById('tot-kebutuhan')) {
+            document.getElementById('tot-kebutuhan').innerText = rp(grandTotKebutuhan); 
+        }
+        if (document.getElementById('tot-pembelanjaan')) {
+            document.getElementById('tot-pembelanjaan').innerText = rp(grandTotPembelanjaan);
+        }
+        if (document.getElementById('tot-pembelanjaan-ringkasan')) {
+            document.getElementById('tot-pembelanjaan-ringkasan').innerText = rp(grandTotPembelanjaan);
         }
         totalBelanjaGlobal = grandTotPembelanjaan; 
  
