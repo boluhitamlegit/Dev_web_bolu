@@ -326,95 +326,113 @@
             outline: none; 
             transform: translateY(-1px);
         }
+        /* --- PERBAIKAN FINAL TAMPILAN PESANAN DI MOBILE (LAYOUT BERTINGKAT) --- */
         @media (max-width: 768px) {
             .table-responsive td[data-label="Rincian Varian"] {
                 flex-direction: column !important;
                 align-items: flex-start !important;
-                padding: 12px 10px !important; 
+                padding: 15px 12px !important; 
             }
             .table-responsive td[data-label="Rincian Varian"]::before {
-                margin-bottom: 10px !important;
+                margin-bottom: 12px !important;
                 width: 100% !important;
-                font-size: 12px !important;
+                font-size: 12.5px !important;
                 letter-spacing: 0.5px !important;
             }
             .table-responsive td[data-label="Rincian Varian"] > div {
                 width: 100% !important;
                 box-sizing: border-box !important;
-                padding: 10px !important; 
+                padding: 12px !important; 
                 background: #f9fdf5 !important; 
                 border: 1px solid var(--secondary) !important;
+                border-radius: 12px !important;
             }
+            
+            /* Mengubah layout menjadi bertingkat agar tidak tergencet */
             .pesanan-item-row {
-                display: grid !important;
-                grid-template-columns: 1fr 72px 38px !important; 
-                gap: 5px !important; 
-                padding: 6px !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important; 
+                padding: 10px !important;
                 background: #ffffff !important;
                 border-radius: 10px !important;
                 border: 1px solid #e2e8f0 !important;
                 box-shadow: 2px 2px 0px #e2e8f0 !important;
+                margin-bottom: 12px !important;
             }
             
+            /* Pilihan Varian Bolu mengambil 100% lebar (Baris Atas) */
             .pesanan-item-row select.wide {
                 width: 100% !important;
-                padding-left: 6px !important; 
-                padding-right: 20px !important; 
-                background-position: right 5px center !important;
-                font-size: 12.5px !important; 
-                height: 42px !important;
-                min-height: 42px !important;
+                flex: 0 0 100% !important;
+                padding-left: 10px !important; 
+                padding-right: 30px !important; 
+                background-position: right 10px center !important;
+                font-size: 14px !important; 
+                height: 44px !important;
+                min-height: 44px !important;
                 border-radius: 8px !important;
                 border: 1px solid #cbd5e1 !important;
                 box-shadow: none !important;
-                text-overflow: ellipsis !important; 
+                text-overflow: unset !important; /* Memastikan teks tidak dipotong */
             }
             
+            /* Kotak Angka mengambil sisa ruang di Baris Bawah */
             .pesanan-item-row .input-group {
-                width: 100% !important;
+                flex: 1 !important;
+                width: auto !important;
                 max-width: none !important;
                 margin: 0 !important;
             }
             
             .pesanan-item-row .input-group input {
                 width: 100% !important;
-                height: 42px !important;
-                min-height: 42px !important;
-                padding-left: 2px !important;
-                padding-right: 24px !important; 
-                font-size: 13px !important;
+                height: 44px !important;
+                min-height: 44px !important;
+                padding-left: 10px !important;
+                padding-right: 40px !important; 
+                font-size: 15px !important;
                 font-weight: 800 !important;
-                text-align: center !important; 
+                text-align: left !important; 
                 border-radius: 8px !important;
                 border: 1px solid #cbd5e1 !important;
                 box-shadow: none !important;
             }
             
             .pesanan-item-row .input-group .input-unit {
-                right: 6px !important;
-                font-size: 10px !important; 
+                right: 12px !important;
+                font-size: 12px !important; 
                 font-weight: 800 !important;
                 color: var(--text-muted) !important;
             }
             
+            /* Tombol X (Hapus) berada di sebelah kanan kotak angka */
             .pesanan-item-row button.btn-danger {
-                width: 100% !important;
-                height: 42px !important;
-                min-height: 42px !important;
+                flex: 0 0 44px !important;
+                width: 44px !important;
+                height: 44px !important;
+                min-height: 44px !important;
                 padding: 0 !important;
                 border-radius: 8px !important;
                 border: 1px solid var(--danger) !important;
                 box-shadow: none !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
+            
+            /* Merapikan Tombol "Tambah Varian Bolu" */
             .table-responsive td[data-label="Rincian Varian"] button.btn {
-                height: 45px !important;
-                min-height: 45px !important;
+                height: 46px !important;
+                min-height: 46px !important;
                 border-radius: 10px !important;
-                font-size: 13px !important;
+                font-size: 13.5px !important;
                 box-shadow: none !important;
                 border: 2px dashed #cbd5e1 !important;
                 background: #ffffff !important;
                 color: var(--primary) !important;
+                width: 100% !important;
+                margin-top: 5px !important;
             }
             .table-responsive td[data-label="Rincian Varian"] button.btn:active {
                 background: var(--accent) !important;
@@ -801,25 +819,27 @@
     </div>
 
     <div id="page-hpp" class="page-container">
+        
         <div class="card form-input-card">
             <div class="card-header" style="border-bottom: none; margin-bottom: 10px;">
                 <h2><i class="fas fa-shopping-cart"></i> Form Pembelian Bahan</h2>
+                <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; display: inline-block; margin-top: 5px;">Input data produksi & pembelian harian.</span>
             </div>
             <div class="form-grid">
-            <div class="form-group"><label>No. Adonan </label><input type="text" id="log-no-adonan" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
                 <div class="form-group"><label>Tanggal</label><input type="date" id="log-tanggal" style="font-weight: 800;" onchange="updateAutoNoAdonan()"></div>
-                <div class="form-group">
-                    <label>Nama Produk</label>
-                    <select id="log-produk" class="custom-select"></select>
+                
+                <div style="grid-column: 1 / -1; background: #f7fcf0; padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--border);">
+                    <label style="display:block; font-weight:800; margin-bottom:10px; font-size:12.5px; color:var(--primary); text-transform:uppercase;">Daftar Produk & Jumlah Produksi (Loyang)</label>
+                    
+                    <div id="hpp-bolu-container" style="display: flex; flex-direction: column; gap: 10px;">
+                        </div>
+                    
+                    <button class="btn" style="margin-top: 15px; width: 100%; border: 2px dashed var(--border); background: var(--surface); color: var(--primary);" onclick="tambahItemHpp()">
+                        <i class="fas fa-plus"></i> Tambah Varian Bolu
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label>Qty</label>
-                    <div class="input-group full-width">
-                        <input type="number" id="log-qty" class="text-right has-unit" placeholder="........" min="0" style="font-weight: 800;">
-                        <span class="input-unit">loyang</span>
-                    </div>
-                </div>
-                <div class="form-group"><label>Nama petugas </label><input type="text" id="log-petugas" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
+
+                <div class="form-group"><label>Nama Petugas </label><input type="text" id="log-petugas" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
             </div>
             
             <div style="display: flex; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
@@ -829,49 +849,67 @@
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-file-signature"></i> Laporan Penggunaan Bahan</h2>
-                <span style="font-size: 12px; color: var(--primary); background: var(--secondary); padding: 6px 14px; border-radius: 30px; font-weight: 800; border: 1px solid var(--primary); box-shadow: 1px 1px 0 var(--primary);"><i class="fas fa-sync-alt"></i> HPP Terintegrasi Otomatis</span>
+            <div class="card-header" style="cursor: pointer; border-bottom: none; padding-bottom: 0;" onclick="toggleHistoryHPP()">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin: 0;">
+                    <h2 style="margin: 0;"><i class="fas fa-file-signature"></i> Laporan Penggunaan Bahan</h2>
+                    <i class="fas fa-chevron-down" id="icon-toggle-hpp" style="transition: transform 0.3s; font-size: 18px; color: var(--primary);"></i>
+                </div>
+                <span style="font-size: 11px; color: var(--primary); background: var(--secondary); padding: 4px 10px; border-radius: 30px; font-weight: 800; border: 1px solid var(--primary); display: inline-block; margin-top: 10px;"><i class="fas fa-sync-alt"></i> HPP Terintegrasi Otomatis</span>
             </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No. Adonan</th>
-                            <th>Tanggal</th>
-                            <th>Nama Produk</th>
-                            <th class="text-right">Qty (loyang)</th>
-                            <th>Nama Petugas</th>
-                            <th class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-laporan-penggunaan">
+            
+            <div id="area-history-hpp" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No. Urut</th>
+                                <th>Tanggal</th>
+                                <th>Nama Produk</th>
+                                <th class="text-right">Qty (loyang)</th>
+                                <th>Nama Petugas</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-laporan-penggunaan">
                         </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header" style="align-items: flex-start; justify-content: space-between;">
-                <div>
-                    <h2><i class="fas fa-boxes"></i> Kalkulasi Kebutuhan & HPP</h2>
-                    <span style="font-size: 13px; color: var(--text-muted); font-weight: 600; display: inline-block; margin-top: 5px;">Data <b style="color:var(--primary); background: var(--secondary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--primary);">Butuh</b> terintegrasi otomatis dari form di atas.</span>
+            <div class="card-header" style="cursor: pointer; border-bottom: none; padding-bottom: 0;" onclick="toggleKalkulasiHPP()">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin: 0;">
+                    <div>
+                        <h2 style="margin: 0;"><i class="fas fa-boxes"></i> Kalkulasi Kebutuhan & HPP</h2>
+                        <span style="font-size: 11px; color: var(--text-muted); font-weight: 600; display: inline-block; margin-top: 5px;">Klik untuk melihat rincian bahan baku.</span>
+                    </div>
+                    <i class="fas fa-chevron-down" id="icon-toggle-kalkulasi" style="transition: transform 0.3s; font-size: 18px; color: var(--primary);"></i>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table>
-                    <thead><tr><th>Nama Bahan</th><th class="text-right">Harga Satuan</th><th class="text-right" data-tooltip="Klik angka untuk mengedit">Butuh/Adonan</th><th class="text-right">Tersedia</th><th class="text-right">Sisa</th><th class="text-right">Jml Butuh</th><th class="text-right">Jml Belanja</th></tr></thead>
-                    
-                    <tbody id="tabel-bahan-body"></tbody> 
-                    
-                    <tfoot>
-                        <tr>
-                            <td colspan="5" data-label="Kesimpulan" class="text-right" style="font-weight: 800; font-size: 15px;">GRAND TOTAL BELANJA:</td>
-                            <td id="tot-kebutuhan" data-label="Total Kebutuhan" class="text-right" style="font-weight: 800; font-size: 14.5px; opacity: 0.8;">Rp 0</td>
-                            <td id="tot-pembelanjaan" data-label="Total Belanja" class="text-right" style="font-size: 18px; color: var(--secondary); font-weight: 800; text-shadow: 1px 1px 0 var(--primary);">Rp 0</td>
-                        </tr>
-                    </tfoot>
-                </table>
+            
+            <div id="area-kalkulasi-detail" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Bahan</th>
+                                <th class="text-right">Harga Satuan</th>
+                                <th class="text-right">Butuh/Adonan</th>
+                                <th class="text-right">Tersedia</th>
+                                <th class="text-right">Sisa</th>
+                                <th class="text-right">Jml Butuh</th>
+                                <th class="text-right">Jml Belanja</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-bahan-body"></tbody> 
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 800; font-size: 14px; text-transform: uppercase;">Total Belanja:</span>
+                <span id="tot-pembelanjaan-ringkasan" style="font-size: 20px; color: var(--primary); font-weight: 800; background: var(--secondary); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--primary); box-shadow: 3px 3px 0 var(--primary);">Rp 0</span>
             </div>
         </div>
     </div>
@@ -998,16 +1036,25 @@
             </div>
         </div>
 
-        <div class="card owner-card">
-            <div class="card-header"><h2><i class="fas fa-calculator"></i> Input Beban Keuangan (Hari Ini)</h2></div>
-            <div class="form-grid">
-                <div class="form-group"><label>Penjualan Kotor</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-penjualan" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
-                <div class="form-group"><label>Biaya Gas</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-gas" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
-                <div class="form-group"><label>Upah Pegawai</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-upah" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
-                <div class="form-group"><label>Retur Barang</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-retur" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+        <div class="card owner-card" style="margin-bottom: 25px;">
+            <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;"><i class="fas fa-calculator"></i> Input Beban Harian</h2>
+                    <button class="btn btn-primary" onclick="toggleInputKeuangan()" style="height: 40px; padding: 0 15px; font-size: 13px;">
+                        <i class="fas fa-edit"></i> <span class="hide-mobile">Isi Data</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="area-input-keuangan" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
+                <div class="form-grid">
+                    <div class="form-group"><label>Penjualan Kotor</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-penjualan" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+                    <div class="form-group"><label>Biaya Gas</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-gas" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+                    <div class="form-group"><label>Upah Pegawai</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-upah" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+                    <div class="form-group"><label>Retur Barang</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-retur" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
+                </div>
             </div>
         </div>
-
         <div class="grid-owner">
             <div class="stat-box bg-blue">
                 <h3><i class="fas fa-hand-holding-usd stat-icon"></i> Total Penjualan</h3>
@@ -1035,22 +1082,34 @@
     <div id="page-kas" class="page-container">
         
         <div class="card owner-card" style="margin-bottom: 25px;">
+            <div class="card owner-card" style="margin-bottom: 25px; border-top: 4px solid var(--primary);">
             <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
-                <h2 style="margin-bottom: 20px; width: 100%;"><i class="fas fa-book-open"></i> Buku Kas & Laporan Cloud</h2>
-                
-                <div class="form-grid" style="width: 100%; background: var(--accent); padding: 25px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;"><i class="fas fa-book-open"></i> Buku Kas & Laporan</h2>
+                    <button class="btn btn-primary" onclick="toggleFilterKas()" style="height: 40px; padding: 0 15px; font-size: 13px;">
+                        <i class="fas fa-filter"></i> <span class="hide-mobile">Filter & Laporan</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="area-filter-kas" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
+                <div class="form-grid" style="background: var(--accent); padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 20px;">
                     <div class="form-group" style="grid-column: 1 / -1;"><label>Pencarian Keterangan</label><input type="text" id="filter-search" placeholder="Cari data transaksi..." oninput="debouncedRenderKas()"></div>
                     <div class="form-group"><label>Pilih Bulan</label><input type="month" id="filter-bulan" onchange="resetDateRange(); renderKas()"></div>
                     <div class="form-group"><label>Mulai Tanggal</label><input type="date" id="filter-start" onchange="clearMonth(); renderKas()"></div>
                     <div class="form-group"><label>Sampai Tanggal</label><input type="date" id="filter-end" onchange="clearMonth(); renderKas()"></div>
                 </div>
 
-                <div style="display: flex; gap: 15px; width: 100%; flex-wrap: wrap;">
-                    <button class="btn btn-gold" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Unduh CSV</button>
-                    <button class="btn btn-primary" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="btn btn-success" style="margin-left: auto;" onclick="tambahKas()"><i class="fas fa-plus"></i> Transaksi Baru</button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-gold" style="flex: 1;" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Unduh CSV</button>
+                    <button class="btn btn-primary" style="flex: 1;" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
                 </div>
             </div>
+
+            <button class="btn btn-success" style="width: 100%; margin-top: 15px;" onclick="tambahKas()">
+                <i class="fas fa-plus"></i> Tambah Transaksi Kas Baru
+            </button>
+        </div>
         </div>
 
         <div class="grid-owner" id="kas-summary" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 25px;">
@@ -1458,6 +1517,33 @@ let saveTimeout;
 
     let checklistInputItems = [{ prod: "", qty: "" }];
     
+    let hppInputItems = [{ prod: "", qty: "" }];
+    function renderHppInput() {
+        let container = document.getElementById('hpp-bolu-container');
+        if(!container) return;
+        container.innerHTML = '';
+        
+        let optionsHtml = '<option value="">-- Pilih Bolu --</option>';
+        produkBolu.forEach(p => { optionsHtml += `<option value="${p.nama}">${p.nama}</option>`; });
+
+        hppInputItems.forEach((item, idx) => {
+            container.innerHTML += `
+            <div class="pesanan-item-row">
+                <select class="custom-select wide" onchange="hppInputItems[${idx}].prod=this.value">
+                    ${optionsHtml.replace(`value="${item.prod}"`, `value="${item.prod}" selected`)}
+                </select>
+                <div class="input-group">
+                    <input type="number" class="text-right has-unit" placeholder="Qty" value="${item.qty}" min="1" onchange="hppInputItems[${idx}].qty=validateNumInput(this); updateHPPFromLaporan();">
+                    <span class="input-unit">Lyg</span>
+                </div>
+                <button class="btn-danger" onclick="hapusItemHpp(${idx})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            `;
+        });
+    }
+
     function renderChecklistInput() {
         let container = document.getElementById('chk-bolu-container');
         if(!container) return;
@@ -1468,20 +1554,34 @@ let saveTimeout;
 
         checklistInputItems.forEach((item, idx) => {
             container.innerHTML += `
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <select class="custom-select" style="flex: 2; min-width: 0;" onchange="checklistInputItems[${idx}].prod=this.value">
+            <div class="pesanan-item-row">
+                <select class="custom-select wide" onchange="checklistInputItems[${idx}].prod=this.value">
                     ${optionsHtml.replace(`value="${item.prod}"`, `value="${item.prod}" selected`)}
                 </select>
-                <div class="input-group" style="flex: 1; min-width: 90px; margin: 0;">
+                <div class="input-group">
                     <input type="number" class="text-right has-unit" placeholder="Qty" value="${item.qty}" min="1" onchange="checklistInputItems[${idx}].qty=validateNumInput(this)">
                     <span class="input-unit">Lyg</span>
                 </div>
-                <button class="btn-danger" style="padding: 0; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm);" onclick="hapusItemChecklist(${idx})">
+                <button class="btn-danger" onclick="hapusItemChecklist(${idx})">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             `;
         });
+    }
+    
+
+    function tambahItemHpp() {
+        hppInputItems.push({ prod: "", qty: "" });
+        renderHppInput();
+    }
+
+    function hapusItemHpp(idx) {
+        if(hppInputItems.length > 1) {
+            hppInputItems.splice(idx, 1);
+            renderHppInput();
+            updateHPPFromLaporan();
+        }
     }
 
     function tambahItemChecklist() {
@@ -1507,50 +1607,8 @@ let saveTimeout;
         let today = new Date().toISOString().slice(0,10);
         if(document.getElementById('log-tanggal')) document.getElementById('log-tanggal').value = today;
         if(document.getElementById('chk-tanggal')) document.getElementById('chk-tanggal').value = today;
-
+        renderHppInput();
         renderChecklistInput(); 
-    }
-
-    function simpanLaporanPenggunaan(cetakLangsung = false) {
-        let no = document.getElementById('log-no-adonan').value.trim();
-        let tgl = document.getElementById('log-tanggal').value;
-        let prod = document.getElementById('log-produk').value;
-        let qty = getVal(document.getElementById('log-qty').value);
-        let petugas = document.getElementById('log-petugas').value;
-
-        if(!no || !tgl || !prod || qty <= 0 || !petugas) return showToast("Harap isi semua data form laporan dengan benar!", "error");
-
-        let isDuplicate = laporanPenggunaan.some(lap => lap.no.toLowerCase() === no.toLowerCase());
-        if (isDuplicate) {
-            document.getElementById('log-no-adonan').classList.add('invalid');
-            return showToast("Gagal! No. Adonan '" + no + "' sudah dilaporkan. HPP bisa ganda!", "error");
-        } else {
-            document.getElementById('log-no-adonan').classList.remove('invalid');
-        }
-    
-
-        laporanPenggunaan.push({
-            id: "lap_" + Date.now(),
-            no: no,
-            tgl: tgl,
-            prod: prod,
-            qty: qty,
-            petugas: petugas
-        });
-        
-        saveData();
-        renderLaporanPenggunaan();
-        updateHPPFromLaporan();
-        
-        showToast("Data Penggunaan Berhasil Disimpan & HPP Diperbarui", "success");
-        
-        if (cetakLangsung) {
-            cetakLaporanPDF(laporanPenggunaan.length - 1);
-        }
-
-        document.getElementById('log-no-adonan').value = '';
-        document.getElementById('log-qty').value = '';
-        updateAutoNoAdonan();
     }
 
     function renderLaporanPenggunaan() {
@@ -1588,104 +1646,108 @@ let saveTimeout;
         });
     }
 
+   function simpanLaporanPenggunaan(cetakLangsung = false) {
+        let tgl = document.getElementById('log-tanggal').value;
+        let petugas = document.getElementById('log-petugas').value;
+
+        let validItems = hppInputItems.filter(x => x.prod !== "" && getVal(x.qty) > 0);
+        if(!tgl || validItems.length === 0 || !petugas) return showToast("Harap isi semua data produksi dengan benar!", "error");
+        let urutanKe = laporanPenggunaan.length + 1;
+        let noUrutOtomatis = "PROD-" + urutanKe;
+
+        laporanPenggunaan.push({
+            id: "lap_" + Date.now(),
+            no: noUrutOtomatis,
+            tgl: tgl,
+            items: validItems, 
+            prod: validItems.map(x => x.prod).join(", "),
+            qty: validItems.reduce((sum, x) => sum + getVal(x.qty), 0),
+            petugas: petugas
+        });
+        
+        saveData();
+        renderLaporanPenggunaan();
+        updateHPPFromLaporan();
+        
+        showToast("Laporan Pembelian & Produksi Berhasil Disimpan", "success");
+        
+        if (cetakLangsung) {
+            cetakLaporanPDF(laporanPenggunaan.length - 1);
+        }
+        hppInputItems = [{ prod: "", qty: "" }];
+        renderHppInput();
+    }
+
     async function cetakLaporanPDF(idx) {   
         let ready = await initPdfModules();
         if (!ready) return;
 
         let lap = laporanPenggunaan[idx];
-        let prodObj = produkBolu.find(p => p.nama === lap.prod);
-        
-        if (!prodObj) return showToast("Gagal! Produk tidak ditemukan.", "error");
+        showLoading('Menghitung Total Biaya & Menyiapkan Laporan A4...');
 
-        showLoading('Menghitung Bahan & Menyiapkan PDF...');
         setTimeout(() => {
             const { jsPDF } = window.jspdf; 
-            const doc = new jsPDF('landscape', 'mm', 'a4'); 
-
-
-            doc.setFontSize(18); 
-            doc.setTextColor(25, 26, 35); 
-            doc.setFont("helvetica", "bold");
-            doc.text("LAPORAN PENGGUNAAN BAHAN", 14, 20); 
+            const doc = new jsPDF('p', 'mm', 'a4'); 
+            doc.setFontSize(18); doc.setFont("helvetica", "bold");
+            doc.text("LAPORAN BIAYA PRODUKSI (HPP)", 105, 20, { align: 'center' });
             
-            doc.setFontSize(11); 
-            doc.setTextColor(75, 75, 75); 
-            doc.setFont("helvetica", "normal");
-            
-            doc.text(`No. Adonan     : ${lap.no}`, 14, 32);
-            doc.text(`Tanggal        : ${lap.tgl}`, 14, 38);
-            doc.text(`Nama Produk    : ${lap.prod}`, 14, 44);
-            doc.text(`Qty            : ${lap.qty} loyang`, 14, 50);
-            doc.text(`Nama petugas   : ${lap.petugas}`, 14, 56);
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text(`No. Adonan  : ${lap.no}`, 14, 35);
+            doc.text(`Tanggal     : ${lap.tgl}`, 14, 40);
+            doc.text(`Petugas     : ${lap.petugas}`, 14, 45);
+            doc.text(`Daftar Bolu : ${lap.prod}`, 14, 50);
 
             let tableData = [];
-            let qtyLoyang = getVal(lap.qty);
-            let adonan = qtyLoyang / prodObj.rAdonan;
-            let totalPcs = qtyLoyang * prodObj.rPcs;
-            let totalJmlButuh = 0;
-            let totalJmlBelanja = 0;
+            let grandTotalBiaya = 0;
+            let akumulasiBahan = {};
+            lap.items.forEach(item => {
+                let p = produkBolu.find(x => x.nama === item.prod);
+                if(p) {
+                    let qtyLyg = getVal(item.qty);
+                    let rasioAdonan = qtyLyg / p.rAdonan;
+                    let totalPcs = qtyLyg * p.rPcs;
 
-            bahanBaku.forEach(b => {
-                let need = 0;
-                if (b.isMikaS) {
-                    need = totalPcs / 6;
-                } else {
-                    let gram = adonan * (b.resep[prodObj.id] || 0);
-                    need = b.isKg ? (gram / 1000) : gram;
-                }
+                    bahanBaku.forEach(b => {
+                        let butuh = 0;
+                        if (b.isMikaS) butuh = totalPcs / 6;
+                        else butuh = b.isKg ? ((rasioAdonan * (b.resep[p.id] || 0)) / 1000) : (rasioAdonan * (b.resep[p.id] || 0));
 
-                if (need > 0) {
-                    let unit = b.isKg ? 'kg' : 'pcs';
-                    let sedia = getVal(b.sedia);
-                    
-                    let calcNeed = b.isKg ? need : Math.ceil(need);
-                    let calcSedia = b.isKg ? sedia : Math.ceil(sedia);
-                    let sisa = calcNeed - calcSedia; if(sisa < 0) sisa = 0;
-                    
-                    let formatNeed = b.isKg ? calcNeed.toFixed(3) : calcNeed;
-                    let formatSedia = b.isKg ? calcSedia.toFixed(3) : calcSedia;
-                    let formatSisa = b.isKg ? sisa.toFixed(3) : sisa;
-                    
-                    let jmlKeb = calcNeed * b.harga;
-                    let jmlPem = sisa * b.harga;
-                    
-                    totalJmlButuh += jmlKeb;
-                    totalJmlBelanja += jmlPem;
-
-                    tableData.push([
-                        b.nama, 
-                        rp(b.harga),
-                        formatNeed + ' ' + unit,
-                        formatSedia + ' ' + unit,
-                        formatSisa + ' ' + unit,
-                        rp(jmlKeb),
-                        rp(jmlPem)
-                    ]);
+                        if (butuh > 0) {
+                            if (!akumulasiBahan[b.id]) akumulasiBahan[b.id] = { nama: b.nama, harga: b.harga, total: 0, unit: b.isKg?'kg':'pcs' };
+                            akumulasiBahan[b.id].total += butuh;
+                        }
+                    });
                 }
             });
+            Object.keys(akumulasiBahan).forEach(id => {
+                let data = akumulasiBahan[id];
+                let jmlFinal = data.unit === 'kg' ? data.total : Math.ceil(data.total);
+                let subTotal = jmlFinal * data.harga;
+                grandTotalBiaya += subTotal;
+
+                tableData.push([
+                    data.nama,
+                    rp(data.harga),
+                    jmlFinal.toFixed(data.unit==='kg'?3:0) + " " + data.unit,
+                    rp(subTotal)
+                ]);
+            });
+
             doc.autoTable({ 
-                startY: 65, 
-                head: [['Nama Bahan', 'Harga Satuan', 'Butuh (kg/adonan)', 'Tersedia (kg/adonan)', 'Sisa (kg/adonan)', 'Jml Butuh', 'Jml Belanja']], 
+                startY: 60, 
+                head: [['Nama Bahan Baku', 'Harga Satuan', 'Total Kebutuhan', 'Subtotal Biaya']], 
                 body: tableData, 
-                foot: [['', '', '', '', 'TOTAL BIAYA:', rp(totalJmlButuh), rp(totalJmlBelanja)]], 
+                foot: [['', '', 'TOTAL BIAYA PRODUKSI:', rp(grandTotalBiaya)]], 
                 theme: 'grid', 
-                headStyles: { fillColor: [25, 26, 35], textColor: [255, 255, 255], fontStyle: 'bold' }, 
+                headStyles: { fillColor: [25, 26, 35], fontStyle: 'bold' }, 
                 footStyles: { fillColor: [185, 255, 102], textColor: [25, 26, 35], fontStyle: 'bold' }, 
-                styles: { fontSize: 10, font: 'helvetica', lineColor: [25, 26, 35], lineWidth: 0.1 },
-                columnStyles: {
-                    1: { halign: 'right' },
-                    2: { halign: 'right' },
-                    3: { halign: 'right' },
-                    4: { halign: 'right' },
-                    5: { halign: 'right' },
-                    6: { halign: 'right' }
-                }
+                columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } }
             });
 
-            doc.save(`Penggunaan_Bahan_${lap.no}_${lap.prod.replace(/\s+/g, '_')}.pdf`); 
+            doc.save(`Laporan_HPP_A4_${lap.no}.pdf`); 
             hideLoading(); 
-            showToast('PDF Laporan Berhasil Dibuat!', 'success');
-        }, 600);
+            showToast('Laporan A4 Berhasil Dibuat!', 'success');
+        }, 800);
     }
 
 
@@ -2093,6 +2155,9 @@ let saveTimeout;
         
         document.getElementById('tot-kebutuhan').innerText = rp(grandTotKebutuhan); 
         document.getElementById('tot-pembelanjaan').innerText = rp(grandTotPembelanjaan);
+        if(document.getElementById('tot-pembelanjaan-ringkasan')) {
+        document.getElementById('tot-pembelanjaan-ringkasan').innerText = rp(grandTotPembelanjaan);
+        }
         totalBelanjaGlobal = grandTotPembelanjaan; 
  
         hitungOwner(true); 
@@ -3055,6 +3120,63 @@ let saveTimeout;
         } else {
             area.style.display = 'none';
             icon.style.transform = 'rotate(0deg)';
+        }
+    }
+    function toggleHistoryHPP() {
+        const area = document.getElementById('area-history-hpp');
+        const icon = document.getElementById('icon-toggle-hpp');
+        
+        if (area.style.display === 'none' || area.style.display === '') {
+            area.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+            renderLaporanPenggunaan();
+        } else {
+            area.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+    function toggleKalkulasiHPP() {
+        const area = document.getElementById('area-kalkulasi-detail');
+        const icon = document.getElementById('icon-toggle-kalkulasi');
+        
+        if (area.style.display === 'none' || area.style.display === '') {
+            area.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            area.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+    function toggleFilterKas() {
+        const area = document.getElementById('area-filter-kas');
+        const btn = event.currentTarget;
+        
+        if (area.style.display === 'none' || area.style.display === '') {
+            area.style.display = 'block';
+            btn.innerHTML = '<i class="fas fa-times"></i> <span class="hide-mobile">Tutup Filter</span>';
+            btn.classList.add('btn-danger');
+            btn.classList.remove('btn-primary');
+        } else {
+            area.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-filter"></i> <span class="hide-mobile">Filter & Laporan</span>';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-primary');
+        }
+    }
+    function toggleInputKeuangan() {
+        const area = document.getElementById('area-input-keuangan');
+        const btn = event.currentTarget;
+        
+        if (area.style.display === 'none' || area.style.display === '') {
+            area.style.display = 'block';
+            btn.innerHTML = '<i class="fas fa-times"></i> <span class="hide-mobile">Tutup</span>';
+            btn.classList.add('btn-danger');
+            btn.classList.remove('btn-primary');
+        } else {
+            area.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-edit"></i> <span class="hide-mobile">Isi Data</span>';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-primary');
         }
     }
 </script>
