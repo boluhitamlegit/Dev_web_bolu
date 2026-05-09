@@ -326,7 +326,6 @@
             outline: none; 
             transform: translateY(-1px);
         }
-        /* --- PERBAIKAN FINAL TAMPILAN PESANAN DI MOBILE (LAYOUT BERTINGKAT) --- */
         @media (max-width: 768px) {
             .table-responsive td[data-label="Rincian Varian"] {
                 flex-direction: column !important;
@@ -347,8 +346,6 @@
                 border: 1px solid var(--secondary) !important;
                 border-radius: 12px !important;
             }
-            
-            /* Mengubah layout menjadi bertingkat agar tidak tergencet */
             .pesanan-item-row {
                 display: flex !important;
                 flex-wrap: wrap !important;
@@ -360,8 +357,6 @@
                 box-shadow: 2px 2px 0px #e2e8f0 !important;
                 margin-bottom: 12px !important;
             }
-            
-            /* Pilihan Varian Bolu mengambil 100% lebar (Baris Atas) */
             .pesanan-item-row select.wide {
                 width: 100% !important;
                 flex: 0 0 100% !important;
@@ -374,10 +369,8 @@
                 border-radius: 8px !important;
                 border: 1px solid #cbd5e1 !important;
                 box-shadow: none !important;
-                text-overflow: unset !important; /* Memastikan teks tidak dipotong */
+                text-overflow: unset !important; 
             }
-            
-            /* Kotak Angka mengambil sisa ruang di Baris Bawah */
             .pesanan-item-row .input-group {
                 flex: 1 !important;
                 width: auto !important;
@@ -405,8 +398,6 @@
                 font-weight: 800 !important;
                 color: var(--text-muted) !important;
             }
-            
-            /* Tombol X (Hapus) berada di sebelah kanan kotak angka */
             .pesanan-item-row button.btn-danger {
                 flex: 0 0 44px !important;
                 width: 44px !important;
@@ -420,8 +411,6 @@
                 align-items: center !important;
                 justify-content: center !important;
             }
-            
-            /* Merapikan Tombol "Tambah Varian Bolu" */
             .table-responsive td[data-label="Rincian Varian"] button.btn {
                 height: 46px !important;
                 min-height: 46px !important;
@@ -436,6 +425,92 @@
             }
             .table-responsive td[data-label="Rincian Varian"] button.btn:active {
                 background: var(--accent) !important;
+            }
+        }
+        .fab-tambah-pesanan {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3), 0px 4px 0px var(--border);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+        }
+        .fab-tambah-pesanan:active {
+            transform: translateY(4px);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3), 0px 0px 0px var(--border);
+        }
+        @media (max-width: 768px) {
+            .fab-tambah-pesanan {
+                bottom: 25px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 20px;
+                box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3), 0px 3px 0px var(--border);
+            }
+        }
+        @media (max-width: 768px) {
+            .table-responsive tbody tr {
+                position: relative !important;
+            }
+
+            .table-responsive td[data-label="Pemesan"] {
+                padding-right: 48px !important; 
+            }
+            .table-responsive td[data-label="Aksi"] {
+                position: absolute !important;
+                top: 15px !important;
+                right: 15px !important;
+                padding: 0 !important;
+                border: none !important;
+                width: 38px !important;
+                min-height: 38px !important;
+                background: transparent !important;
+            }
+            
+            .table-responsive td[data-label="Aksi"]::before {
+                display: none !important; 
+            }
+            .table-responsive td[data-label="Aksi"] button.btn-danger {
+                width: 38px !important;
+                height: 38px !important;
+                flex: 0 0 38px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background: #fee2e2 !important; 
+                color: var(--danger) !important;
+                border: 1px solid #fca5a5 !important;
+                box-shadow: none !important;
+            }
+            
+            .table-responsive td[data-label="Aksi"] button.btn-danger:active {
+                background: var(--danger) !important;
+                color: #ffffff !important;
+            }
+            .table-responsive td[data-label="Untuk Tanggal"] {
+                border-bottom: none !important; 
+            }
+            .table-responsive td[data-label="Rincian Varian"] {
+                background: #f8fafc !important;
+                border-radius: 14px !important;
+                padding: 15px !important;
+                margin-top: 5px !important;
+                border: 1px solid #e2e8f0 !important;
             }
         }
     </style>
@@ -988,23 +1063,29 @@
     </div>
 
     <div id="page-pesanan" class="page-container active">
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-users"></i> Rekap Pesanan Pelanggan</h2>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: flex-end; flex: 1;">
-                    <div class="input-group" style="min-width: 180px; flex: 1; margin: 0;">
-                        <span class="input-prefix"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search-pesanan" placeholder="Cari Nama..." oninput="renderPesanan()" class="has-prefix" style="width: 100%;">
-                    </div>
-                    <select id="sort-pesanan" class="custom-select" onchange="renderPesanan()" style="min-width: 180px; flex: 1; margin: 0; cursor: pointer;">
-                        <option value="lama">Sortir: Lama - Terbaru</option>
-                        <option value="baru">Sortir: Terbaru - Lama</option>
-                    </select>
-                    <button class="btn btn-primary" onclick="tambahPesanan()" title="Tambah Baris Pesanan Baru" style="white-space: nowrap;">
-                        <i class="fas fa-plus"></i> Tambah
+        <div class="card-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 15px;">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;"><i class="fas fa-users"></i> Rekap Pesanan</h2>
+                    <button class="btn btn-primary" onclick="toggleFilterPesanan()" style="height: 40px; padding: 0 15px; font-size: 13px;">
+                        <i class="fas fa-search"></i> <span class="hide-mobile">Cari & Sortir</span>
                     </button>
                 </div>
             </div>
+            
+            <div id="area-filter-pesanan" style="display: none; margin-bottom: 15px; padding: 0 20px 20px 20px;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; background: var(--accent); padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--border);">
+                    <div class="input-group" style="min-width: 180px; flex: 1; margin: 0;">
+                        <span class="input-prefix"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search-pesanan" placeholder="Cari Nama Pemesan..." oninput="renderPesanan()" class="has-prefix" style="width: 100%;">
+                    </div>
+                    <select id="sort-pesanan" class="custom-select" onchange="renderPesanan()" style="min-width: 180px; flex: 1; margin: 0; cursor: pointer;">
+                        <option value="lama">Urutkan: Lama ke Terbaru</option>
+                        <option value="baru">Urutkan: Terbaru ke Lama</option>
+                    </select>
+                </div>
+            </div>
+            <div id="panel-rekap-pesanan" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                </div>
             <div class="table-responsive">
                 <table>
                     <thead id="tabel-pesanan-head"></thead>
@@ -1013,6 +1094,10 @@
                 </table>
             </div>
         </div>
+        <button class="fab-tambah-pesanan" onclick="tambahPesanan()" title="Tambah Pesanan Baru">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
     </div>
 
     <div id="page-dashboard" class="page-container">
@@ -2344,18 +2429,33 @@ let saveTimeout;
         produkBolu.forEach(prod => {
             let t = totals[prod.id];
             if (t > 0) {
-                summaryPak.push(`<span><b>${prod.nama}:</b> ${t} Pak</span>`);
-                summaryLoyang.push(`<span><b>${prod.nama}:</b> ${Math.floor(t/2)} Lyg` + (t%2 > 0 ? `, ${t%2} Pk` : "") + `</span>`);
-                summaryKresek.push(`<span><b>${prod.nama}:</b> ${Math.floor(t/5)} Ksk` + (t%5 > 0 ? `, ${t%5} Pk` : "") + `</span>`);
+                let namaBolu = escapeHTML(prod.nama);
+                summaryPak.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${t} Pak</b></div>`);
+                summaryLoyang.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${Math.floor(t/2)} Lyg` + (t%2 > 0 ? `, ${t%2} Pk` : "") + `</b></div>`);
+                summaryKresek.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${Math.floor(t/5)} Ksk` + (t%5 > 0 ? `, ${t%5} Pk` : "") + `</b></div>`);
             }
         });
+        let panelRekap = '';
+        if (summaryPak.length > 0) {
+            panelRekap += `
+            <div style="background: var(--surface); padding: 15px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 4px 4px 0 var(--border);">
+                <h3 style="margin: 0 0 12px 0; font-size: 13.5px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-box" style="color:var(--secondary); margin-right: 5px; background: var(--primary); padding: 5px; border-radius: 6px;"></i> Total Pak</h3>
+                <div style="font-size: 13px; color: var(--text-muted);">${summaryPak.join('')}</div>
+            </div>
+            <div style="background: var(--accent); padding: 15px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 4px 4px 0 var(--border);">
+                <h3 style="margin: 0 0 12px 0; font-size: 13.5px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-layer-group" style="color:var(--primary); margin-right: 5px;"></i> Total Loyang</h3>
+                <div style="font-size: 13px; color: var(--primary);">${summaryLoyang.join('')}</div>
+            </div>
+            <div style="background: var(--secondary); padding: 15px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 4px 4px 0 var(--border);">
+                <h3 style="margin: 0 0 12px 0; font-size: 13.5px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-shopping-bag" style="color:var(--primary); margin-right: 5px;"></i> Total Kresek</h3>
+                <div style="font-size: 13px; color: var(--primary);">${summaryKresek.join('')}</div>
+            </div>`;
+        }
 
-        let tfoot = `
-        <tr><td colspan="2" class="text-right" style="font-weight:800; color:var(--secondary);">Total Pak</td><td colspan="2"><div class="summary-footer-text">${summaryPak.length > 0 ? summaryPak.join('') : '-'}</div></td></tr>
-        <tr><td colspan="2" class="text-right" style="font-weight:800; color:var(--secondary);">Total Loyang</td><td colspan="2"><div class="summary-footer-text">${summaryLoyang.length > 0 ? summaryLoyang.join('') : '-'}</div></td></tr>
-        <tr><td colspan="2" class="text-right" style="font-weight:800; color:var(--secondary);">Total Kresek</td><td colspan="2"><div class="summary-footer-text">${summaryKresek.length > 0 ? summaryKresek.join('') : '-'}</div></td></tr>
-        `;
-        document.getElementById('tabel-pesanan-foot').innerHTML = tfoot;
+        let panelEl = document.getElementById('panel-rekap-pesanan');
+        if(panelEl) panelEl.innerHTML = panelRekap;
+        let tfootEl = document.getElementById('tabel-pesanan-foot');
+        if(tfootEl) tfootEl.innerHTML = '';
 
         if(adaPesananHariIni && !sessionStorage.getItem('notifPesanan_shown')) { 
             showToast('Ada pesanan untuk dikirim hari ini!', 'accent'); 
@@ -3175,6 +3275,22 @@ let saveTimeout;
         } else {
             area.style.display = 'none';
             btn.innerHTML = '<i class="fas fa-edit"></i> <span class="hide-mobile">Isi Data</span>';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-primary');
+        }
+    }
+    function toggleFilterPesanan() {
+        const area = document.getElementById('area-filter-pesanan');
+        const btn = event.currentTarget;
+        
+        if (area.style.display === 'none' || area.style.display === '') {
+            area.style.display = 'block';
+            btn.innerHTML = '<i class="fas fa-times"></i> <span class="hide-mobile">Tutup Pencarian</span>';
+            btn.classList.add('btn-danger');
+            btn.classList.remove('btn-primary');
+        } else {
+            area.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-search"></i> <span class="hide-mobile">Cari & Sortir</span>';
             btn.classList.remove('btn-danger');
             btn.classList.add('btn-primary');
         }
