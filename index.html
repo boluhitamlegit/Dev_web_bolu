@@ -803,7 +803,7 @@
     <div id="page-hpp" class="page-container">
         <div class="card form-input-card">
             <div class="card-header" style="border-bottom: none; margin-bottom: 10px;">
-                <h2><i class="fas fa-clipboard-check"></i> Form Input Penggunaan Bahan</h2>
+                <h2><i class="fas fa-shopping-cart"></i> Form Pembelian Bahan</h2>
             </div>
             <div class="form-grid">
             <div class="form-group"><label>No. Adonan </label><input type="text" id="log-no-adonan" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
@@ -880,22 +880,21 @@
         
         <div class="card form-input-card">
             <div class="card-header" style="border-bottom: none; margin-bottom: 10px;">
-                <h2><i class="fas fa-clipboard-check"></i> Form Persiapan Checklist Bahan</h2>
+                <h2><i class="fas fa-clipboard-check"></i> Form Penggunaan Bahan</h2>
                 <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; display: inline-block; margin-top: 5px;">Input data produksi untuk mendapatkan checklist bahan baku.</span>
             </div>
             <div class="form-grid">
                 <div class="form-group"><label>No. Adonan </label><input type="text" id="chk-no-adonan" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
                 <div class="form-group"><label>Tanggal</label><input type="date" id="chk-tanggal" style="font-weight: 800;" onchange="updateAutoNoAdonan()"></div>
-                <div class="form-group">
-                    <label>Nama Varian Bolu</label>
-                    <select id="chk-produk" class="custom-select"></select>
-                </div>
-                <div class="form-group">
-                    <label>Target Buat (Loyang)</label>
-                    <div class="input-group full-width">
-                        <input type="number" id="chk-qty" class="text-right has-unit" placeholder="Cth: 20" min="1" style="font-weight: 800;">
-                        <span class="input-unit">loyang</span>
-                    </div>
+               <div style="grid-column: 1 / -1; background: #f9fdf5; padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--secondary);">
+                    <label style="display:block; font-weight:800; margin-bottom:10px; font-size:12.5px; color:var(--primary); text-transform:uppercase;">Daftar Varian Bolu & Target Buat (Loyang)</label>
+                    
+                    <div id="chk-bolu-container" style="display: flex; flex-direction: column; gap: 10px;">
+                        </div>
+                    
+                    <button class="btn" style="margin-top: 15px; width: 100%; border: 2px dashed var(--border); background: var(--surface); color: var(--primary);" onclick="tambahItemChecklist()">
+                        <i class="fas fa-plus"></i> Tambah Varian Bolu
+                    </button>
                 </div>
                 <div class="form-group"><label>Nama Pegawai </label><input type="text" id="chk-petugas" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
             </div>
@@ -918,28 +917,34 @@
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-history"></i> History Checklist Pegawai</h2>
-                <div class="input-group" style="min-width: 200px; margin: 0;">
+            <div class="card-header" style="cursor: pointer; border-bottom: none; padding-bottom: 0;" onclick="toggleHistoryChecklist()">
+                <h2 style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin: 0;">
+                    <span><i class="fas fa-history"></i> History Checklist</span>
+                    <i class="fas fa-chevron-down" id="icon-toggle-history" style="transition: transform 0.3s; background: transparent; box-shadow: none; border: none; padding: 0;"></i>
+                </h2>
+            </div>
+            
+            <div id="area-history-checklist" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
+                <div class="input-group" style="min-width: 200px; margin: 0 0 15px 0;">
                     <span class="input-prefix"><i class="fas fa-search"></i></span>
                     <input type="text" id="search-checklist" placeholder="Cari No. Adonan / Pegawai..." oninput="renderChecklistHistory()" class="has-prefix" style="width: 100%;">
                 </div>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tgl & Waktu</th>
-                            <th>No. Adonan</th>
-                            <th>Pegawai</th>
-                            <th>Varian Bolu</th>
-                            <th class="text-right">Jml Loyang</th>
-                            <th class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-checklist-history">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tgl & Waktu</th>
+                                <th>No. Adonan</th>
+                                <th>Pegawai</th>
+                                <th>Varian Bolu</th>
+                                <th class="text-right">Jml Loyang</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-checklist-history">
                         </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -1451,19 +1456,59 @@ let saveTimeout;
         initTabelHPP(); 
     }
 
+    let checklistInputItems = [{ prod: "", qty: "" }];
+    
+    function renderChecklistInput() {
+        let container = document.getElementById('chk-bolu-container');
+        if(!container) return;
+        container.innerHTML = '';
+        
+        let optionsHtml = '<option value="">-- Pilih Bolu --</option>';
+        produkBolu.forEach(p => { optionsHtml += `<option value="${p.nama}">${p.nama}</option>`; });
+
+        checklistInputItems.forEach((item, idx) => {
+            container.innerHTML += `
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <select class="custom-select" style="flex: 2; min-width: 0;" onchange="checklistInputItems[${idx}].prod=this.value">
+                    ${optionsHtml.replace(`value="${item.prod}"`, `value="${item.prod}" selected`)}
+                </select>
+                <div class="input-group" style="flex: 1; min-width: 90px; margin: 0;">
+                    <input type="number" class="text-right has-unit" placeholder="Qty" value="${item.qty}" min="1" onchange="checklistInputItems[${idx}].qty=validateNumInput(this)">
+                    <span class="input-unit">Lyg</span>
+                </div>
+                <button class="btn-danger" style="padding: 0; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm);" onclick="hapusItemChecklist(${idx})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            `;
+        });
+    }
+
+    function tambahItemChecklist() {
+        checklistInputItems.push({ prod: "", qty: "" });
+        renderChecklistInput();
+    }
+
+    function hapusItemChecklist(idx) {
+        if(checklistInputItems.length > 1) {
+            checklistInputItems.splice(idx, 1);
+            renderChecklistInput();
+        } else {
+            showToast("Minimal harus ada 1 form varian bolu!", "error");
+        }
+    }
+
     function populateLogProduk() {
         let selectLog = document.getElementById('log-produk');
-        let selectChk = document.getElementById('chk-produk'); 
-        
         let optionsHtml = '<option value="">-- Pilih Produk --</option>';
         produkBolu.forEach(p => { optionsHtml += `<option value="${p.nama}">${p.nama}</option>`; });
-        
         if(selectLog) selectLog.innerHTML = optionsHtml;
-        if(selectChk) selectChk.innerHTML = optionsHtml;
 
         let today = new Date().toISOString().slice(0,10);
         if(document.getElementById('log-tanggal')) document.getElementById('log-tanggal').value = today;
         if(document.getElementById('chk-tanggal')) document.getElementById('chk-tanggal').value = today;
+
+        renderChecklistInput(); 
     }
 
     function simpanLaporanPenggunaan(cetakLangsung = false) {
@@ -1644,108 +1689,7 @@ let saveTimeout;
     }
 
 
-    function generateChecklistPreview() {
-        let no = document.getElementById('chk-no-adonan').value;
-        let tgl = document.getElementById('chk-tanggal').value;
-        let prod = document.getElementById('chk-produk').value;
-        let qtyLoyang = getVal(document.getElementById('chk-qty').value);
-        let petugas = document.getElementById('chk-petugas').value;
-
-        if(!no || !tgl || !prod || qtyLoyang <= 0 || !petugas) return showToast("Harap isi semua form Checklist dengan benar!", "error");
-
-        let isDuplicate = checklistHistory.some(chk => chk.no.toLowerCase() === no.toLowerCase());
-        if (isDuplicate) {
-            document.getElementById('chk-no-adonan').classList.add('invalid');
-            return showToast("Gagal! No. Adonan '" + no + "' sudah digunakan di history.", "error");
-        } else {
-            document.getElementById('chk-no-adonan').classList.remove('invalid');
-        }
-
-        let prodObj = produkBolu.find(p => p.nama === prod);
-        if(!prodObj) return showToast("Produk tidak ditemukan!", "error");
-
-        let adonan = qtyLoyang / prodObj.rAdonan;
-        let totalPcs = qtyLoyang * prodObj.rPcs;
-        let listBahan = [];
-
-        bahanBaku.forEach(b => {
-            let need = 0;
-            if (b.isMikaS) {
-                need = totalPcs / 6;
-            } else {
-                let gram = adonan * (b.resep[prodObj.id] || 0);
-                need = b.isKg ? (gram / 1000) : gram;
-            }
-
-            if (need > 0) {
-                let unit = b.isKg ? 'kg' : 'pcs';
-                let calcNeed = b.isKg ? need : Math.ceil(need);
-                let formatNeed = b.isKg ? calcNeed.toFixed(3) : calcNeed;
-                listBahan.push({ nama: b.nama, butuh: formatNeed, unit: unit });
-            }
-        });
-
-        currentChecklistData = {
-            id: "chk_" + Date.now(),
-            tgl: tgl,
-            no: no,
-            petugas: petugas,
-            prod: prod,
-            qty: qtyLoyang,
-            items: listBahan,
-            waktu_generate: new Date().toLocaleString('id-ID')
-        };
-
-        let htmlPreview = `
-            <div style="text-align:center; border-bottom: 2px solid var(--primary); padding-bottom:10px; margin-bottom:15px;">
-                <h3 style="margin:0; text-transform:uppercase; font-size:18px;">CHECKLIST PRODUKSI</h3>
-                <h4 style="margin:5px 0 0 0; font-weight:800; font-size:14px;">Bolu Sakinah</h4>
-            </div>
-            <table style="width:100%; font-size:13px; font-weight:600; margin-bottom:15px;">
-                <tr><td style="padding:2px 0;">Tgl/Jam</td><td>: ${currentChecklistData.waktu_generate}</td></tr>
-                <tr><td style="padding:2px 0;">Pegawai</td><td>: ${petugas}</td></tr>
-                <tr><td style="padding:2px 0;">Adonan</td><td>: ${no}</td></tr>
-                <tr><td style="padding:2px 0;">Produk</td><td>: ${prod}</td></tr>
-                <tr><td style="padding:2px 0;">Jumlah</td><td>: <b>${qtyLoyang} Loyang</b></td></tr>
-            </table>
-            <div style="border-top: 1px dashed var(--primary); margin:15px 0;"></div>
-            <div style="font-weight:800; margin-bottom:10px;">DAFTAR BAHAN:</div>
-            <ul style="list-style: none; padding:0; margin:0;">
-        `;
-
-        listBahan.forEach((item) => {
-            htmlPreview += `
-                <li style="display:flex; align-items:center; gap:10px; margin-bottom:8px; border-bottom:1px dashed var(--border); padding-bottom:5px;">
-                   <input type="checkbox" style="width:18px; height:18px; margin:0; cursor:pointer;">
-                   <span style="font-weight:700; font-size:14.5px;">${item.nama}</span>
-                   <span style="margin-left:auto; font-weight:800; color:var(--primary); font-size:14.5px;">${item.butuh} ${item.unit}</span>
-                </li>
-            `;
-        });
-
-        htmlPreview += `</ul>`;
-
-        document.getElementById('preview-checklist-content').innerHTML = htmlPreview;
-        document.getElementById('preview-checklist-card').style.display = 'block';
-        document.getElementById('preview-checklist-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    function simpanChecklistData() {
-        if (!currentChecklistData) return showToast("Tidak ada data checklist aktif!", "error");
-        
-        checklistHistory.push(currentChecklistData);
-        saveData();
-        renderChecklistHistory();
-
-        let indexTerakhir = checklistHistory.length - 1;
-        cetakChecklistStrukPDF(indexTerakhir);
-
-        document.getElementById('chk-no-adonan').value = '';
-        document.getElementById('chk-qty').value = '';
-        document.getElementById('preview-checklist-card').style.display = 'none';
-        currentChecklistData = null;
-        updateAutoNoAdonan();
-    }
+    
         function renderChecklistHistory() {
         let tbody = document.getElementById('tabel-checklist-history');
         if(!tbody) return;
@@ -1791,79 +1735,217 @@ let saveTimeout;
         });
     }
 
+    function generateChecklistPreview() {
+        let no = document.getElementById('chk-no-adonan').value;
+        let tgl = document.getElementById('chk-tanggal').value;
+        let petugas = document.getElementById('chk-petugas').value;
+
+        if(!no || !tgl || !petugas) return showToast("Harap isi tanggal & petugas!", "error");
+
+        let validItems = checklistInputItems.filter(x => x.prod !== "" && getVal(x.qty) > 0);
+        if(validItems.length === 0) return showToast("Pilih minimal 1 varian bolu & isi jumlah loyangnya!", "error");
+
+        let isDuplicate = checklistHistory.some(chk => chk.no.toLowerCase() === no.toLowerCase());
+        if (isDuplicate) {
+            document.getElementById('chk-no-adonan').classList.add('invalid');
+            return showToast("Gagal! No. Adonan '" + no + "' sudah digunakan di history.", "error");
+        } else {
+            document.getElementById('chk-no-adonan').classList.remove('invalid');
+        }
+        let totalBahan = {}; 
+        let perProdukDetail = []; 
+
+        validItems.forEach(item => {
+            let prodObj = produkBolu.find(p => p.nama === item.prod);
+            if(prodObj) {
+                let qtyLoyang = getVal(item.qty);
+                let adonan = qtyLoyang / prodObj.rAdonan;
+                let totalPcs = qtyLoyang * prodObj.rPcs;
+                let listBahanBoluIni = [];
+
+                bahanBaku.forEach(b => {
+                    let need = 0;
+                    if (b.isMikaS) {
+                        need = totalPcs / 6;
+                    } else {
+                        let gram = adonan * (b.resep[prodObj.id] || 0);
+                        need = b.isKg ? (gram / 1000) : gram;
+                    }
+
+                    if (need > 0) {
+                        let unit = b.isKg ? 'kg' : 'pcs';
+                        let calcNeed = b.isKg ? need : Math.ceil(need);
+                        let formatNeed = b.isKg ? calcNeed.toFixed(3) : calcNeed;
+                        listBahanBoluIni.push({ nama: b.nama, butuh: formatNeed, unit: unit });
+                        
+                        if(!totalBahan[b.nama]) totalBahan[b.nama] = { val: 0, unit: unit };
+                        totalBahan[b.nama].val += calcNeed;
+                    }
+                });
+                
+                perProdukDetail.push({ prod: item.prod, qty: qtyLoyang, bahan: listBahanBoluIni });
+            }
+        });
+
+        let listTotalBahan = [];
+        Object.keys(totalBahan).forEach(nama => {
+            let bObj = totalBahan[nama];
+            let formatNeed = bObj.unit === 'kg' ? bObj.val.toFixed(3) : Math.ceil(bObj.val);
+            listTotalBahan.push({ nama: nama, butuh: formatNeed, unit: bObj.unit });
+        });
+
+        let namaProdukGabungan = validItems.map(x => x.prod).join(", ");
+        let totalLoyangGabungan = validItems.reduce((sum, x) => sum + getVal(x.qty), 0);
+
+        currentChecklistData = {
+            id: "chk_" + Date.now(), tgl: tgl, no: no, petugas: petugas,
+            prod: namaProdukGabungan.length > 25 ? namaProdukGabungan.substring(0, 25) + "..." : namaProdukGabungan,
+            qty: totalLoyangGabungan, detailProduk: perProdukDetail, items: listTotalBahan,
+            waktu_generate: new Date().toLocaleString('id-ID')
+        };
+        let htmlPreview = `
+            <div style="text-align:center; border-bottom: 2px solid var(--primary); padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="margin:0; text-transform:uppercase; font-size:18px;">PENGGUNAAN BAHAN</h3>
+                <h4 style="margin:5px 0 0 0; font-weight:800; font-size:14px;">Bolu Sakinah</h4>
+            </div>
+            <table style="width:100%; font-size:13px; font-weight:600; margin-bottom:15px;">
+                <tr><td style="padding:2px 0;">Tgl/Jam</td><td>: ${currentChecklistData.waktu_generate}</td></tr>
+                <tr><td style="padding:2px 0;">Pegawai</td><td>: ${petugas}</td></tr>
+                <tr><td style="padding:2px 0;">Adonan</td><td>: ${no}</td></tr>
+            </table>
+            <div style="border-top: 1px dashed var(--primary); margin:15px 0;"></div>
+        `;
+
+        perProdukDetail.forEach(dp => {
+            htmlPreview += `<div style="font-weight:800; margin-bottom:5px; color:var(--primary); font-size:14px;">[${dp.qty} Lyg] ${dp.prod}</div>`;
+            htmlPreview += `<ul style="list-style: none; padding:0; margin:0 0 15px 0;">`;
+            dp.bahan.forEach(item => { htmlPreview += `<li style="display:flex; justify-content:space-between; margin-bottom:3px; padding-left:10px; font-size:13px;"><span>- ${item.nama}</span><span style="font-weight:700;">${item.butuh} ${item.unit}</span></li>`; });
+            htmlPreview += `</ul>`;
+        });
+
+        htmlPreview += `<div style="border-top: 2px solid var(--primary); margin:15px 0;"></div>`;
+        htmlPreview += `<div style="font-weight:800; margin-bottom:10px; font-size: 15px; color: var(--danger);">TOTAL SEMUA BAHAN:</div>`;
+        htmlPreview += `<ul style="list-style: none; padding:0; margin:0;">`;
+        
+        listTotalBahan.forEach((item) => {
+            htmlPreview += `<li style="display:flex; align-items:center; gap:10px; margin-bottom:8px; border-bottom:1px dashed var(--border); padding-bottom:5px;"><input type="checkbox" style="width:18px; height:18px; margin:0; cursor:pointer;"><span style="font-weight:700; font-size:14.5px;">${item.nama}</span><span style="margin-left:auto; font-weight:800; color:var(--primary); font-size:14.5px;">${item.butuh} ${item.unit}</span></li>`;
+        });
+
+        htmlPreview += `</ul>`;
+
+        document.getElementById('preview-checklist-content').innerHTML = htmlPreview;
+        document.getElementById('preview-checklist-card').style.display = 'block';
+        document.getElementById('preview-checklist-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function simpanChecklistData() {
+        if (!currentChecklistData) return showToast("Tidak ada data aktif!", "error");
+        checklistHistory.push(currentChecklistData);
+        saveData();
+        renderChecklistHistory();
+
+        let indexTerakhir = checklistHistory.length - 1;
+        cetakChecklistStrukPDF(indexTerakhir); 
+        document.getElementById('chk-no-adonan').value = '';
+        checklistInputItems = [{ prod: "", qty: "" }];
+        renderChecklistInput();
+        document.getElementById('preview-checklist-card').style.display = 'none';
+        currentChecklistData = null;
+        updateAutoNoAdonan();
+    }
+
     async function cetakChecklistStrukPDF(idx) {
-        
-        
         let ready = await initPdfModules();
         if (!ready) return;
-        
 
         let chk = checklistHistory[idx];
-        if(!chk || !chk.items) return showToast("Data checklist tidak valid!", "error");
+        if(!chk || !chk.items) return showToast("Data tidak valid!", "error");
 
         showLoading('Menyiapkan Struk Printer Kasir...');
         setTimeout(() => {
             const { jsPDF } = window.jspdf;
+            let headerHeight = 55; 
+            let detailHeight = 0;
+            if (chk.detailProduk) {
+                chk.detailProduk.forEach(dp => {
+                    detailHeight += 10; 
+                    detailHeight += (dp.bahan.length * 6); 
+                    detailHeight += 5; 
+                });
+            }
             
-            let listBahan = chk.items;
+            let totalBahanHeight = 15 + (chk.items.length * 6); 
+            let footerHeight = 25; 
+            
+            let totalPanjangKertas = headerHeight + detailHeight + totalBahanHeight + footerHeight;
 
-            let baseHeight = 65; 
-            let itemHeight = listBahan.length * 6.5; 
-            let totalHeight = baseHeight + itemHeight;
-            const doc = new jsPDF('p', 'mm', [58, totalHeight]);
+            const doc = new jsPDF('p', 'mm', [58, totalPanjangKertas]);
 
             doc.setFontSize(11);
             doc.setFont("helvetica", "bold");
-            doc.text("CHECKLIST PRODUKSI", 29, 8, {align: 'center'});
+            doc.text("PENGGUNAAN BAHAN", 29, 10, {align: 'center'});
             doc.setFontSize(9);
-            doc.text("BOLU SAKINAH", 29, 13, {align: 'center'});
+            doc.text("BOLU SAKINAH", 29, 15, {align: 'center'});
             
             doc.setFontSize(7.5);
             doc.setFont("helvetica", "normal");
-            doc.text(`Tgl     : ${chk.waktu_generate.split(' ')[0]}`, 4, 21);
-            doc.text(`Jam     : ${chk.waktu_generate.split(' ')[1]}`, 4, 25);
+            doc.text(`Tgl/Jam : ${chk.waktu_generate}`, 4, 25);
             doc.text(`Pegawai : ${chk.petugas}`, 4, 29);
             doc.text(`Adonan  : ${chk.no}`, 4, 33);
-            doc.text(`Produk  : ${chk.prod}`, 4, 37);
-            doc.text(`Jumlah  : ${chk.qty} Loyang`, 4, 41);
-    
-            doc.setLineWidth(0.3);
-            doc.setLineDash([1.5, 1.5], 0);
-            doc.line(4, 44, 54, 44);
             
-            doc.setFontSize(8);
-            doc.setFont("helvetica", "bold");
-            doc.text("DAFTAR BAHAN:", 4, 49);
-            
-            doc.setFontSize(8);
-            doc.setFont("helvetica", "normal");
-            let y = 55;
+            doc.setLineDash([1, 1], 0);
+            doc.line(4, 37, 54, 37); 
 
-            doc.setLineDash([]); 
-            listBahan.forEach((item) => {
-                doc.rect(4, y - 3, 3, 3); 
-                doc.text(`${item.nama}`, 9, y);
-                doc.text(`${item.butuh} ${item.unit}`, 54, y, {align: 'right'});
-                y += 6.5;
+            let currentY = 43;
+            if (chk.detailProduk) {
+                chk.detailProduk.forEach(dp => {
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(8);
+                    doc.text(`[${dp.qty} Lyg] ${dp.prod}`, 4, currentY);
+                    currentY += 5;
+
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(7.5);
+                    dp.bahan.forEach(b => {
+                        doc.text(`- ${b.nama}`, 6, currentY);
+                        doc.text(`${b.butuh} ${b.unit}`, 54, currentY, {align: 'right'});
+                        currentY += 5.5;
+                    });
+                    currentY += 2; 
+                });
+            }
+
+            doc.setLineDash([1, 1], 0);
+            doc.line(4, currentY, 54, currentY);
+            currentY += 6;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+            doc.setTextColor(200, 0, 0); 
+            doc.text("TOTAL SEMUA BAHAN:", 4, currentY);
+            doc.setTextColor(0, 0, 0);
+            currentY += 6;
+
+            doc.setFontSize(8.5);
+            chk.items.forEach(item => {
+                doc.rect(4, currentY - 2.5, 2.5, 2.5);
+                doc.text(`${item.nama}`, 8, currentY);
+                doc.text(`${item.butuh} ${item.unit}`, 54, currentY, {align: 'right'});
+                currentY += 6;
             });
-            
-   
-            doc.setLineDash([1.5, 1.5], 0);
-            doc.line(4, y, 54, y);
-            
-            y += 5;
+            currentY += 5;
+            doc.line(4, currentY, 54, currentY);
+            currentY += 6;
             doc.setFontSize(7);
-            doc.text("Karyawan", 12, y, {align: 'center'});
-            doc.text("Supervisor", 45, y, {align: 'center'});
-            
-            y += 10;
-            doc.text("(............)", 12, y, {align: 'center'});
-            doc.text("(............)", 45, y, {align: 'center'});
-            
-   
-            doc.save(`Struk_Checklist_${chk.no}_${chk.prod.replace(/\s+/g, '_')}.pdf`);
+            doc.text("Petugas,", 10, currentY, {align: 'center'});
+            doc.text("Admin/Owner,", 45, currentY, {align: 'center'});
+            currentY += 12;
+            doc.text("(............)", 10, currentY, {align: 'center'});
+            doc.text("(............)", 45, currentY, {align: 'center'});
+
+            doc.save(`Struk_Bahan_${chk.no}.pdf`);
             hideLoading();
-            showToast('Struk Printer berhasil dibuat!', 'success');
+            showToast('Struk Thermal Berhasil Dibuat!', 'success');
         }, 500);
     }
 
@@ -2961,6 +3043,19 @@ let saveTimeout;
             }
         });
         bukaPage(targetPage, targetBtn);
+    }
+    function toggleHistoryChecklist() {
+        const area = document.getElementById('area-history-checklist');
+        const icon = document.getElementById('icon-toggle-history');
+        
+        if (area.style.display === 'none' || area.style.display === '') {
+            area.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+            renderChecklistHistory();
+        } else {
+            area.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+        }
     }
 </script>
 </body>
