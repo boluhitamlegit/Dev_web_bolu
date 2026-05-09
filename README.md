@@ -1,4 +1,4 @@
-# 🎂 Sistem Operasional Bolu Sakinah
+# 🎂 Sistem Operasional Bolu 
 
 ![Version](https://img.shields.io/badge/Version-1.0%20Beta-blue)
 ![Status](https://img.shields.io/badge/Status-Active_Development-success)
