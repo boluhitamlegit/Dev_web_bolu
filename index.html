@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Sistem Operasional Bolu Sakinah</title>
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23191A23' d='M510.5 373.9c2.8-14.6-2.6-29.6-13.6-38.3C458.1 305 450 256 450 256c0-120.3-100-218.4-221.7-223.6C218.2 31.9 209 23.3 197.6 22.8c-11.8-.5-22.3 6.9-25.5 18.2L161.4 76.5c-39 12.3-73.6 35.3-100.4 66.2C22.6 182.2 0 241.6 0 304c0 132.5 107.5 240 240 240c111.4 0 205.1-76.3 232.7-180.7C477 353.4 492.3 358.3 510.5 373.9zM240 480C142.9 480 64 401.1 64 304c0-51.4 22-97.7 57.1-130.3l17.8 49.3c3.8 10.6 14.5 17.1 25.8 15.6c11.3-1.6 20.3-10.2 22.4-21.4l11.4-60.8c24.6-11.3 51.6-18 80.2-19.5c.3 48.7 40.5 87.7 89.3 87.7c26.3 0 50-11.4 66.5-29.5c5.1 39.4 22.5 74.5 48.6 101.4C447.7 428.1 352.4 480 240 480zM176 224c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32zm96 96c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32zm-96 96c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32zm144-48c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z'/%3E%3C/svg%3E">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3144/3144760.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/541/541732.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -635,7 +635,29 @@
         <div class="spinner"></div>
         <h3 id="loading-text" style="color: var(--primary); font-weight: 800;">Menyinkronkan Data...</h3>
     </div>
-
+    <div id="lock-screen-modal" class="modal-overlay" style="z-index: 10000; background: rgba(25, 26, 35, 0.98);">
+        <div class="modal-box" style="text-align: center; max-width: 380px; box-shadow: 0 0 30px rgba(185, 255, 102, 0.15);">
+            <div style="background: var(--surface); width: 80px; height: 80px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 2px solid var(--secondary); box-shadow: 0 0 15px rgba(185, 255, 102, 0.3);">
+                <i class="fas fa-lock" style="font-size: 35px; color: var(--primary);"></i>
+            </div>
+            <h2 style="margin-bottom: 5px; color: var(--primary);">Layar Terkunci</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 25px;">Sesi <b id="lock-username" style="color: var(--primary);">User</b> diamankan otomatis.</p>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <div class="input-group full-width">
+                    <span class="input-prefix" style="color: var(--text-muted);"><i class="fas fa-key"></i></span>
+                    <input type="password" id="unlock-pin" class="has-prefix" placeholder="Masukkan PIN..." style="text-align: center; letter-spacing: 4px; font-size: 20px; height: 54px; border-radius: 12px; background: #f8fafc;" autocomplete="off">
+                </div>
+            </div>
+            
+            <button class="btn btn-success" style="width: 100%; height: 50px; font-size: 15px; border-radius: 12px;" onclick="bukaKunciLayar()">
+                <i class="fas fa-unlock-alt"></i> Buka Kunci
+            </button>
+            <button class="btn" style="width: 100%; height: 50px; margin-top: 10px; border: none; background: transparent; color: var(--danger);" onclick="logoutUser()">
+                Keluar (Logout)
+            </button>
+        </div>
+    </div>
     <div id="toast-container"></div>
 
     <div id="mobile-overlay" class="mobile-overlay-menu" onclick="toggleMobileMenu()"></div>
@@ -1002,9 +1024,10 @@
                 <div class="form-group"><label>Nama Petugas </label><input type="text" id="log-petugas" readonly style="font-weight: 800; background: var(--accent); color: var(--primary);"></div>
             </div>
             
-            <div style="display: flex; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
-                <button class="btn btn-primary" style="flex: 1; min-width: 200px;" onclick="simpanLaporanPenggunaan(false)"><i class="fas fa-save"></i> Simpan Data Penggunaan</button>
-                <button class="btn btn-success" style="flex: 1; min-width: 200px;" onclick="simpanLaporanPenggunaan(true)"><i class="fas fa-print"></i> Hitung & Cetak Laporan PDF</button>
+            <div style="margin-top: 25px;">
+                <button class="btn btn-success" style="width: 100%; font-size: 15px; height: 55px;" onclick="simpanLaporanPenggunaan(true)">
+                    <i class="fas fa-print"></i> Simpan Data & Cetak Laporan PDF
+                </button>
             </div>
         </div>
 
@@ -1149,7 +1172,8 @@
     </div>
 
     <div id="page-pesanan" class="page-container active">
-        <div class="card-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 15px;">
+        <div class="card">
+            <div class="card-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 15px;">
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
                     <h2 style="margin: 0;"><i class="fas fa-users"></i> Rekap Pesanan</h2>
                     <button class="btn btn-primary" onclick="toggleFilterPesanan()" style="height: 40px; padding: 0 15px; font-size: 13px;">
@@ -1170,8 +1194,10 @@
                     </select>
                 </div>
             </div>
+
             <div id="panel-rekap-pesanan" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
                 </div>
+
             <div class="table-responsive">
                 <table>
                     <thead id="tabel-pesanan-head"></thead>
@@ -1179,8 +1205,7 @@
                     <tfoot id="tabel-pesanan-foot"></tfoot>
                 </table>
             </div>
-        </div>
-        <button class="fab-tambah-pesanan" onclick="tambahPesanan()" title="Tambah Pesanan Baru">
+        </div> <button class="fab-tambah-pesanan" onclick="tambahPesanan()" title="Tambah Pesanan Baru">
             <i class="fas fa-plus"></i>
         </button>
     </div>
@@ -1317,6 +1342,16 @@
             <h2><i class="fas fa-tools"></i> Pengaturan Master Data</h2>
             <p style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Kelola data produk, bahan baku, dan akses pegawai.</p>
         </div>
+        <div id="pwa-install-container" style="display: none; background: #fafff0; padding: 25px; border-radius: var(--radius-md); border: 2px dashed var(--secondary); margin-bottom: 25px; text-align: center; box-shadow: inset 0 0 10px rgba(185,255,102,0.2);">
+            <div style="background: var(--primary); width: 60px; height: 60px; border-radius: 15px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <i class="fas fa-mobile-alt" style="font-size: 30px; color: var(--secondary);"></i>
+            </div>
+            <h3 style="margin: 0 0 10px 0; font-size: 16px; color: var(--primary);">Pasang Aplikasi di HP</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">Download aplikasi Bolu Sakinah ke layar utama HP Anda agar jauh lebih cepat diakses oleh para pegawai.</p>
+            <button class="btn btn-success" style="width: 100%; height: 50px; font-size: 15px; box-shadow: 0 4px 15px rgba(185,255,102,0.4);" onclick="installPWA()">
+                <i class="fas fa-download"></i> Download Aplikasi Sekarang
+            </button>
+        </div>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
             <button class="btn btn-success" onclick="bukaModalProduk()" style="height: 60px;">
@@ -1376,7 +1411,46 @@
     let db;
     let isPdfLoaded = false;
     let isModeEditHPP = false;
-    
+   
+    let lockTimer;
+    const IDLE_TIMEOUT_MS = 30 * 60 * 1000; 
+    function setupActivityListeners() {
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+            document.addEventListener(evt, resetActivityTimer, { passive: true });
+        });
+    }
+    function resetActivityTimer() {
+        if (!sesiAktif) return;
+
+        let now = Date.now();
+        let savedTime = parseInt(localStorage.getItem('bs_session_time') || "0");
+        if (now - savedTime > 60000) { 
+            localStorage.setItem('bs_session_time', now.toString());
+        }
+        clearTimeout(lockTimer);
+        lockTimer = setTimeout(kunciLayar, IDLE_TIMEOUT_MS);
+    }
+
+    function kunciLayar() {
+        if (!sesiAktif) return;
+        document.getElementById('lock-username').innerText = sesiAktif.username;
+        document.getElementById('unlock-pin').value = '';
+        const modalLock = document.getElementById('lock-screen-modal');
+        modalLock.style.display = 'flex';
+        requestAnimationFrame(() => modalLock.classList.add('show'));
+    }
+
+    function bukaKunciLayar() {
+        let pinInput = document.getElementById('unlock-pin').value;
+        if (pinInput === sesiAktif.pin) {
+            tutupModal('lock-screen-modal');
+            resetActivityTimer();
+            showToast("Kunci layar dibuka", "success");
+        } else {
+            showToast("PIN Salah!", "error");
+            document.getElementById('unlock-pin').value = '';
+        }
+    }
     function loadScript(src) {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
@@ -1820,25 +1894,27 @@ let saveTimeout;
         if (!ready) return;
 
         let lap = laporanPenggunaan[idx];
-        showLoading('Menghitung Total Biaya & Menyiapkan Laporan A4...');
+        showLoading('Menghitung Biaya & Menyiapkan Laporan A4 Lengkap...');
 
         setTimeout(() => {
             const { jsPDF } = window.jspdf; 
-            const doc = new jsPDF('p', 'mm', 'a4'); 
+            const doc = new jsPDF('l', 'mm', 'a4'); 
             doc.setFontSize(18); doc.setFont("helvetica", "bold");
-            doc.text("LAPORAN BIAYA PRODUKSI (HPP)", 105, 20, { align: 'center' });
+            doc.text("LAPORAN DETAIL BIAYA PRODUKSI & STOK", 148, 15, { align: 'center' });
             
             doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text(`No. Adonan  : ${lap.no}`, 14, 35);
-            doc.text(`Tanggal     : ${lap.tgl}`, 14, 40);
-            doc.text(`Petugas     : ${lap.petugas}`, 14, 45);
-            doc.text(`Daftar Bolu : ${lap.prod}`, 14, 50);
+            doc.text(`No. Produksi : ${lap.no}`, 14, 25);
+            doc.text(`Tanggal      : ${lap.tgl}`, 14, 30);
+            doc.text(`Petugas      : ${lap.petugas}`, 14, 35);
+            doc.text(`Varian Bolu  : ${lap.prod}`, 14, 40);
 
             let tableData = [];
-            let grandTotalBiaya = 0;
+            let totalBiayaButuh = 0;
+            let totalBiayaBelanja = 0;
+            let totalNilaiTersedia = 0;
             let akumulasiBahan = {};
+            
             let listBoluCetak = lap.items || [{ prod: lap.prod, qty: lap.qty }];
-
             listBoluCetak.forEach(item => {
                 let p = produkBolu.find(x => x.nama === item.prod);
                 if(p) {
@@ -1852,41 +1928,87 @@ let saveTimeout;
                         else butuh = b.isKg ? ((rasioAdonan * (b.resep[p.id] || 0)) / 1000) : (rasioAdonan * (b.resep[p.id] || 0));
 
                         if (butuh > 0) {
-                            if (!akumulasiBahan[b.id]) akumulasiBahan[b.id] = { nama: b.nama, harga: b.harga, total: 0, unit: b.isKg?'kg':'pcs' };
-                            akumulasiBahan[b.id].total += butuh;
+                            if (!akumulasiBahan[b.id]) {
+                                akumulasiBahan[b.id] = { 
+                                    nama: b.nama, 
+                                    harga: b.harga, 
+                                    butuh: 0, 
+                                    tersedia: getVal(b.sedia), 
+                                    unit: b.isKg ? 'kg' : 'pcs' 
+                                };
+                            }
+                            akumulasiBahan[b.id].butuh += butuh;
                         }
                     });
                 }
             });
 
+            const formatSatuan = (nilai, unit) => {
+                if (unit !== 'kg') return Math.ceil(nilai) + " " + unit;
+                
+                let absVal = Math.abs(nilai);
+                if (absVal > 0 && absVal < 1) {
+                    return Math.round(nilai * 1000) + " gram";
+                } else {
+                    let numStr = parseFloat(nilai.toFixed(3)).toString();
+                    return numStr.replace('.', ',') + " kg";
+                }
+            };
+
             Object.keys(akumulasiBahan).forEach(id => {
                 let data = akumulasiBahan[id];
-                let jmlFinal = data.unit === 'kg' ? data.total : Math.ceil(data.total);
-                let subTotal = jmlFinal * data.harga;
-                grandTotalBiaya += subTotal;
+                let jmlButuh = data.butuh;
+                let jmlSedia = data.tersedia;
+                let sisaButuh = jmlSedia - jmlButuh;
+                let jmlBelanja = sisaButuh < 0 ? Math.abs(sisaButuh) : 0;
+                let butuhCalc = data.unit === 'kg' ? jmlButuh : Math.ceil(jmlButuh);
+                let belanjaCalc = data.unit === 'kg' ? jmlBelanja : Math.ceil(jmlBelanja);
+                
+                let biayaButuh = butuhCalc * data.harga;
+                let biayaBelanja = belanjaCalc * data.harga;
+                let nilaiTersedia = jmlSedia * data.harga;
+
+                totalBiayaButuh += biayaButuh;
+                totalBiayaBelanja += biayaBelanja;
+                totalNilaiTersedia += nilaiTersedia;
 
                 tableData.push([
                     data.nama,
+                    formatSatuan(jmlButuh, data.unit),
+                    formatSatuan(jmlSedia, data.unit),
+                    formatSatuan(sisaButuh, data.unit),
                     rp(data.harga),
-                    jmlFinal.toFixed(data.unit==='kg'?3:0) + " " + data.unit,
-                    rp(subTotal)
+                    rp(biayaButuh),
+                    rp(biayaBelanja),
+                    rp(nilaiTersedia)
                 ]);
             });
-
             doc.autoTable({ 
-                startY: 60, 
-                head: [['Nama Bahan Baku', 'Harga Satuan', 'Total Kebutuhan', 'Subtotal Biaya']], 
+                startY: 50, 
+                head: [[
+                    'Nama Bahan', 'Butuh', 'Tersedia', 'Sisa Butuh', 
+                    'Harga Satuan', 'Biaya Butuh', 'Biaya Belanja', 'Nilai Tersedia'
+                ]], 
                 body: tableData, 
-                foot: [['', '', 'TOTAL BIAYA PRODUKSI:', rp(grandTotalBiaya)]], 
+                foot: [[
+                    { content: 'TOTAL KESELURUHAN', colSpan: 5, styles: { halign: 'right' } }, 
+                    rp(totalBiayaButuh), 
+                    rp(totalBiayaBelanja), 
+                    rp(totalNilaiTersedia)
+                ]], 
                 theme: 'grid', 
-                headStyles: { fillColor: [25, 26, 35], fontStyle: 'bold' }, 
-                footStyles: { fillColor: [185, 255, 102], textColor: [25, 26, 35], fontStyle: 'bold' }, 
-                columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } }
+                headStyles: { fillColor: [25, 26, 35], fontSize: 8, halign: 'center' }, 
+                footStyles: { fillColor: [185, 255, 102], textColor: [25, 26, 35], fontStyle: 'bold', fontSize: 9 }, 
+                columnStyles: { 
+                    1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 
+                    4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } 
+                },
+                styles: { fontSize: 8 }
             });
 
-            doc.save(`Laporan_HPP_A4_${lap.no}.pdf`); 
+            doc.save(`Laporan_Lengkap_${lap.no}.pdf`); 
             hideLoading(); 
-            showToast('Laporan A4 Berhasil Dibuat!', 'success');
+            showToast('Laporan A4 Lengkap Berhasil Dibuat!', 'success');
         }, 800);
     }
 
@@ -2790,6 +2912,7 @@ let saveTimeout;
 
     window.onload = () => { 
         loadData(); 
+        setupActivityListeners();
         let currentMonthStr = new Date().toISOString().slice(0,7); 
         document.getElementById('filter-bulan').value = currentMonthStr; 
         document.querySelectorAll('input[type="number"]').forEach(input => {
@@ -2868,7 +2991,8 @@ let saveTimeout;
             bukaPage('page-checklist', document.querySelectorAll('.nav-item[onclick*="page-checklist"]')[0]);
             showToast(`Login berhasil. Halo ${userObj.username}`, 'success');   
         }
-        updateAutoNoAdonan(); 
+        updateAutoNoAdonan();
+        resetActivityTimer(); 
     }
 
     function cekSesiLogin() {
@@ -3085,8 +3209,40 @@ let saveTimeout;
                 }
             });
         }
+        const inputUnlock = document.getElementById('unlock-pin');
+         if (inputUnlock) {
+         inputUnlock.addEventListener('keypress', function(e) {
+             if (e.key === 'Enter') { e.preventDefault(); bukaKunciLayar(); }
+         });
+        }
     }, 500); 
+    let deferredPrompt;
 
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installContainer = document.getElementById('pwa-install-container');
+        if (installContainer) installContainer.style.display = 'block';
+    });
+    function installPWA() {
+        if (!deferredPrompt) {
+            showToast("Aplikasi sudah terinstal atau browser tidak mendukung.", "error");
+            return;
+        }
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                showToast("Aplikasi sedang diunduh...", "success");
+                document.getElementById('pwa-install-container').style.display = 'none';
+            }
+            deferredPrompt = null;
+        });
+    }
+    window.addEventListener('appinstalled', (evt) => {
+        const installContainer = document.getElementById('pwa-install-container');
+        if (installContainer) installContainer.style.display = 'none';
+        showToast("Aplikasi berhasil dipasang di Layar Utama!", "success");
+    });
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
