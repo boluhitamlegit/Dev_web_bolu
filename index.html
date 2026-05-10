@@ -779,7 +779,7 @@
                 &copy; 2026 <span style="color: var(--primary);">Bolu Sakinah</span>. All rights reserved.
             </div>
             <div style="margin-top: 8px; font-size: 11px; font-weight: 600; opacity: 0.7;">
-                Sistem Manajemen Operasional &bull; <span style="color: var(--primary); letter-spacing: 1px;">Ghazy</span>
+                Sistem Manajemen Operasional &bull; <span style="color: var(--primary); letter-spacing: 1px;"></span>
             </div>
         </div>
     </div>
@@ -3362,20 +3362,21 @@ let saveTimeout;
         
             newWorker.postMessage({ type: 'SKIP_WAITING' });
             
-           
+      
             const btnUpdate = document.getElementById('btn-check-update');
             if(btnUpdate) {
                 btnUpdate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menginstall...';
                 btnUpdate.disabled = true;
             }
             
-      
+
             const updateToast = document.getElementById('pwa-update-toast');
             if(updateToast) {
                 updateToast.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:24px; color:var(--secondary);"></i><p style="margin-top:10px;">Menerapkan pembaruan...</p>';
             }
+
             setTimeout(() => {
-                window.location.reload(true);
+                window.location.href = window.location.pathname + '?update=' + new Date().getTime();
             }, 1500);
         }
     }
