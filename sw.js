@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bolu-sakinah-v10';
+const CACHE_NAME = 'bolu-sakinah-v11';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -26,6 +26,8 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
+    }).then(() => {
+      return self.clients.claim(); 
     })
   );
 });
