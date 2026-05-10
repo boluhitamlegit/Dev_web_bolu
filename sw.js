@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bolu-sakinah-v7';
+const CACHE_NAME = 'bolu-sakinah-v8';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
