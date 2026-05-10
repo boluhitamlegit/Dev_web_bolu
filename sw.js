@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bolu-sakinah-v3';
+const CACHE_NAME = 'bolu-sakinah-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -53,4 +53,9 @@ self.addEventListener('fetch', (event) => {
      
     })
   );
+});
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
