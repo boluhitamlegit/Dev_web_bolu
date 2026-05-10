@@ -638,7 +638,15 @@
         </div>
     </div>
     <div id="toast-container"></div>
-
+    <div id="pwa-update-toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; background: var(--primary); color: var(--surface); padding: 20px; border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 90%; max-width: 350px; border: 2px solid var(--secondary); flex-direction: column; gap: 10px; align-items: center; text-align: center;">
+        <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; color: var(--secondary);">
+            <i class="fas fa-cloud-download-alt" style="font-size: 24px;"></i> Versi Baru Tersedia!
+        </div>
+        <p style="margin: 0 0 5px 0; font-size: 13px; font-weight: 500; color: #e2e8f0; line-height: 1.5;">Developer baru saja menambahkan pembaruan fitur. Silakan perbarui aplikasi sekarang.</p>
+        <button class="btn btn-success" style="width: 100%; height: 45px; min-height: 45px; font-size: 14px;" id="btn-pwa-update">
+            <i class="fas fa-sync-alt"></i> Perbarui & Muat Ulang
+        </button>
+    </div>
     <div id="mobile-overlay" class="mobile-overlay-menu" onclick="toggleMobileMenu()"></div>
 
     <header class="header" id="main-header" style="display:none;">
@@ -3220,13 +3228,36 @@ let saveTimeout;
         if (installContainer) installContainer.style.display = 'none';
         showToast("Aplikasi berhasil dipasang di Layar Utama!", "success");
     });
+    let newWorker;
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('✅ PWA Ready: Service Worker berhasil didaftarkan.'))
-                .catch(err => console.warn('⚠️ PWA Gagal:', err));
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                console.log('✅ PWA Ready');
+                reg.addEventListener('updatefound', () => {
+                    newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            let updateToast = document.getElementById('pwa-update-toast');
+                            if (updateToast) updateToast.style.display = 'flex';
+                        }
+                    });
+                });
+            }).catch(err => console.warn('⚠️ PWA Gagal:', err));
+        });
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                window.location.reload();
+                refreshing = true;
+            }
         });
     }
+    document.getElementById('btn-pwa-update')?.addEventListener('click', () => {
+        if (newWorker) {
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            document.getElementById('pwa-update-toast').innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:24px; color:var(--secondary);"></i><p style="margin-top:10px;">Menerapkan pembaruan...</p>';
+        }
+    });
     function bukaModalManajemenBahan() {
         if(document.getElementById('search-manage-bahan')) document.getElementById('search-manage-bahan').value = '';
         renderListManageBahan();
