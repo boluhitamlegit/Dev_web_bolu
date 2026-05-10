@@ -639,15 +639,7 @@
         </div>
     </div>
     <div id="toast-container"></div>
-    <div id="pwa-update-toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; background: var(--primary); color: var(--surface); padding: 20px; border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 90%; max-width: 350px; border: 2px solid var(--secondary); flex-direction: column; gap: 10px; align-items: center; text-align: center;">
-        <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; color: var(--secondary);">
-            <i class="fas fa-cloud-download-alt" style="font-size: 24px;"></i> Versi Baru Tersedia!
-        </div>
-        <p style="margin: 0 0 5px 0; font-size: 13px; font-weight: 500; color: #e2e8f0; line-height: 1.5;">Developer baru saja menambahkan pembaruan fitur. Silakan perbarui aplikasi sekarang.</p>
-        <button class="btn btn-success" style="width: 100%; height: 45px; min-height: 45px; font-size: 14px;" id="btn-pwa-update">
-            <i class="fas fa-sync-alt"></i> Perbarui & Muat Ulang
-        </button>
-    </div>
+   
     <div id="mobile-overlay" class="mobile-overlay-menu" onclick="toggleMobileMenu()"></div>
 
     <header class="header" id="main-header" style="display:none;">
@@ -978,15 +970,30 @@
                 </button>
             </div>
 
-            <div id="pwa-install-container" style="display: none; background: #fafff0; padding: 20px; border-radius: var(--radius-md); border: 2px dashed var(--secondary); text-align: center; box-shadow: inset 0 0 10px rgba(185,255,102,0.2);">
-                <div style="background: var(--primary); width: 50px; height: 50px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                    <i class="fas fa-mobile-alt" style="font-size: 24px; color: var(--secondary);"></i>
+            <div id="pwa-manager-container" style="display: none; background: #fafff0; padding: 20px; border-radius: var(--radius-md); border: 2px dashed var(--secondary); text-align: center; box-shadow: inset 0 0 10px rgba(185,255,102,0.2);">
+                
+                <div id="pwa-install-view" style="display: none;">
+                    <div style="background: var(--primary); width: 50px; height: 50px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        <i class="fas fa-mobile-alt" style="font-size: 24px; color: var(--secondary);"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; font-size: 15px; color: var(--primary);">Pasang Aplikasi di HP</h3>
+                    <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">Download Bolu Sakinah ke layar utama agar lebih cepat diakses.</p>
+                    <button class="btn btn-success" style="width: 100%; height: 45px; font-size: 14px; box-shadow: 0 4px 15px rgba(185,255,102,0.4);" onclick="installPWA()">
+                        <i class="fas fa-download"></i> Download Sekarang
+                    </button>
                 </div>
-                <h3 style="margin: 0 0 10px 0; font-size: 15px; color: var(--primary);">Pasang Aplikasi di HP</h3>
-                <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">Download Aplikasi ke layar utama agar lebih cepat diakses.</p>
-                <button class="btn btn-success" style="width: 100%; height: 45px; font-size: 14px; box-shadow: 0 4px 15px rgba(185,255,102,0.4);" onclick="installPWA()">
-                    <i class="fas fa-download"></i> Download Sekarang
-                </button>
+
+                <div id="pwa-update-view" style="display: none;">
+                    <div style="background: var(--surface); border: 2px solid var(--border); width: 50px; height: 50px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 2px 2px 0 var(--border);">
+                        <i class="fas fa-sync-alt" style="font-size: 24px; color: var(--primary);"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; font-size: 15px; color: var(--primary);">Pembaruan Sistem</h3>
+                    <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">Periksa apakah ada fitur baru atau perbaikan dari Developer.</p>
+                    <button id="btn-check-update" class="btn btn-success" style="width: 100%; height: 45px; font-size: 14px; box-shadow: 0 4px 15px rgba(185,255,102,0.4);" onclick="checkForPwaUpdate()">
+                        <i class="fas fa-search"></i> Periksa Pembaruan
+                    </button>
+                </div>
+
             </div>
 
         </div>
@@ -1849,8 +1856,16 @@ let saveTimeout;
 
         let validItems = hppInputItems.filter(x => x.prod !== "" && getVal(x.qty) > 0);
         if(!tgl || validItems.length === 0 || !petugas) return showToast("Harap isi semua data produksi dengan benar!", "error");
-        let urutanKe = laporanPenggunaan.length + 1;
-        let noUrutOtomatis = "PROD-" + urutanKe;
+        let maxUrutan = 0;
+        laporanPenggunaan.forEach(lap => {
+            if (lap.no && lap.no.startsWith("PROD-")) {
+                let numPart = parseInt(lap.no.split('-')[1]);
+                if (!isNaN(numPart) && numPart > maxUrutan) {
+                    maxUrutan = numPart;
+                }
+            }
+        });
+        let noUrutOtomatis = "PROD-" + (maxUrutan + 1);
 
         laporanPenggunaan.push({
             id: "lap_" + Date.now(),
@@ -3114,6 +3129,7 @@ let saveTimeout;
     function bukaModalGantiPinUser() {
         document.getElementById('change-pin-old').value = '';
         document.getElementById('change-pin-new').value = '';
+        if(typeof updatePwaUI === 'function') updatePwaUI(); 
         const modal = document.getElementById('modal-ganti-pin-user');
         modal.style.display = 'flex';
         requestAnimationFrame(() => modal.classList.add('show'));
@@ -3202,73 +3218,136 @@ let saveTimeout;
          });
         }
     }, 500); 
+    // --- MANAJER APLIKASI (PWA INSTALL & UPDATE) ---
     let deferredPrompt;
+    let newWorker;
+    let swRegistration;
+    
+    // Deteksi apakah aplikasi sedang berjalan di dalam mode Terinstal (Aplikasi HP)
+    let isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
+    function updatePwaUI() {
+        const mainContainer = document.getElementById('pwa-manager-container');
+        const installView = document.getElementById('pwa-install-view');
+        const updateView = document.getElementById('pwa-update-view');
+        const btnUpdate = document.getElementById('btn-check-update');
+
+        if (!mainContainer || !installView || !updateView) return;
+
+        // Selalu tampilkan kontainer utama
+        mainContainer.style.display = 'block';
+
+        if (!isAppInstalled && deferredPrompt) {
+            // Mode Browser: Tampilkan tombol Install
+            installView.style.display = 'block';
+            updateView.style.display = 'none';
+        } else {
+            // Mode Terinstal di HP: Tampilkan sistem Update
+            installView.style.display = 'none';
+            updateView.style.display = 'block';
+
+            if (newWorker && newWorker.state === 'installed') {
+                btnUpdate.innerHTML = '<i class="fas fa-download"></i> Install Pembaruan';
+                btnUpdate.className = 'btn btn-primary';
+                btnUpdate.onclick = applyPwaUpdate;
+            } else {
+                btnUpdate.innerHTML = '<i class="fas fa-search"></i> Periksa Pembaruan';
+                btnUpdate.className = 'btn btn-success';
+                btnUpdate.onclick = checkForPwaUpdate;
+            }
+        }
+    }
+
+    // 1. Tangkap Event PWA Siap Diinstal
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        const installContainer = document.getElementById('pwa-install-container');
-        if (installContainer) installContainer.style.display = 'block';
+        updatePwaUI();
     });
+
+    // 2. Tombol Pemicu Install
     function installPWA() {
-        if (!deferredPrompt) {
-            showToast("Aplikasi sudah terinstal atau browser tidak mendukung.", "error");
-            return;
-        }
+        if (!deferredPrompt) return showToast("Sistem tidak mendukung install.", "error");
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                showToast("Aplikasi sedang diunduh...", "success");
-                document.getElementById('pwa-install-container').style.display = 'none';
-            }
+            if (choiceResult.outcome === 'accepted') showToast("Mengunduh aplikasi...", "success");
             deferredPrompt = null;
+            updatePwaUI();
         });
     }
-    window.addEventListener('appinstalled', (evt) => {
-        const installContainer = document.getElementById('pwa-install-container');
-        if (installContainer) installContainer.style.display = 'none';
-        showToast("Aplikasi berhasil dipasang di Layar Utama!", "success");
-    });
-    let newWorker;
-    function showUpdatePrompt(worker) {
-        newWorker = worker;
-        let updateToast = document.getElementById('pwa-update-toast');
-        if (updateToast) updateToast.style.display = 'flex';
-    }
 
+    // 3. Event Setelah Install Berhasil
+    window.addEventListener('appinstalled', (evt) => {
+        isAppInstalled = true;
+        deferredPrompt = null;
+        updatePwaUI();
+        showToast("Aplikasi berhasil dipasang di HP!", "success");
+    });
+
+    // 4. Registrasi & Radar Pembaruan
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then(reg => {
-                console.log('✅ PWA Ready');
-                reg.update();
-                if (reg.waiting) {
-                    showUpdatePrompt(reg.waiting);
-                }
+                swRegistration = reg;
+                if (reg.waiting) { newWorker = reg.waiting; updatePwaUI(); }
                 reg.addEventListener('updatefound', () => {
                     const installingWorker = reg.installing;
                     installingWorker.addEventListener('statechange', () => {
                         if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            showUpdatePrompt(installingWorker);
+                            newWorker = installingWorker;
+                            updatePwaUI();
                         }
                     });
                 });
-            }).catch(err => console.warn('⚠️ PWA Gagal:', err));
+            }).catch(err => console.warn('PWA Gagal:', err));
         });
+
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) {
-                window.location.reload();
-                refreshing = true;
-            }
+            if (!refreshing) { window.location.reload(); refreshing = true; }
         });
     }
 
-    document.getElementById('btn-pwa-update')?.addEventListener('click', () => {
+    function checkForPwaUpdate() {
+        const btnUpdate = document.getElementById('btn-check-update');
+        btnUpdate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
+        btnUpdate.disabled = true;
+
+        if (swRegistration) {
+            swRegistration.update().then(() => {
+                setTimeout(() => { 
+                    if (newWorker && newWorker.state === 'installed') {
+                        updatePwaUI();
+                        showToast("Pembaruan ditemukan! Silakan install.", "success");
+                    } else {
+                        btnUpdate.innerHTML = '<i class="fas fa-check-circle"></i> Sudah Versi Terbaru';
+                        btnUpdate.className = 'btn';
+                        btnUpdate.style.cssText = 'width: 100%; height: 45px; font-size: 14px; background: var(--surface); color: var(--primary); border: 2px solid var(--border); box-shadow: none;';
+                        setTimeout(() => {
+                            btnUpdate.disabled = false;
+                            btnUpdate.style.cssText = 'width: 100%; height: 45px; font-size: 14px; box-shadow: 0 4px 15px rgba(185,255,102,0.4);';
+                            updatePwaUI(); 
+                        }, 3000);
+                    }
+                }, 1500);
+            }).catch(() => {
+                btnUpdate.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal Memeriksa';
+                setTimeout(() => { btnUpdate.disabled = false; updatePwaUI(); }, 2000);
+            });
+        } else {
+            showToast("Mode Aplikasi tidak aktif", "error");
+            btnUpdate.disabled = false;
+            updatePwaUI();
+        }
+    }
+    function applyPwaUpdate() {
         if (newWorker) {
             newWorker.postMessage({ type: 'SKIP_WAITING' });
-            document.getElementById('pwa-update-toast').innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:24px; color:var(--secondary);"></i><p style="margin-top:10px;">Menerapkan pembaruan...</p>';
+            const btnUpdate = document.getElementById('btn-check-update');
+            btnUpdate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menginstall...';
+            btnUpdate.disabled = true;
         }
-    });
+    }
     function bukaModalManajemenBahan() {
         if(document.getElementById('search-manage-bahan')) document.getElementById('search-manage-bahan').value = '';
         renderListManageBahan();
