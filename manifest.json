@@ -1,19 +1,19 @@
 {
-  "name": "Bolu Sakinah Operasional",
+  "name": "Bolu Sakinah.App",
   "short_name": "BoluSakinah",
-  "description": "Sistem Manajemen Produksi & Kasir Bolu Sakinah",
+  "description": "Sistem Manajemen Produksi Bolu Sakinah",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#191A23",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3144/3144760.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/541/541732.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3144/3144760.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/541/541732.png",
       "sizes": "512x512",
       "type": "image/png"
     }
