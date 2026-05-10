@@ -914,18 +914,9 @@
                 <input type="text" id="search-manage-bahan" placeholder="Cari nama bahan..." oninput="renderListManageBahan()" class="has-prefix" style="width: 100%;">
             </div>
 
-            <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: #f9f9f9;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead style="position: sticky; top: 0; background: var(--accent); z-index: 5;">
-                        <tr>
-                            <th style="padding: 12px; font-size: 11px; text-align: left;">Nama Bahan</th>
-                            <th style="padding: 12px; font-size: 11px; text-align: right; width: 150px;">Harga Satuan</th>
-                            <th style="padding: 12px; font-size: 11px; text-align: right; width: 130px;">Stok Tersedia</th>
-                        </tr>
-                    </thead>
-                    <tbody id="list-manage-bahan-body">
-                        </tbody>
-                </table>
+            <div style="max-height: 60vh; overflow-y: auto; background: #f8fafc; padding: 12px; border-radius: var(--radius-md); border: 2px solid var(--border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                <div id="list-manage-bahan-body" style="display: flex; flex-direction: column; gap: 12px;">
+                    </div>
             </div>
             
             <div style="margin-top: 25px; display: flex; gap: 10px;">
@@ -2074,9 +2065,21 @@ let saveTimeout;
             }
 
             if (need > 0) {
-                let unit = b.isKg ? 'kg' : 'pcs';
-                let calcNeed = b.isKg ? need.toFixed(3) : Math.ceil(need);
-                listBahan.push({ nama: b.nama, butuh: calcNeed, unit: unit });
+                let calcNeedVal, calcUnit;
+                
+                if (!b.isKg) {
+                    calcNeedVal = Math.ceil(need);
+                    calcUnit = 'pcs';
+                } else {
+                    if (need > 0 && need < 1) {
+                        calcNeedVal = Math.round(need * 1000);
+                        calcUnit = 'gram';
+                    } else {
+                        calcNeedVal = parseFloat(need.toFixed(3)).toString().replace('.', ',');
+                        calcUnit = 'kg';
+                    }
+                }
+                listBahan.push({ nama: b.nama, butuh: calcNeedVal, unit: calcUnit });
             }
         });
 
@@ -2146,9 +2149,21 @@ let saveTimeout;
             let currentY = 42;
             doc.setFontSize(8.5);
             chk.items.forEach(item => {
+                let finalButuh = item.butuh;
+                let finalUnit = item.unit;
+                if (finalUnit === 'kg' && String(finalButuh).includes('.')) {
+                    let valNum = parseFloat(finalButuh);
+                    if (valNum > 0 && valNum < 1) {
+                        finalButuh = Math.round(valNum * 1000);
+                        finalUnit = 'gram';
+                    } else {
+                        finalButuh = parseFloat(valNum.toFixed(3)).toString().replace('.', ',');
+                    }
+                }
+
                 doc.rect(4, currentY - 2.5, 2.5, 2.5);
                 doc.text(`${item.nama}`, 8, currentY);
-                doc.text(`${item.butuh} ${item.unit}`, 54, currentY, {align: 'right'});
+                doc.text(`${finalButuh} ${finalUnit}`, 54, currentY, {align: 'right'});
                 currentY += 6;
             });
 
@@ -2267,21 +2282,20 @@ let saveTimeout;
             let sisaButuh = calcButuh - calcSedia; if(sisaButuh < 0) sisaButuh = 0;
             let calcSisa = b.isKg ? sisaButuh : Math.ceil(sisaButuh);
 
-            let jmlKeb = calcButuh * roundedHarga; 
-            let jmlPem = calcSisa * roundedHarga; 
-
             let dispButuhVal = calcButuh, dispButuhUnit = unt(b);
             let dispSediaVal = calcSedia, dispSediaUnit = unt(b);
             let dispSisaVal = calcSisa, dispSisaUnit = unt(b);
+            
             if (!isModeEditHPP && b.isKg) { 
                 if (calcButuh > 0 && calcButuh < 1) { dispButuhVal = calcButuh * 1000; dispButuhUnit = "gram"; }
                 if (calcSedia > 0 && calcSedia < 1) { dispSediaVal = calcSedia * 1000; dispSediaUnit = "gram"; }
                 if (calcSisa > 0 && calcSisa < 1) { dispSisaVal = calcSisa * 1000; dispSisaUnit = "gram"; }
             }
 
-            let formatButuh = (dispButuhUnit === 'kg') ? dispButuhVal.toFixed(3) : Math.round(dispButuhVal);
-            let formatSedia = (dispSediaUnit === 'kg') ? dispSediaVal.toFixed(3) : Math.round(dispSediaVal);
-            let formatSisa = (dispSisaUnit === 'kg') ? dispSisaVal.toFixed(3) : Math.round(dispSisaVal);
+            let formatButuh = (dispButuhUnit === 'kg') ? parseFloat(dispButuhVal.toFixed(3)) : Math.round(dispButuhVal);
+            let formatSedia = (dispSediaUnit === 'kg') ? parseFloat(dispSediaVal.toFixed(3)) : Math.round(dispSediaVal);
+
+            let formatSisa = (dispSisaUnit === 'kg') ? parseFloat(dispSisaVal.toFixed(3)).toString().replace('.', ',') : Math.round(dispSisaVal);
 
             let inputButuh = document.getElementById(`input-butuh-${i}`);
             if(document.activeElement !== inputButuh) { inputButuh.value = formatButuh; } 
@@ -2290,31 +2304,26 @@ let saveTimeout;
             let inputSedia = document.getElementById(`input-sedia-${i}`);
             if(document.activeElement !== inputSedia) { inputSedia.value = formatSedia; } 
             document.getElementById(`unit-sedia-${i}`).innerText = dispSediaUnit;
+
             document.getElementById(`sisa-${i}`).innerText = `${formatSisa} ${dispSisaUnit}`; 
         
-            
+            let jmlKeb = calcButuh * roundedHarga; 
+            let jmlPem = calcSisa * roundedHarga; 
             document.getElementById(`jmlKeb-${i}`).innerText = rp(jmlKeb); 
             document.getElementById(`jmlPem-${i}`).innerText = rp(jmlPem);
 
             grandTotKebutuhan += jmlKeb; 
             grandTotPembelanjaan += jmlPem; 
         });
-        if (document.getElementById('tot-kebutuhan')) {
-            document.getElementById('tot-kebutuhan').innerText = rp(grandTotKebutuhan); 
-        }
-        if (document.getElementById('tot-pembelanjaan')) {
-            document.getElementById('tot-pembelanjaan').innerText = rp(grandTotPembelanjaan);
-        }
-        if (document.getElementById('tot-pembelanjaan-ringkasan')) {
-            document.getElementById('tot-pembelanjaan-ringkasan').innerText = rp(grandTotPembelanjaan);
-        }
+        
+        if (document.getElementById('tot-kebutuhan')) document.getElementById('tot-kebutuhan').innerText = rp(grandTotKebutuhan); 
+        if (document.getElementById('tot-pembelanjaan')) document.getElementById('tot-pembelanjaan').innerText = rp(grandTotPembelanjaan);
+        if (document.getElementById('tot-pembelanjaan-ringkasan')) document.getElementById('tot-pembelanjaan-ringkasan').innerText = rp(grandTotPembelanjaan);
+        
         totalBelanjaGlobal = grandTotPembelanjaan; 
- 
         hitungOwner(true); 
         
-        if (!isRenderOnly) {
-            saveData();
-        }
+        if (!isRenderOnly) { saveData(); }
     }
 
 
@@ -3232,28 +3241,43 @@ let saveTimeout;
         bahanBaku.forEach((b, i) => {
             if (b.nama.toLowerCase().includes(searchQ)) {
                 let unit = b.isKg ? "kg" : "pcs";
+                let cleanHarga = parseFloat(b.harga.toFixed(2));
+                let cleanSedia = parseFloat((b.sedia || 0).toFixed(3));
+                let helperGram = (b.isKg && cleanSedia > 0 && cleanSedia < 1) 
+                    ? `<div style="font-size:11px; color:var(--secondary); margin-top:8px; font-weight:800; background: var(--primary); padding: 4px 8px; border-radius: 6px; display: inline-block;"><i class="fas fa-info-circle"></i> Setara ${Math.round(cleanSedia * 1000)} gram</div>` 
+                    : ``;
+
                 tbody.innerHTML += `
-                    <tr style="border-bottom: 1px solid #eee; background: white;">
-                        <td style="padding: 12px; font-weight: 700; font-size: 14px; color: var(--primary);">${b.nama}</td>
-                        <td style="padding: 12px;">
-                            <div class="input-group">
-                                <span class="input-prefix" style="font-size:10px;">Rp</span>
-                                <input type="number" id="edit-m-harga-${i}" value="${b.harga}" class="has-prefix text-right" style="height: 38px; font-size: 14px;">
+                    <div style="background: #ffffff; border: 2px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: 4px 4px 0px var(--border);">
+                        <div style="font-weight: 800; font-size: 16px; color: var(--primary); margin-bottom: 15px; border-bottom: 3px solid var(--secondary); display: inline-block; padding-bottom: 2px;">
+                            ${escapeHTML(b.nama)}
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div>
+                                <label style="font-size: 11px; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Harga Satuan Terbaru</label>
+                                <div class="input-group full-width" style="margin: 0; max-width: none;">
+                                    <span class="input-prefix" style="font-size: 13px; font-weight: 800;">Rp</span>
+                                    <input type="number" id="edit-m-harga-${i}" value="${cleanHarga}" class="has-prefix text-right" style="height: 52px; font-size: 16px; font-weight: 700; width: 100%; border-color: #cbd5e1; background: #f8fafc;" onfocus="this.select()">
+                                </div>
                             </div>
-                        </td>
-                        <td style="padding: 12px;">
-                            <div class="input-group">
-                                <input type="number" id="edit-m-sedia-${i}" value="${b.sedia}" step="0.01" class="has-unit text-right" style="height: 38px; font-size: 14px;">
-                                <span class="input-unit" style="font-size:10px;">${unit}</span>
+
+                            <div>
+                                <label style="font-size: 11px; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Jumlah Stok di Gudang</label>
+                                <div class="input-group full-width" style="margin: 0; max-width: none;">
+                                    <input type="number" id="edit-m-sedia-${i}" value="${cleanSedia}" step="0.01" class="has-unit text-right" style="height: 52px; font-size: 16px; font-weight: 700; width: 100%; border-color: #cbd5e1; background: #f8fafc;" onfocus="this.select()">
+                                    <span class="input-unit" style="font-size: 13px; font-weight: 800;">${unit}</span>
+                                </div>
+                                ${helperGram}
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                 `;
             }
         });
 
         if (tbody.innerHTML === '') {
-            tbody.innerHTML = '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">Bahan tidak ditemukan.</td></tr>';
+            tbody.innerHTML = '<div style="padding: 40px 20px; text-align: center; color: var(--text-muted); font-weight: 600;">Bahan baku tidak ditemukan.</div>';
         }
     }
 
