@@ -3229,16 +3229,25 @@ let saveTimeout;
         showToast("Aplikasi berhasil dipasang di Layar Utama!", "success");
     });
     let newWorker;
+    function showUpdatePrompt(worker) {
+        newWorker = worker;
+        let updateToast = document.getElementById('pwa-update-toast');
+        if (updateToast) updateToast.style.display = 'flex';
+    }
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then(reg => {
                 console.log('✅ PWA Ready');
+                reg.update();
+                if (reg.waiting) {
+                    showUpdatePrompt(reg.waiting);
+                }
                 reg.addEventListener('updatefound', () => {
-                    newWorker = reg.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            let updateToast = document.getElementById('pwa-update-toast');
-                            if (updateToast) updateToast.style.display = 'flex';
+                    const installingWorker = reg.installing;
+                    installingWorker.addEventListener('statechange', () => {
+                        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            showUpdatePrompt(installingWorker);
                         }
                     });
                 });
@@ -3252,6 +3261,7 @@ let saveTimeout;
             }
         });
     }
+
     document.getElementById('btn-pwa-update')?.addEventListener('click', () => {
         if (newWorker) {
             newWorker.postMessage({ type: 'SKIP_WAITING' });
