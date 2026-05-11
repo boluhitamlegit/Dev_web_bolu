@@ -3364,27 +3364,31 @@ let saveTimeout;
 
    
     function applyPwaUpdate() {
-        if (newWorker) {
-        
-            newWorker.postMessage({ type: 'SKIP_WAITING' });
-            
-      
-            const btnUpdate = document.getElementById('btn-check-update');
-            if(btnUpdate) {
-                btnUpdate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menginstall...';
-                btnUpdate.disabled = true;
-            }
-            
-
-            const updateToast = document.getElementById('pwa-update-toast');
-            if(updateToast) {
-                updateToast.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:24px; color:var(--secondary);"></i><p style="margin-top:10px;">Menerapkan pembaruan...</p>';
-            }
-
-            setTimeout(() => {
-                window.location.href = window.location.pathname + '?update=' + new Date().getTime();
-            }, 1500);
+        const btnUpdate = document.getElementById('btn-check-update');
+        if(btnUpdate) {
+            btnUpdate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menginstall...';
+            btnUpdate.disabled = true;
         }
+        
+        const updateToast = document.getElementById('pwa-update-toast');
+        if(updateToast) {
+            updateToast.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:24px; color:var(--secondary);"></i><p style="margin-top:10px;">Menerapkan pembaruan...</p>';
+        }
+        if (newWorker) {
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+        }
+        setTimeout(() => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                    window.location.replace(window.location.pathname + '?v=' + new Date().getTime());
+                });
+            } else {
+                window.location.replace(window.location.pathname + '?v=' + new Date().getTime());
+            }
+        }, 1500);
     }
     function bukaModalManajemenBahan() {
         if(document.getElementById('search-manage-bahan')) document.getElementById('search-manage-bahan').value = '';
