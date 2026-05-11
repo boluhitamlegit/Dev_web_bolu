@@ -3329,8 +3329,22 @@ let saveTimeout;
             btnUpdate.disabled = true;
         }
 
-        if (swRegistration) {
-            swRegistration.update().then(() => {
+        if (!navigator.onLine) {
+            showToast("Koneksi internet terputus!", "error");
+            if(btnUpdate) {
+                btnUpdate.innerHTML = '<i class="fas fa-wifi"></i> Offline';
+                setTimeout(() => { btnUpdate.disabled = false; updatePwaUI(); }, 2500);
+            }
+            return;
+        }
+
+        if ('serviceWorker' in navigator) {
+            fetch('./sw.js', { cache: 'no-store' }).then(() => {
+                return navigator.serviceWorker.register('./sw.js');
+            }).then(reg => {
+                swRegistration = reg;
+                return reg.update(); 
+            }).then(() => {
                 setTimeout(() => { 
                     if (newWorker && newWorker.state === 'installed') {
                         updatePwaUI();
@@ -3349,7 +3363,8 @@ let saveTimeout;
                         }
                     }
                 }, 1500);
-            }).catch(() => {
+            }).catch((err) => {
+                console.warn("Pengecekan update diblokir Android:", err);
                 if(btnUpdate) {
                     btnUpdate.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal Memeriksa';
                     setTimeout(() => { btnUpdate.disabled = false; updatePwaUI(); }, 2000);
