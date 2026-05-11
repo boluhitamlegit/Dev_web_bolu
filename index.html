@@ -1756,12 +1756,18 @@ let saveTimeout;
     }
     function updateHPPFromLaporan() {
         produkBolu.forEach(p => p.loyang = 0);
+        
         laporanPenggunaan.forEach(lap => {
-            let p = produkBolu.find(x => x.nama === lap.prod);
-            if(p) {
-                p.loyang += getVal(lap.qty);
-            }
+            let listItems = lap.items || [{ prod: lap.prod, qty: lap.qty }];
+            
+            listItems.forEach(item => {
+                let p = produkBolu.find(x => x.nama === item.prod);
+                if(p) {
+                    p.loyang += getVal(item.qty);
+                }
+            });
         });
+        
         initTabelHPP(); 
     }
 
