@@ -581,6 +581,7 @@
     </style>
 </head>
 <body>
+<datalist id="customer-list-datalist"></datalist>
 
 <div id="welcome-modal" class="modal-overlay" style="z-index: 9999;">
         <div class="modal-box" style="text-align: center; max-width: 440px;">
@@ -828,6 +829,31 @@
                         <ul id="list-akun-pegawai" style="list-style:none; padding:0; margin:0; max-height:200px; overflow-y:auto; border: 1px solid var(--border-light); border-radius: var(--radius-sm);">
                             </ul>
                     </div>
+                    <div style="background: #f0f9ff; padding: 20px; border-radius: var(--radius-md); border: 2px dashed #0ea5e9; grid-column: 1 / -1;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 14px; color: #0369a1;"><i class="fas fa-address-book"></i> Database Pelanggan Tetap</h3>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Daftar ini akan muncul sebagai saran otomatis saat input pesanan.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="db-cust-nama" placeholder="Ketik Nama Lengkap Pelanggan..." style="background: #fff; width: 100%;">
+                        <input type="text" id="db-cust-alamat" placeholder="Ketik Daerah / Alamat (Cth: Garut)..." style="background: #fff; width: 100%;">
+                        <button class="btn btn-primary" onclick="tambahPelangganKeDB()" style="width: 100%; justify-content: center; height: 48px;">
+                            <i class="fas fa-user-plus"></i> Tambahkan ke Database
+                        </button>
+                    </div>
+
+                    <div style="max-height: 200px; overflow-y: auto; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <table style="width: 100%; font-size: 12.5px;">
+                            <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
+                                <tr>
+                                    <th style="padding: 10px;">Nama</th>
+                                    <th style="padding: 10px;">Daerah/Alamat</th>
+                                    <th style="padding: 10px; text-align: center;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-pelanggan-db-body"></tbody>
+                        </table>
+                    </div>
+                </div>
                 </div>
 
             </div>
@@ -1561,7 +1587,7 @@
     let laporanPenggunaan = [];
     let checklistHistory = [];
     let currentChecklistData = null; 
-    
+    let pelanggan = []
     const rp = (num) => "Rp " + Math.round(num).toLocaleString('id-ID');
     const getVal = (val) => isNaN(parseFloat(val)) ? 0 : parseFloat(val);
     const unt = (b) => b.isKg ? "kg" : "pcs";
@@ -1614,10 +1640,61 @@
                 }))
             }));
         }
-
+        if (basicClean.pelanggan) {
+            basicClean.pelanggan = basicClean.pelanggan.map(c => ({
+                id: Schema.str(c.id, "cust_" + Date.now()),
+                nama: Schema.str(c.nama),
+                alamat: Schema.str(c.alamat)
+            }));
+        }
         return basicClean;
     }
+    function renderPelangganList() {
+        const tbody = document.getElementById('list-pelanggan-db-body');
+        const datalist = document.getElementById('customer-list-datalist');
+        if(!tbody || !datalist) return;
 
+        tbody.innerHTML = '';
+        datalist.innerHTML = '';
+
+        pelanggan.sort((a,b) => a.nama.localeCompare(b.nama)).forEach((c, i) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td style="padding:10px; font-weight:800;">${escapeHTML(c.nama)}</td>
+                    <td style="padding:10px;">${escapeHTML(c.alamat || '-')}</td>
+                    <td style="padding:10px; text-align:center;">
+                        <button class="btn-danger" style="padding:5px 8px; font-size:10px;" onclick="hapusPelangganDariDB(${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            datalist.innerHTML += `<option value="${escapeHTML(c.nama)}">${escapeHTML(c.alamat)}</option>`;
+        });
+    }
+
+    function tambahPelangganKeDB() {
+        let n = document.getElementById('db-cust-nama').value.trim();
+        let a = document.getElementById('db-cust-alamat').value.trim();
+        
+        if(!n) return showToast("Nama pelanggan tidak boleh kosong!", "error");
+        if(pelanggan.some(p => p.nama.toLowerCase() === n.toLowerCase())) return showToast("Nama sudah ada di database!", "error");
+
+        pelanggan.push({ id: "cust_" + Date.now(), nama: n, alamat: a });
+        document.getElementById('db-cust-nama').value = '';
+        document.getElementById('db-cust-alamat').value = '';
+        
+        saveData();
+        renderPelangganList();
+        showToast("Pelanggan berhasil disimpan ke database!");
+    }
+
+    function hapusPelangganDariDB(idx) {
+        confirmDelete("Hapus pelanggan ini dari database?", () => {
+            pelanggan.splice(idx, 1);
+            saveData();
+            renderPelangganList();
+        });
+    }
     function toggleMobileMenu() {
         const navMenu = document.getElementById('nav-menu-container');
         const overlay = document.getElementById('mobile-overlay');
@@ -1630,7 +1707,7 @@
     function saveToLocal() { 
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
             produkBolu, bahanBaku, pesanan, kas, ownerBeban, laporanPenggunaan, checklistHistory,
-            daftarUser, daftarCabang, daftarToken
+            daftarUser, daftarCabang, daftarToken, pelanggan
         })); 
     }
 
@@ -1639,7 +1716,7 @@
         db.collection('bolu_sakinah_log').add({ action, note, timestamp: firebase.firestore.FieldValue.serverTimestamp(), user: "System", date: new Date().toISOString() }).catch(e => console.warn(e));
     }
 
-let saveTimeout;
+    let saveTimeout;
     function saveData() {
         setTimeout(() => { saveToLocal(); }, 0);
         
@@ -1654,11 +1731,10 @@ let saveTimeout;
         
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
-            const dataToSave = cleanData({ produkBolu, bahanBaku, pesanan, laporanPenggunaan, checklistHistory });
+            const dataToSave = cleanData({ produkBolu, bahanBaku, pesanan, laporanPenggunaan, checklistHistory, pelanggan });
             db.collection('bolu_sakinah').doc('produksi').set(dataToSave, { merge: true });
 
             db.collection('bolu_sakinah').doc('kas').set({ kas: cleanData({kas}).kas }, { merge: true });
-   
             db.collection('bolu_sakinah').doc('laba').set({ ownerBeban: ownerBeban }, { merge: true });
             db.collection('bolu_sakinah').doc('auth_data').set({
                 daftarUser: daftarUser,
@@ -1686,7 +1762,9 @@ let saveTimeout;
                 let d = prodDoc.data(); 
                 if(d.produkBolu) produkBolu=d.produkBolu; if(d.bahanBaku) bahanBaku=d.bahanBaku; 
                 if(d.pesanan) pesanan=d.pesanan; if(d.laporanPenggunaan) laporanPenggunaan=d.laporanPenggunaan; 
-                if(d.checklistHistory) checklistHistory=d.checklistHistory; hasData=true; 
+                if(d.checklistHistory) checklistHistory=d.checklistHistory; 
+                if(d.pelanggan) pelanggan=d.pelanggan;
+                hasData=true; 
             }
             if(kasDoc.exists) { let d = kasDoc.data(); if(d.kas) kas = d.kas; hasData=true; }
             if(labDoc.exists) { let d = labDoc.data(); if(d.ownerBeban) ownerBeban = d.ownerBeban; hasData=true; }
@@ -1723,6 +1801,7 @@ let saveTimeout;
                 if(parsed.daftarUser) daftarUser = parsed.daftarUser;
                 if(parsed.daftarCabang) daftarCabang = parsed.daftarCabang;
                 if(parsed.daftarToken) daftarToken = parsed.daftarToken;
+                if(parsed.pelanggan) pelanggan = parsed.pelanggan;
             } catch(e) { console.error("Data load error", e); }
         } else {
             let todayStr = new Date().toISOString().slice(0,10);
@@ -1747,6 +1826,7 @@ let saveTimeout;
             try { renderPesanan(); } catch(e) {}
             try { renderKas(); } catch(e) {}
             try { renderChecklistHistory(); } catch(e) {}
+            try { renderPelangganList(); } catch(e) {}
             
         } catch (error) {
             console.error("Terjadi bentrokan data lama:", error);
@@ -2501,7 +2581,10 @@ let saveTimeout;
                 });
 
                 let tr = `<tr>
-                    <td data-label="Pemesan"><input type="text" class="wide" value="${escapeHTML(p.n)}" placeholder="Nama..." onchange="if(!this.value){showToast('Nama kosong!','error');}else{pesanan[${realIdx}].n=this.value; saveData();}"></td>
+                    <td data-label="Pemesan">
+                        <input type="text" list="customer-list-datalist" class="wide" value="${escapeHTML(p.n)}" placeholder="Ketik/Pilih Nama..." 
+                        onchange="if(!this.value){showToast('Nama kosong!','error');}else{pesanan[${realIdx}].n=this.value; saveData();}">
+                    </td>
                     <td data-label="Untuk Tanggal"><input type="date" value="${p.tgl || ''}" onchange="pesanan[${realIdx}].tgl=this.value; saveData(); renderPesanan();"></td>`;
                 
                 let itemsHtml = `<div style="background: var(--surface); padding: 10px; border-radius: var(--radius-sm); border: 1px dashed var(--border);">`;
@@ -3082,7 +3165,7 @@ let saveTimeout;
             </li>`;
         });
         ulPegawai.innerHTML = pegawaiHtml; 
-
+        renderPelangganList();
         const modal = document.getElementById('admin-auth-modal');
         modal.style.display = 'flex'; requestAnimationFrame(() => modal.classList.add('show'));
     }
