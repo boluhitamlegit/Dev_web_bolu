@@ -237,12 +237,31 @@
             .btn-gembok { padding: 8px 12px; font-size: 14px; }
             .footer { margin-top: 0px; padding-bottom: 20px; }
             .page-container { padding: 15px 10px; }
-            .card { padding: 20px 15px; border-radius: 16px;}
-            .form-input-card { padding: 20px 15px; }
-            .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .card-header h2 { display: block; line-height: 1.5; width: 100%; }
-            .card-header > div { width: 100%; display: flex; flex-direction: column; gap: 10px; } 
+            /* --- PERBAIKAN TATA LETAK CARD & HEADER MOBILE --- */
+            .card { padding: 22px 18px; border-radius: 20px; margin-bottom: 20px !important; }
+            .form-input-card { padding: 22px 18px; }
+            
+            .card-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+            
+            /* Perbaikan Teks Judul: Mengalir rapi seperti kalimat biasa */
+            .card-header h2 { 
+                display: block !important; 
+                line-height: 1.5; 
+                width: 100%; 
+                font-size: 17.5px !important; 
+                letter-spacing: -0.3px;
+            }
+            .card-header h2 i { 
+                display: inline-block; 
+                vertical-align: middle;
+                margin-right: 8px; 
+                margin-bottom: 4px;
+            }
+                
+            /* Solusi Tombol: Tetap lebar penuh tapi teksnya dimunculkan */
+            .card-header > div { width: 100%; display: flex; flex-direction: column; gap: 12px; } 
             .card-header > div > * { width: 100% !important; min-width: 0 !important; max-width: none !important; }
+            .card-header button .hide-mobile { display: inline !important; }
 
             .card-header .input-group { max-width: 100% !important; width: 100% !important; }
             .card-header .input-group input { width: 100% !important; }
@@ -289,6 +308,13 @@
         }
 
         @media (max-width: 768px) {
+            #toast-container { 
+                bottom: 110px !important; 
+                right: 20px !important; 
+                left: 20px !important; 
+                align-items: center; 
+            }
+            .toast { min-width: 100% !important; justify-content: center; }
             .desktop-only-btn { display: none !important; }
             .header { padding: 0 10px !important; } 
             .brand { gap: 5px !important; font-size: 16px !important; white-space: nowrap; }
@@ -578,6 +604,125 @@
                 color: #ffffff !important;
             }
         }
+        .dash-grid-top, .dash-grid-bottom { display: grid; gap: 15px; grid-template-columns: 1fr 1fr; }
+        .dash-full { grid-column: 1 / -1; }
+        @media (min-width: 769px) {
+            .dash-grid-top { grid-template-columns: repeat(3, 1fr); }
+            .dash-grid-bottom { grid-template-columns: repeat(4, 1fr); }
+            .dash-full { grid-column: auto; }
+        }
+        @media (max-width: 768px) {
+            .dash-grid-top .stat-box, .dash-grid-bottom .stat-box { padding: 16px 12px; }
+            .dash-grid-top .stat-box h3, .dash-grid-bottom .stat-box h3 { 
+                font-size: 11px; letter-spacing: 0; margin-bottom: 8px;
+                display: flex; align-items: center; flex-wrap: wrap; gap: 5px;
+            }
+            .dash-grid-top .stat-box h1, .dash-grid-bottom .stat-box h1 { font-size: 17px !important; word-break: break-word; }
+            .dash-full h3 { font-size: 12.5px !important; }
+            .dash-full h1 { font-size: 26px !important; }
+        }
+        .bottom-nav {
+            display: none; 
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: var(--surface);
+            border-top: 2px solid var(--border);
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .bottom-nav-item i { font-size: 20px; transition: var(--transition); }
+        .bottom-nav-item.active { color: var(--primary); }
+        .bottom-nav-item.active i {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            box-shadow: 3px 3px 0 var(--border);
+            margin-bottom: 2px;
+        }
+        @media (max-width: 768px) {
+            body.pegawai-mode { padding-bottom: 80px; }
+            body.pegawai-mode .bottom-nav { display: flex; }
+            body.pegawai-mode .header .hamburger-btn { display: none !important; }
+        }
+        @media (max-width: 768px) {
+            body.pegawai-mode .fab-tambah-pesanan {
+                bottom: 95px !important; 
+            }
+        }
+        @media (max-width: 768px) {
+            #kas-summary { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+            #kas-summary .stat-box { padding: 16px 12px !important; }
+            #kas-summary .stat-box h3 { font-size: 10.5px !important; margin-bottom: 8px !important; display: flex; flex-wrap: wrap; gap: 4px; }
+            #kas-summary .stat-box h1 { font-size: 17px !important; word-break: break-word; }
+            #kas-summary .stat-box:last-child { grid-column: 1 / -1 !important; background: var(--primary) !important; }
+            #kas-summary .stat-box:last-child h1 { font-size: 22px !important; color: var(--secondary) !important; }
+            #page-kas .table-responsive tbody tr:not(.date-group-header) {
+                display: flex !important; flex-wrap: wrap !important; gap: 8px !important;
+                padding: 20px 15px !important; position: relative !important;
+            }
+            #page-kas .table-responsive td { border: none !important; padding: 0 !important; display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: center !important; min-height: auto !important; }
+            #page-kas .table-responsive td::before { margin-bottom: 4px !important; font-size: 11px !important; color: var(--text-muted) !important; }
+            
+            #page-kas .table-responsive td[data-label="No"] { display: none !important; } 
+            
+            #page-kas .table-responsive td[data-label="Aksi"] { position: absolute !important; top: 15px !important; right: 15px !important; flex-direction: row !important; }
+            #page-kas .table-responsive td[data-label="Aksi"]::before { display: none !important; }
+            #page-kas .table-responsive td[data-label="Aksi"] button { width: 40px !important; height: 40px !important; padding: 0 !important; margin: 0 !important; }
+            #page-kas .table-responsive td[data-label="Tanggal"] { width: 100% !important; padding-right: 55px !important; margin-bottom: 5px !important; }
+            #page-kas .table-responsive td[data-label="Tanggal"] input { font-size: 15px !important; font-weight: 800 !important; color: var(--primary) !important; background: #f8fafc !important; border: 1px solid #cbd5e1 !important; }
+            
+            #page-kas .table-responsive td[data-label="Ket"] { width: 100% !important; margin-bottom: 12px !important; }
+            #page-kas .table-responsive td[data-label="Ket"] input { font-size: 16px !important; font-weight: 800 !important; color: var(--primary) !important; background: #f8fafc !important; border: 1px solid #cbd5e1 !important; }
+            #page-kas .table-responsive td[data-label="Kas(Rp)"], #page-kas .table-responsive td[data-label="Bank(Rp)"], #page-kas .table-responsive td[data-label="Bolu(Rp)"], #page-kas .table-responsive td[data-label="Sisa(Rp)"] { width: 48% !important; }
+            #page-kas .table-responsive td .input-group { width: 100% !important; max-width: 100% !important; }
+            #page-kas .table-responsive td input { width: 100% !important; max-width: 100% !important; text-align: right !important; }
+            #page-kas .table-responsive td[data-label="Selisih(Rp)"], #page-kas .table-responsive td[data-label="Jumlah(Rp)"] { width: 100% !important; margin-top: 5px !important; padding-top: 12px !important; border-top: 1px dashed #cbd5e1 !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; }
+            #page-kas .table-responsive td[data-label="Selisih(Rp)"]::before, #page-kas .table-responsive td[data-label="Jumlah(Rp)"]::before { margin-bottom: 0 !important; }
+            #page-kas .table-responsive td[data-label="Selisih(Rp)"] .input-group { width: 140px !important; margin: 0 !important; }
+            #page-kas .table-responsive tbody tr.date-group-header {
+                display: block !important;
+                padding: 15px 18px !important;
+                background: var(--primary) !important;
+                border-radius: 14px !important;
+                margin-bottom: 15px !important;
+            }
+            #page-kas .table-responsive tbody tr.date-group-header td {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                background: transparent !important; 
+                color: var(--surface) !important;
+                border: none !important;
+                padding: 0 !important;
+                font-size: 14.5px !important;
+            }
+            #page-kas .table-responsive tbody tr.date-group-header td i {
+                color: var(--secondary) !important; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -667,16 +812,7 @@
                 <button class="nav-item" onclick="bukaPage('page-hpp', this); toggleMobileMenu()"><i class="fas fa-calculator"></i> <span>Stok & Produksi</span></button>
                 <button class="nav-item" onclick="bukaPage('page-dashboard', this); toggleMobileMenu()"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
                 <button class="nav-item" onclick="bukaPage('page-kas', this); toggleMobileMenu()"><i class="fas fa-wallet"></i> <span>Buku Kas</span></button>
-                <button class="nav-item" onclick="bukaPage('page-pengaturan', this); toggleMobileMenu()"><i class="fas fa-cog"></i> <span>Pengaturan</span></button>
-            </div>
-            <div class="hide-desktop" style="width: 100%; border-top: 2px dashed var(--border); margin-top: 5px; padding-top: 15px; display: flex; flex-direction: column; gap: 5px;">
-                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px;">AKUN SAYA</span>
-                <button class="nav-item" onclick="bukaModalGantiPinUser(); toggleMobileMenu()" style="width: 100%; justify-content: flex-start;">
-                    <i class="fas fa-cog" style="color: var(--primary);"></i> <span style="color: var(--primary);">Ganti PIN Saya</span>
-                </button>
-                <button class="nav-item" onclick="logoutUser(); toggleMobileMenu()" style="width: 100%; justify-content: flex-start;">
-                    <i class="fas fa-sign-out-alt" style="color: var(--danger);"></i> <span style="color: var(--danger);">Keluar (Logout)</span>
-                </button>
+                <button class="nav-item" onclick="bukaPage('page-pengaturan', this); toggleMobileMenu()"><i class="fas fa-database"></i> <span>Database</span></button>
             </div>
         </div>
 
@@ -685,19 +821,13 @@
                 <i class="fas fa-cloud"></i>
             </div>
 
-            <div id="user-capsule" style="display: flex; align-items: center; gap: 6px; background: var(--surface); border: 2px solid var(--border); padding: 0 10px 0 4px; border-radius: 30px; box-shadow: 2px 2px 0 var(--border); height: 36px;">
+            <div id="user-capsule" style="display: flex; align-items: center; gap: 6px; background: var(--surface); border: 2px solid var(--border); padding: 0 10px 0 4px; border-radius: 30px; box-shadow: 2px 2px 0 var(--border); height: 36px; cursor: pointer; transition: transform 0.2s;" onclick="bukaProfileMenu()">
                 <div style="background: var(--secondary); border-radius: 50%; width: 24px; height: 24px; min-width: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
                     <i class="fas fa-user" style="color: var(--primary); font-size: 11px;"></i>
                 </div>
                 <span id="display-user-name" style="font-size: 12.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">User</span>
+                <i class="fas fa-chevron-down" style="font-size: 10px; color: var(--text-muted); margin-left: 4px;"></i>
             </div>
-
-            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--primary); padding: 0; width: 36px; height: 36px; min-height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); box-shadow: 2px 2px 0 var(--border);" onclick="bukaModalGantiPinUser()" title="Ganti PIN Saya">
-                <i class="fas fa-cog" style="font-size: 14px;"></i>
-            </button>
-            <button class="btn desktop-only-btn" style="background: var(--surface); color: var(--danger); padding: 0; width: 36px; height: 36px; min-height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--danger); box-shadow: 2px 2px 0 var(--danger);" onclick="logoutUser()" title="Keluar">
-                <i class="fas fa-sign-out-alt" style="font-size: 14px;"></i>
-            </button>
 
             <button class="hamburger-btn hide-desktop" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; margin-left: 2px;" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         </div>
@@ -842,14 +972,11 @@
             Daftar ini akan muncul sebagai saran otomatis saat Anda mengetik nama di halaman input pesanan.
         </p>
         
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: #f0f9ff; padding: 15px; border-radius: 12px; border: 2px dashed #0ea5e9;">
-            <input type="text" id="db-cust-nama" placeholder="Ketik Nama Lengkap Pelanggan..." style="background: #fff; width: 100%;">
-            <input type="text" id="db-cust-alamat" placeholder="Ketik Daerah / Alamat (Cth: Garut)..." style="background: #fff; width: 100%;">
-            <button class="btn btn-primary" onclick="tambahPelangganKeDB()" style="width: 100%; justify-content: center; height: 48px; background: #0ea5e9;">
-                <i class="fas fa-user-plus"></i> Tambahkan ke Database
-            </button>
-        </div>
-
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                     <input type="text" id="db-cust-nama" placeholder="Nama Pelanggan..." style="background: #fff; width: 100%;">
+                     <input type="text" id="db-cust-alamat" placeholder="Daerah/Alamat (Cth: Garut)..." style="background: #fff; width: 100%;">
+                     <button class="btn btn-primary" onclick="tambahPelangganKeDB()" style="width: 100%; justify-content: center; height: 48px;"><i class="fas fa-user-plus"></i> Tambah</button>
+                 </div>
         <div style="max-height: 40vh; overflow-y: auto; background: #fff; border-radius: 12px; border: 2px solid var(--border);">
             <table style="width: 100%; font-size: 13px;">
                 <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
@@ -987,7 +1114,31 @@
             <button class="btn btn-success" style="width: 100%;" onclick="simpanBahanBaru()"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud</button>
         </div>
     </div>
-
+    <div id="modal-profile-menu" class="modal-overlay" style="z-index: 10001; align-items: flex-start; justify-content: flex-end; padding-top: 70px; padding-right: 20px;">
+        <div class="modal-box" style="width: 250px; max-width: 100%; padding: 20px; text-align: left; margin: 0;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-light);">
+                <div style="background: var(--secondary); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border);">
+                    <i class="fas fa-user" style="color: var(--primary); font-size: 20px;"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 800; color: var(--primary); font-size: 15px;" id="profile-dropdown-name">User</div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;" id="profile-dropdown-role">Pegawai</div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="tutupModal('modal-profile-menu'); bukaModalGantiPinUser()" style="width: 100%; justify-content: flex-start; background: transparent; border: none; box-shadow: none; padding: 12px 10px; height: auto; min-height: auto;">
+                <i class="fas fa-cog" style="color: var(--primary); width: 20px; font-size: 16px;"></i> <span style="color: var(--primary); font-size: 14.5px;">Pengaturan Akun</span>
+            </button>
+            
+            <button class="btn" onclick="tutupModal('modal-profile-menu'); logoutUser()" style="width: 100%; justify-content: flex-start; background: transparent; border: none; box-shadow: none; padding: 12px 10px; height: auto; min-height: auto; margin-top: 5px;">
+                <i class="fas fa-sign-out-alt" style="color: var(--danger); width: 20px; font-size: 16px;"></i> <span style="color: var(--danger); font-size: 14.5px;">Keluar (Logout)</span>
+            </button>
+            
+            <button class="btn" onclick="tutupModal('modal-profile-menu')" style="width: 100%; justify-content: center; background: #f8fafc; border: 1px solid #cbd5e1; box-shadow: none; padding: 8px; height: auto; min-height: auto; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                Batal & Tutup
+            </button>
+        </div>
+    </div>
     <div id="modal-ganti-pin-user" class="modal-overlay">
         <div class="modal-box" style="max-width: 400px;">
             <button class="btn-close" onclick="tutupModal('modal-ganti-pin-user')">&times;</button>
@@ -1246,24 +1397,24 @@
             <i class="fas fa-plus"></i>
         </button>
     </div>
-    </div>
 
     <div id="page-dashboard" class="page-container">
-        <div class="card owner-card" style="border-top: 4px solid var(--secondary);">
-            <div class="card-header" style="margin-bottom: 20px; border-bottom: none; padding-bottom: 0;">
+        
+        <div class="card owner-card" style="border-top: 4px solid var(--secondary); margin-bottom: 25px;">
+            <div class="card-header" style="margin-bottom: 15px; border-bottom: none; padding-bottom: 0;">
                 <h2><i class="fas fa-calendar-day"></i> Ringkasan Hari Ini (<span id="daily-date"></span>)</h2>
             </div>
-            <div class="grid-owner" style="margin-bottom: 0;">
+            <div class="dash-grid-top">
                 <div class="stat-box bg-white">
-                    <h3><i class="fas fa-arrow-down stat-icon"></i> Kas Masuk</h3>
-                    <h1 id="daily-kas" style="color:var(--primary)">Rp 0</h1>
+                    <h3 style="color: var(--text-muted);"><i class="fas fa-arrow-down stat-icon" style="color:var(--primary); background:#e2e8f0; font-size:14px; padding:6px;"></i> Kas Masuk</h3>
+                    <h1 id="daily-kas" style="color:var(--primary);">Rp 0</h1>
                 </div>
                 <div class="stat-box bg-white">
-                    <h3><i class="fas fa-arrow-up stat-icon"></i> Pengeluaran</h3>
-                    <h1 id="daily-out" style="color:var(--danger)">Rp 0</h1>
+                    <h3 style="color: var(--text-muted);"><i class="fas fa-arrow-up stat-icon" style="color:var(--danger); background:#fee2e2; border-color:#fca5a5; font-size:14px; padding:6px;"></i> Keluar</h3>
+                    <h1 id="daily-out" style="color:var(--danger);">Rp 0</h1>
                 </div>
-                <div class="stat-box bg-orange">
-                    <h3><i class="fas fa-wallet stat-icon"></i> Laba Harian</h3>
+                <div class="stat-box bg-orange dash-full">
+                    <h3><i class="fas fa-wallet stat-icon"></i> Laba Bersih Harian</h3>
                     <h1 id="daily-laba">Rp 0</h1>
                 </div>
             </div>
@@ -1280,7 +1431,7 @@
             </div>
 
             <div id="area-input-keuangan" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
-                <div class="form-grid">
+                <div class="form-grid" style="background: #f8fafc; padding: 18px; border-radius: var(--radius-md); border: 1px solid #e2e8f0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                     <div class="form-group"><label>Penjualan Kotor</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-penjualan" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
                     <div class="form-group"><label>Biaya Gas</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-gas" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
                     <div class="form-group"><label>Upah Pegawai</label><div class="input-group full-width"><span class="input-prefix">Rp</span><input type="number" id="own-upah" value="0" class="has-prefix text-right" onchange="hitungOwner()" onfocus="this.select()"></div></div>
@@ -1288,23 +1439,24 @@
                 </div>
             </div>
         </div>
-        <div class="grid-owner">
-            <div class="stat-box bg-blue">
-                <h3><i class="fas fa-hand-holding-usd stat-icon"></i> Total Penjualan</h3>
+        
+        <div class="dash-grid-bottom">
+            <div class="stat-box bg-blue dash-full">
+                <h3><i class="fas fa-hand-holding-usd stat-icon"></i> Total Penjualan Global</h3>
                 <h1 id="stat-jual">Rp 0</h1>
             </div>
             <div class="stat-box bg-red">
-                <h3><i class="fas fa-shopping-cart stat-icon"></i> Belanja HPP</h3>
+                <h3><i class="fas fa-shopping-cart stat-icon"></i> HPP Bolu</h3>
                 <h1 id="stat-hpp">Rp 0</h1>
             </div>
             <div class="stat-box bg-blue">
-                <h3><i class="fas fa-file-invoice-dollar stat-icon"></i> Beban Lainnya</h3>
+                <h3><i class="fas fa-file-invoice-dollar stat-icon"></i> Beban Lain</h3>
                 <h1 id="stat-beban">Rp 0</h1>
             </div>
-            <div class="stat-box bg-green">
-                <h3><i class="fas fa-chart-line stat-icon"></i> Laba Kotor</h3>
+            <div class="stat-box bg-green dash-full" style="border: 2px solid var(--secondary);">
+                <h3><i class="fas fa-chart-line stat-icon"></i> Laba Kotor Global</h3>
                 <h1 id="stat-laba">Rp 0</h1>
-                <button id="btn-sync-laba" class="btn btn-primary" style="margin-top: 20px; font-size: 13px; width: 100%;" onclick="syncLabaToKas()">
+                <button id="btn-sync-laba" class="btn btn-primary" style="margin-top: 15px; font-size: 14px; width: 100%; border-style: dashed; border-width: 2px;" onclick="syncLabaToKas()">
                     <i class="fas fa-exchange-alt"></i> Pindahkan ke Kas
                 </button>
             </div>
@@ -1314,7 +1466,6 @@
 
     <div id="page-kas" class="page-container">
         
-        <div class="card owner-card" style="margin-bottom: 25px;">
             <div class="card owner-card" style="margin-bottom: 25px; border-top: 4px solid var(--primary);">
             <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
@@ -1343,12 +1494,11 @@
                 <i class="fas fa-plus"></i> Tambah Transaksi Kas Baru
             </button>
         </div>
-        </div>
+        
 
         <div class="grid-owner" id="kas-summary" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 25px;">
             </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 30px;">
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
             <div class="card owner-card" style="margin-bottom: 0; padding: 25px;">
                 <div class="card-header" style="margin-bottom: 20px;"><h2><i class="fas fa-chart-area"></i> Tren Pergerakan Kas</h2></div>
                 <div style="position: relative; height: 250px; width: 100%;"><canvas id="cashChart"></canvas></div>
@@ -1415,12 +1565,7 @@
         </div>
     </div>
 </div>
-    <footer class="footer">
-        <div>&copy; 2026 <b>Bolu Sakinah</b>. All rights reserved.</div>
-        <div style="margin-top: 8px; font-size: 11.5px; opacity: 0.8;">
-            Sistem Manajemen Operasional &bull; <span style="font-weight: 800; letter-spacing: 1.5px;">.</span>
-        </div>
-    </footer>
+    
 
 <script>
     window.tutupModal = function(id) { 
@@ -2239,6 +2384,13 @@
     }
     function simpanChecklistData() {
         if (!currentChecklistData) return showToast("Tidak ada data!", "error");
+        let checkboxes = document.querySelectorAll('#preview-checklist-content input[type="checkbox"]');
+        currentChecklistData.items.forEach((item, index) => {
+            if(checkboxes[index]) {
+                item.checked = checkboxes[index].checked; 
+            }
+        });
+
         checklistHistory.push(currentChecklistData);
         saveData();
         renderChecklistHistory();
@@ -2254,37 +2406,54 @@
         let ready = await initPdfModules();
         if (!ready) return;
         let chk = checklistHistory[idx];
-        showLoading('Menyiapkan Struk (Perbaikan Layout)...');
+        showLoading('Menyiapkan Struk (Merapikan Margin)...');
 
         setTimeout(() => {
             const { jsPDF } = window.jspdf;
-            let totalPanjang = 65 + (chk.items.length * 8); 
+            let totalPanjang = 80 + (chk.items.length * 8.5); 
             const doc = new jsPDF('p', 'mm', [58, totalPanjang]);
-            doc.setFontSize(12); doc.setFont("helvetica", "bold");
-            doc.text("PENGGUNAAN BAHAN", 29, 10, {align: 'center'});
-            doc.setFontSize(10); doc.text("BOLU SAKINAH", 29, 15, {align: 'center'});
-            doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-            doc.text(`Tgl : ${chk.waktu_generate}`, 4, 24);
-            doc.text(`Pegawai: ${chk.petugas}`, 4, 29);
-            doc.text(`Adonan : ${chk.no}`, 4, 34);
-            doc.text(`Bolu   : ${chk.prod}`, 4, 39);
-            doc.text(`Jumlah : ${chk.qty} Loyang`, 4, 44);
-            doc.line(4, 47, 54, 47);
-            let currentY = 54;
-            doc.setFontSize(9.5); doc.setFont("helvetica", "bold");
+
+            doc.setFontSize(14); doc.setFont("helvetica", "bold");
+            doc.text("PENGGUNAAN BAHAN", 29, 12, {align: 'center'});
+            doc.setFontSize(12); doc.text("BOLU SAKINAH", 29, 17, {align: 'center'});
+            
+            doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+            doc.text(`Tgl : ${chk.waktu_generate}`, 3, 27);
+            doc.text(`Pegawai: ${chk.petugas}`, 3, 33);
+            doc.text(`Adonan : ${chk.no}`, 3, 39);
+            doc.text(`Bolu   : ${chk.prod}`, 3, 45);
+            doc.text(`Jumlah : ${chk.qty} Loyang`, 3, 51);
+
+            doc.setLineWidth(0.5);
+            doc.line(3, 55, 55, 55);
+
+            let currentY = 63;
+            doc.setFontSize(10.5); doc.setFont("helvetica", "bold");
             
             chk.items.forEach(item => {
                 let finalButuh = item.butuh;
                 let finalUnit = item.unit;
+    
                 let namaBahan = item.nama;
-                if (namaBahan.length > 15) {
-                    namaBahan = namaBahan.substring(0, 15) + '..';
+                if (namaBahan.length > 12) {
+                    namaBahan = namaBahan.substring(0, 12) + '..';
                 }
-                doc.rect(4, currentY - 3, 3.5, 3.5); 
-                doc.text(`${namaBahan}`, 9, currentY);
-                doc.text(`${finalButuh} ${finalUnit}`, 54, currentY, {align: 'right'});
+
+                doc.rect(3, currentY - 3.5, 4.5, 4.5); 
                 
-                currentY += 7.5; 
+          
+                if (item.checked) {
+                    doc.setLineWidth(0.8); 
+                    doc.line(3.8, currentY - 1.5, 4.8, currentY - 0.2); 
+                    doc.line(4.8, currentY - 0.2, 6.8, currentY - 2.8); 
+                    doc.setLineWidth(0.5); 
+                }
+                
+  
+                doc.text(`${namaBahan}`, 9, currentY);
+                doc.text(`${finalButuh} ${finalUnit}`, 55, currentY, {align: 'right'});
+                
+                currentY += 8.5; 
             });
 
             doc.save(`Struk_${chk.no}.pdf`);
@@ -2292,7 +2461,6 @@
             showToast('Struk Berhasil Dibuat!');
         }, 500);
     }
-
 
 
     function showToast(msg, type='success') {
@@ -2809,9 +2977,19 @@
                 if(diff < 0) return `<span class="trend-badge trend-down"><i class="fas fa-arrow-down"></i> ${Math.abs(diff).toFixed(1)}%</span>`;
                 return `<span class="trend-badge trend-neutral">-</span>`;
             };
-            compareHtml = `<div class="stat-box bg-white"><h3><i class="fas fa-money-bill-wave"></i> Total Kas</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumKas)}</h1>${calcBadge(sumKas, prevData.sumKas)}</div><div class="stat-box bg-white"><h3><i class="fas fa-university"></i> Total Bank</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBnk)}</h1>${calcBadge(sumBnk, prevData.sumBnk)}</div><div class="stat-box bg-white"><h3><i class="fas fa-cookie"></i> Total Bolu</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBol)}</h1>${calcBadge(sumBol, prevData.sumBol)}</div><div class="stat-box bg-red"><h3><i class="fas fa-wallet"></i> Grand Total Bulan Ini</h3><h1 style="font-size:24px;">${rp(sumJml)}</h1>${calcBadge(sumJml, prevData.sumJml)}</div>`;
+            compareHtml = `
+            <div class="stat-box bg-white"><h3><i class="fas fa-money-bill-wave"></i> Total Kas</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumKas)}</h1>${calcBadge(sumKas, prevData.sumKas)}</div>
+            <div class="stat-box bg-white"><h3><i class="fas fa-university"></i> Total Bank</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBnk)}</h1>${calcBadge(sumBnk, prevData.sumBnk)}</div>
+            <div class="stat-box bg-white"><h3><i class="fas fa-cookie"></i> Total Bolu</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBol)}</h1>${calcBadge(sumBol, prevData.sumBol)}</div>
+            <div class="stat-box bg-white"><h3><i class="fas fa-box"></i> Total Sisa</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumSis)}</h1>${calcBadge(sumSis, prevData.sumSis)}</div>
+            <div class="stat-box bg-red"><h3><i class="fas fa-wallet"></i> Grand Total Bulan Ini</h3><h1 style="font-size:24px;">${rp(sumJml)}</h1>${calcBadge(sumJml, prevData.sumJml)}</div>`;
         } else {
-            compareHtml = `<div class="stat-box bg-white"><h3><i class="fas fa-money-bill-wave"></i> Total Kas</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumKas)}</h1></div><div class="stat-box bg-white"><h3><i class="fas fa-university"></i> Total Bank</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBnk)}</h1></div><div class="stat-box bg-white"><h3><i class="fas fa-cookie"></i> Total Bolu</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBol)}</h1></div><div class="stat-box bg-red"><h3><i class="fas fa-wallet"></i> Grand Total Filter</h3><h1 style="font-size:24px;">${rp(sumJml)}</h1></div>`;
+            compareHtml = `
+            <div class="stat-box bg-white"><h3><i class="fas fa-money-bill-wave"></i> Total Kas</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumKas)}</h1></div>
+            <div class="stat-box bg-white"><h3><i class="fas fa-university"></i> Total Bank</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBnk)}</h1></div>
+            <div class="stat-box bg-white"><h3><i class="fas fa-cookie"></i> Total Bolu</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumBol)}</h1></div>
+            <div class="stat-box bg-white"><h3><i class="fas fa-box"></i> Total Sisa</h3><h1 style="font-size:24px; color:var(--primary);">${rp(sumSis)}</h1></div>
+            <div class="stat-box bg-red"><h3><i class="fas fa-wallet"></i> Grand Total Filter</h3><h1 style="font-size:24px;">${rp(sumJml)}</h1></div>`;
         }
         summaryDiv.innerHTML = compareHtml; updateAnalytics(filteredKas, sumKas, sumBnk, sumBol, sumSis); 
     }
@@ -2951,7 +3129,8 @@
     function bukaPage(pageId, element) { 
         document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active')); 
         document.getElementById(pageId).classList.add('active'); 
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); 
+        document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(nav => nav.classList.remove('active')); 
+        
         if(element) element.classList.add('active'); 
         
         localStorage.setItem('activePageBoluSakinah', pageId);
@@ -3086,7 +3265,6 @@
 
     function buatSesiAktif(userObj) {
         sesiAktif = userObj;
-
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-header').style.display = 'flex';
         
@@ -3095,13 +3273,20 @@
         
         document.getElementById('display-user-name').innerText = userObj.username + (userObj.role === 'owner' ? ' (Owner)' : '');
 
-        let ownerMenu = document.getElementById('owner-menu');
+        const ownerMenu = document.getElementById('owner-menu');
+        const bottomNav = document.getElementById('bottom-nav-pegawai');
+
         if (userObj.role === "owner") {
+            document.body.classList.remove('pegawai-mode');
             ownerMenu.style.display = 'flex';
+            if(bottomNav) bottomNav.style.display = 'none';
+            
             bukaPage('page-dashboard', document.querySelectorAll('.nav-item[onclick*="page-dashboard"]')[0]);
         } else {
+            document.body.classList.add('pegawai-mode');
             ownerMenu.style.display = 'none';
-            bukaPage('page-checklist', document.querySelectorAll('.nav-item[onclick*="page-checklist"]')[0]);
+            if(bottomNav) bottomNav.style.display = 'flex';
+            bukaPage('page-pesanan', document.querySelectorAll('.bottom-nav-item')[0]);
         }
         updateAutoNoAdonan();
         resetActivityTimer(); 
@@ -3114,7 +3299,14 @@
         localStorage.removeItem('bs_session_user');
         localStorage.removeItem('bs_session_time');
     }
-
+    function bukaProfileMenu() {
+        if (!sesiAktif) return;
+        document.getElementById('profile-dropdown-name').innerText = sesiAktif.username;
+        document.getElementById('profile-dropdown-role').innerText = sesiAktif.role === 'owner' ? 'Owner / Admin' : 'Pegawai (' + sesiAktif.cabang + ')';
+        const modal = document.getElementById('modal-profile-menu');
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('show'));
+    }
     function logoutUser() {
         localStorage.removeItem('bs_session_user');
         localStorage.removeItem('bs_session_time');
@@ -3671,5 +3863,15 @@
         requestAnimationFrame(() => modal.classList.add('show'));
     }
 </script>
+<nav id="bottom-nav-pegawai" class="bottom-nav">
+        <button class="bottom-nav-item active" onclick="bukaPage('page-pesanan', this)">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Pesanan</span>
+        </button>
+        <button class="bottom-nav-item" onclick="bukaPage('page-checklist', this)">
+            <i class="fas fa-clipboard-check"></i>
+            <span>Checklist</span>
+        </button>
+    </nav>
 </body>
 </html>
