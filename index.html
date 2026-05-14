@@ -42,16 +42,25 @@
             --radius-md: 14px; 
             --radius-lg: 20px;
             
-            --shadow-sm: 2px 2px 0px var(--primary); 
-            --shadow-md: 5px 5px 0px var(--primary);
-            --shadow-lg: 8px 8px 0px var(--primary); 
+            --shadow-sm: 0px 4px 10px rgba(0,0,0,0.05); 
+            --shadow-md: 0px 8px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0px 12px 30px rgba(0,0,0,0.12); 
+            --border: #e2e8f0; 
             --shadow-hover: 0px 0px 0px var(--primary);
             --transition: all 0.2s ease-in-out;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; padding-top: 75px; color: var(--text-main); font-size: 14px; line-height: 1.6; }
-   
+        ::-webkit-scrollbar {
+            width: 0px; 
+            height: 0px; 
+            background: transparent;
+        }
+        * {
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+        }
         .header { 
             background: rgba(255, 255, 255, 0.85); 
             backdrop-filter: blur(10px); 
@@ -237,13 +246,10 @@
             .btn-gembok { padding: 8px 12px; font-size: 14px; }
             .footer { margin-top: 0px; padding-bottom: 20px; }
             .page-container { padding: 15px 10px; }
-            /* --- PERBAIKAN TATA LETAK CARD & HEADER MOBILE --- */
             .card { padding: 22px 18px; border-radius: 20px; margin-bottom: 20px !important; }
             .form-input-card { padding: 22px 18px; }
             
             .card-header { flex-direction: column; align-items: flex-start; gap: 14px; }
-            
-            /* Perbaikan Teks Judul: Mengalir rapi seperti kalimat biasa */
             .card-header h2 { 
                 display: block !important; 
                 line-height: 1.5; 
@@ -257,8 +263,7 @@
                 margin-right: 8px; 
                 margin-bottom: 4px;
             }
-                
-            /* Solusi Tombol: Tetap lebar penuh tapi teksnya dimunculkan */
+              
             .card-header > div { width: 100%; display: flex; flex-direction: column; gap: 12px; } 
             .card-header > div > * { width: 100% !important; min-width: 0 !important; max-width: none !important; }
             .card-header button .hide-mobile { display: inline !important; }
@@ -355,6 +360,25 @@
             transform: translateY(-1px);
         }
         @media (max-width: 768px) {
+           
+            .modal-overlay { 
+                align-items: flex-end !important; 
+                padding: 0 !important; 
+            }
+    
+            .modal-overlay .modal-box { 
+                border-radius: 28px 28px 0 0 !important; 
+                margin: 0 !important; 
+                width: 100% !important; 
+                border-bottom: none !important;
+                transform: translateY(100%) !important; 
+                transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) !important; 
+                padding-bottom: calc(30px + env(safe-area-inset-bottom)) !important; 
+                max-height: 85vh !important; 
+            }
+            .modal-overlay.show .modal-box { 
+                transform: translateY(0) !important; 
+            }
             .table-responsive td[data-label="Rincian Varian"] {
                 flex-direction: column !important;
                 align-items: flex-start !important;
@@ -625,13 +649,15 @@
             display: none; 
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            height: 70px;
-            background: var(--surface);
-            border-top: 2px solid var(--border);
+            height: 75px;
+            background: rgba(255, 255, 255, 0.85) !important; 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(0,0,0,0.08) !important; 
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.03);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -721,6 +747,14 @@
             }
             #page-kas .table-responsive tbody tr.date-group-header td i {
                 color: var(--secondary) !important; 
+            }
+        }
+        @media (min-width: 769px) {
+            .bottom-nav { 
+                display: none !important; 
+            }
+            body.pegawai-mode { 
+                padding-bottom: 0 !important;
             }
         }
     </style>
@@ -1137,6 +1171,13 @@
             <button class="btn" onclick="tutupModal('modal-profile-menu')" style="width: 100%; justify-content: center; background: #f8fafc; border: 1px solid #cbd5e1; box-shadow: none; padding: 8px; height: auto; min-height: auto; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
                 Batal & Tutup
             </button>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7;">
+                    Sistem Bolu Sakinah • V18.0
+                </span>
+            </div>
+
         </div>
     </div>
     <div id="modal-ganti-pin-user" class="modal-overlay">
@@ -1371,15 +1412,22 @@
             </div>
             
             <div id="area-filter-pesanan" style="display: none; margin-bottom: 15px; padding: 0 20px 20px 20px;">
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; background: var(--accent); padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--border);">
-                    <div class="input-group" style="min-width: 180px; flex: 1; margin: 0;">
-                        <span class="input-prefix"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search-pesanan" placeholder="Cari Nama Pemesan..." oninput="renderPesanan()" class="has-prefix" style="width: 100%;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: var(--accent); padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--border);">
+                    <div class="input-group" style="min-width: 140px; flex: 1; margin: 0;">
+                        <span class="input-prefix"><i class="fas fa-calendar-day"></i></span>
+                        <input type="date" id="filter-date-pesanan" onchange="renderPesanan()" class="has-prefix" style="width: 100%;" title="Filter Tanggal">
                     </div>
-                    <select id="sort-pesanan" class="custom-select" onchange="renderPesanan()" style="min-width: 180px; flex: 1; margin: 0; cursor: pointer;">
-                        <option value="lama">Urutkan: Lama ke Terbaru</option>
-                        <option value="baru">Urutkan: Terbaru ke Lama</option>
+                    <div class="input-group" style="min-width: 160px; flex: 1; margin: 0;">
+                        <span class="input-prefix"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search-pesanan" placeholder="Cari Pemesan..." oninput="renderPesanan()" class="has-prefix" style="width: 100%;">
+                    </div>
+                    <select id="sort-pesanan" class="custom-select" onchange="renderPesanan()" style="min-width: 160px; flex: 1; margin: 0; cursor: pointer;">
+                        <option value="lama">Urut: Lama ke Terbaru</option>
+                        <option value="baru">Urut: Terbaru ke Lama</option>
                     </select>
+                    <button class="btn btn-danger" style="flex: 1; min-width: 100px; height: 48px;" onclick="document.getElementById('filter-date-pesanan').value=''; document.getElementById('search-pesanan').value=''; renderPesanan();">
+                        <i class="fas fa-sync"></i> Reset
+                    </button>
                 </div>
             </div>
 
@@ -2728,8 +2776,12 @@
 
         let searchQ = document.getElementById('search-pesanan') ? document.getElementById('search-pesanan').value.toLowerCase() : "";
         let sortType = document.getElementById('sort-pesanan') ? document.getElementById('sort-pesanan').value : "lama";
-        
-        let filteredPesanan = pesanan.filter(p => (p.n || "").toLowerCase().includes(searchQ));
+        let filterDate = document.getElementById('filter-date-pesanan') ? document.getElementById('filter-date-pesanan').value : "";
+        let filteredPesanan = pesanan.filter(p => {
+            let matchName = (p.n || "").toLowerCase().includes(searchQ);
+            let matchDate = filterDate ? (p.tgl === filterDate) : true;
+            return matchName && matchDate;
+        });
         
         if(sortType === "lama") filteredPesanan.sort((a,b) => (a.tgl || "").localeCompare(b.tgl || ""));
         else filteredPesanan.sort((a,b) => (b.tgl || "").localeCompare(a.tgl || ""));
@@ -3209,8 +3261,12 @@
     window.onload = () => { 
         loadData(); 
         setupActivityListeners();
+        
         let currentMonthStr = new Date().toISOString().slice(0,7); 
-        document.getElementById('filter-bulan').value = currentMonthStr; 
+        if(document.getElementById('filter-bulan')) document.getElementById('filter-bulan').value = currentMonthStr; 
+        let todayStrObj = new Date().toISOString().slice(0,10);
+        if(document.getElementById('filter-date-pesanan')) document.getElementById('filter-date-pesanan').value = todayStrObj;
+
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.setAttribute('inputmode', 'numeric');
             input.setAttribute('pattern', '[0-9]*');
