@@ -1212,7 +1212,7 @@
 
             <div style="text-align: center; margin-top: 15px;">
                 <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7;">
-                    Sistem Bolu Sakinah • V20.2
+                    Sistem Bolu Sakinah • V20.3
                 </span>
             </div>
 
@@ -1446,20 +1446,22 @@
                         <h2 style="margin: 0;"><i class="fas fa-users"></i> Rekap Pesanan</h2>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%;">
-                        <div class="input-group" style="flex: 1; min-width: 140px; margin: 0;">
-                            <span class="input-prefix" style="color: var(--secondary);"><i class="fas fa-calendar-check"></i></span>
-                            <input type="date" id="filter-date-pesanan" onchange="renderPesanan()" class="has-prefix" style="width: 100%; background: var(--primary); color: var(--secondary); border: 2px solid var(--primary);" title="Pilih Tanggal Pesanan">
+                    <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                        <div class="input-group" style="width: 100%; max-width: 100%; margin: 0;">
+                            <span class="input-prefix" style="color: var(--secondary); font-size: 16px; left: 15px;"><i class="fas fa-calendar-check"></i></span>
+                            <input type="date" id="filter-date-pesanan" onchange="renderPesanan()" class="has-prefix" style="width: 100%; background: var(--primary); color: var(--secondary); border: 2px solid var(--primary); padding-left: 45px !important; font-weight: 800; font-size: 15px; letter-spacing: 1px; text-transform: uppercase;" title="Pilih Tanggal Pesanan">
                         </div>
                         
-                        <div class="input-group" style="flex: 2; min-width: 160px; margin: 0;">
-                            <span class="input-prefix"><i class="fas fa-search"></i></span>
-                            <input type="text" id="search-pesanan" placeholder="Cari pemesan..." oninput="renderPesanan()" class="has-prefix" style="width: 100%;">
-                        </div>
+                        <div style="display: flex; gap: 10px; width: 100%;">
+                            <div class="input-group" style="flex: 1; max-width: 100%; margin: 0;">
+                                <span class="input-prefix"><i class="fas fa-search"></i></span>
+                                <input type="text" id="search-pesanan" placeholder="Cari pemesan..." oninput="renderPesanan()" class="has-prefix" style="width: 100%; font-weight: 700;">
+                            </div>
 
-                        <button class="btn btn-danger" style="height: 48px; padding: 0 15px;" onclick="document.getElementById('filter-date-pesanan').value = new Date().toISOString().slice(0,10); document.getElementById('search-pesanan').value=''; renderPesanan();" title="Reset ke Hari Ini">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+                            <button class="btn btn-danger" style="height: 48px; width: 55px; padding: 0; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border-radius: var(--radius-sm);" onclick="document.getElementById('filter-date-pesanan').value = new Date().toISOString().slice(0,10); document.getElementById('search-pesanan').value=''; renderPesanan(); showToast('Kembali ke Hari Ini', 'success');" title="Reset ke Hari Ini">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1826,7 +1828,11 @@
     const rp = (num) => "Rp " + Math.round(num).toLocaleString('id-ID');
     const getVal = (val) => isNaN(parseFloat(val)) ? 0 : parseFloat(val);
     const unt = (b) => b.isKg ? "kg" : "pcs";
-
+    function getTanggalLokal() {
+        let d = new Date();
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        return d.toISOString();
+    }
     const Schema = {
         str: (val, fallback = "") => (val && typeof val !== 'object') ? String(val).trim() : fallback,
         num: (val, fallback = 0) => { let n = parseFloat(val); return isNaN(n) ? fallback : n; },
@@ -2193,8 +2199,7 @@
         if(selectLog) selectLog.innerHTML = optionsHtml;
         let selectChk = document.getElementById('chk-produk');
         if(selectChk) selectChk.innerHTML = optionsHtml;
-
-        let today = new Date().toISOString().slice(0,10);
+        let today = getTanggalLokal().slice(0,10); 
         if(document.getElementById('log-tanggal')) document.getElementById('log-tanggal').value = today;
         if(document.getElementById('chk-tanggal')) document.getElementById('chk-tanggal').value = today;
         
@@ -3523,16 +3528,19 @@
     }
 
     window.onload = () => { 
-        let currentMonthStr = new Date().toISOString().slice(0,7); 
+        let waktuLokal = getTanggalLokal();
+        let currentMonthStr = waktuLokal.slice(0,7); 
+        let todayStrObj = waktuLokal.slice(0,10);
         if(document.getElementById('filter-bulan')) document.getElementById('filter-bulan').value = currentMonthStr; 
-        
-        let todayStrObj = new Date().toISOString().slice(0,10);
         if(document.getElementById('filter-date-pesanan')) document.getElementById('filter-date-pesanan').value = todayStrObj;
+        if(document.getElementById('log-tanggal')) document.getElementById('log-tanggal').value = todayStrObj;
+        if(document.getElementById('chk-tanggal')) document.getElementById('chk-tanggal').value = todayStrObj;
 
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.setAttribute('inputmode', 'numeric');
             input.setAttribute('pattern', '[0-9]*');
         });
+        
         loadData(); 
         setupActivityListeners();
 
