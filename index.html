@@ -757,13 +757,12 @@
                 padding-bottom: 0 !important;
             }
         }
-        /* --- PERBAIKAN LAYOUT PESANAN (ANTI-TERGENCET) --- */
         @media (max-width: 768px) {
             #page-pesanan .table-responsive td[data-label="Info Pemesan"],
             #page-pesanan .table-responsive td[data-label="Untuk Tanggal"] {
                 flex-direction: column !important;
                 align-items: flex-start !important;
-                padding-right: 45px !important; /* Memberi ruang aman untuk tombol tong sampah */
+                padding-right: 45px !important; 
                 gap: 5px !important;
             }
             #page-pesanan .table-responsive td[data-label="Info Pemesan"]::before,
@@ -774,12 +773,28 @@
             #page-pesanan .table-responsive td[data-label="Info Pemesan"] input,
             #page-pesanan .table-responsive td[data-label="Untuk Tanggal"] input {
                 width: 100% !important;
-                max-width: 100% !important; /* Membatalkan batasan lebar */
+                max-width: 100% !important; 
                 text-align: left !important;
                 background: #f8fafc !important;
                 border: 1px solid #cbd5e1 !important;
             }
         }
+        .autocomplete-wrapper { position: relative; width: 100%; margin-bottom: 8px; }
+        .autocomplete-list { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: #ffffff; border: 2px solid var(--primary); border-radius: 12px; 
+            max-height: 200px; overflow-y: auto; z-index: 9999; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); display: none; 
+            margin-top: 5px; padding: 0; list-style: none; 
+        }
+        .autocomplete-list li { 
+            padding: 12px 15px; border-bottom: 1px dashed #e2e8f0; 
+            cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background 0.2s; 
+        }
+        .autocomplete-list li:last-child { border-bottom: none; }
+        .autocomplete-list li:hover { background: #f0f9ff; }
+        .autocomplete-list li strong { font-size: 14.5px; font-weight: 800; color: var(--primary); }
+        .autocomplete-list li small { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -1197,7 +1212,7 @@
 
             <div style="text-align: center; margin-top: 15px;">
                 <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7;">
-                    Sistem Bolu Sakinah • V20.0
+                    Sistem Bolu Sakinah • V20.1
                 </span>
             </div>
 
@@ -2861,12 +2876,19 @@
             let matchDate = filterDate ? (p.tgl === filterDate) : true;
             return matchName && matchDate;
         });
-        
-        if(sortType === "lama") filteredPesanan.sort((a,b) => (a.tgl || "").localeCompare(b.tgl || ""));
-        else filteredPesanan.sort((a,b) => (b.tgl || "").localeCompare(a.tgl || ""));
+        filteredPesanan.sort((a,b) => {
+            let dateDiff = 0;
+            if(sortType === "lama") dateDiff = (a.tgl || "").localeCompare(b.tgl || "");
+            else dateDiff = (b.tgl || "").localeCompare(a.tgl || "");
+      
+            if (dateDiff === 0) {
+                return (b.timestamp || 0) - (a.timestamp || 0);
+            }
+            return dateDiff;
+        });
 
         const tbody = document.getElementById('tabel-pesanan-body');
-        let tbodyHtml = ''; 
+        let tbodyHtml = '';
 
         if (filteredPesanan.length === 0) { 
             tbodyHtml = `<tr><td colspan="4" class="empty-state"><i class="fas fa-folder-open"></i><br>Belum ada pesanan.</td></tr>`; 
@@ -2880,14 +2902,21 @@
                     let knownProd = produkBolu.find(x => (x.nama || "").toLowerCase() === (item.name || "").toLowerCase());
                     if (knownProd) totals[knownProd.id] += getVal(item.qty);
                 });
-
                 let tr = `<tr>
                     <td data-label="Info Pemesan">
-                        <input type="text" list="customer-list-datalist" class="wide" value="${escapeHTML(p.n)}" placeholder="Ketik/Pilih Nama..." 
-                        onchange="if(!this.value){showToast('Nama kosong!','error');}else{pesanan[${realIdx}].n=this.value; saveData();}" style="margin-bottom: 8px; font-weight: 800; color: var(--primary);">
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="input-nama-${realIdx}" class="wide" value="${escapeHTML(p.n)}" placeholder="Ketik/Pilih Nama..." 
+                            oninput="filterPelanggan(this, ${realIdx})" 
+                            onfocus="filterPelanggan(this, ${realIdx})"
+                            onblur="setTimeout(() => { let el = document.getElementById('list-pelanggan-${realIdx}'); if(el) el.style.display='none'; }, 200)"
+                            style="margin-bottom: 0; font-weight: 800; color: var(--primary); background: #ffffff; border: 2px solid var(--border); border-radius: 8px;">
+                            
+                            <ul id="list-pelanggan-${realIdx}" class="autocomplete-list"></ul>
+                        </div>
                         
                         <input type="text" class="wide" value="${escapeHTML(p.al || '')}" placeholder="Ketik Alamat Lengkap..." 
-                        onchange="pesanan[${realIdx}].al=this.value; saveData();" style="font-size: 13.5px;">
+                        onchange="pesanan[${realIdx}].al=this.value; saveData();" 
+                        style="font-size: 13.5px; background: ${p.al ? '#f0f9ff' : '#ffffff'}; border: 1px solid #cbd5e1; border-radius: 8px;">
                     </td>
                     <td data-label="Untuk Tanggal"><input type="date" value="${p.tgl || ''}" onchange="pesanan[${realIdx}].tgl=this.value; saveData(); renderPesanan();"></td>`;
                 
@@ -2964,6 +2993,43 @@
             sessionStorage.setItem('notifPesanan_shown', 'true'); 
         }
     }
+
+    function filterPelanggan(inputEl, realIdx) {
+        let val = inputEl.value.toLowerCase();
+        pesanan[realIdx].n = inputEl.value; 
+        
+        let listEl = document.getElementById('list-pelanggan-' + realIdx);
+        listEl.innerHTML = '';
+        
+        let matches = pelanggan.filter(c => c.nama.toLowerCase().includes(val));
+        
+        if(matches.length > 0) {
+            matches.forEach(c => {
+                let li = document.createElement('li');
+                li.innerHTML = `<strong><i class="fas fa-user-circle" style="color:var(--secondary); margin-right:5px;"></i> ${escapeHTML(c.nama)}</strong> <small><i class="fas fa-map-marker-alt" style="margin-right:5px;"></i> ${escapeHTML(c.alamat || 'Tidak ada alamat')}</small>`;
+                
+                li.onmousedown = function(e) { 
+                    e.preventDefault(); 
+                    pilihPelanggan(realIdx, c.nama, c.alamat);
+                };
+                listEl.appendChild(li);
+            });
+            listEl.style.display = 'block';
+        } else {
+            listEl.innerHTML = `<li style="text-align:center; color:var(--danger);"><small>Pelanggan tidak ditemukan (Pelanggan Baru)</small></li>`;
+            listEl.style.display = 'block';
+        }
+        saveData();
+    }
+
+    function pilihPelanggan(realIdx, nama, alamat) {
+        pesanan[realIdx].n = nama;
+        pesanan[realIdx].al = alamat; 
+        
+        saveData();
+        renderPesanan(); 
+        showToast("Data Pelanggan " + nama + " ditarik!", "success");
+    }
     function tambahPesananItem(pesIdx) {
         if (!pesanan[pesIdx].items) pesanan[pesIdx].items = [];
         pesanan[pesIdx].items.push({ name: "", qty: 1 });
@@ -2997,14 +3063,17 @@
         let newPes = { 
             id: "pes_" + Date.now(), 
             n: "", 
+            al: "", 
             tgl: targetDate, 
             items: [{ name: "", qty: 1 }], 
             timestamp: Date.now() 
         };
-        pesanan.push(newPes); 
+        
+        pesanan.unshift(newPes); 
+        
         renderPesanan(); 
         let tglIndo = targetDate.split('-').reverse().join('/');
-        showToast('Form ditambah untuk tgl ' + tglIndo, 'success'); 
+        showToast('Form baru diletakkan paling atas (' + tglIndo + ')', 'success'); 
     }
     function hapusPesanan(index) { 
         confirmDelete("Hapus data pesanan ini?", () => { 
@@ -4088,6 +4157,23 @@
         const modal = document.getElementById('modal-manajemen-pelanggan');
         modal.style.display = 'flex';
         requestAnimationFrame(() => modal.classList.add('show'));
+    }
+    
+    function handleNameInput(realIdx, element) {
+        let nameVal = element.value;
+        pesanan[realIdx].n = nameVal; 
+        
+       
+        let match = pelanggan.find(c => c.nama.toLowerCase() === nameVal.toLowerCase());
+        
+        if (match) {
+       
+            pesanan[realIdx].al = match.alamat;
+            renderPesanan(); 
+            showToast("Alamat " + match.nama + " terisi otomatis!", "success");
+        }
+        
+        saveData();
     }
 </script>
 <nav id="bottom-nav-pegawai" class="bottom-nav">
