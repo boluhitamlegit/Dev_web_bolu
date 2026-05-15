@@ -757,6 +757,29 @@
                 padding-bottom: 0 !important;
             }
         }
+        /* --- PERBAIKAN LAYOUT PESANAN (ANTI-TERGENCET) --- */
+        @media (max-width: 768px) {
+            #page-pesanan .table-responsive td[data-label="Info Pemesan"],
+            #page-pesanan .table-responsive td[data-label="Untuk Tanggal"] {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                padding-right: 45px !important; /* Memberi ruang aman untuk tombol tong sampah */
+                gap: 5px !important;
+            }
+            #page-pesanan .table-responsive td[data-label="Info Pemesan"]::before,
+            #page-pesanan .table-responsive td[data-label="Untuk Tanggal"]::before {
+                margin-bottom: 5px !important;
+                width: 100% !important;
+            }
+            #page-pesanan .table-responsive td[data-label="Info Pemesan"] input,
+            #page-pesanan .table-responsive td[data-label="Untuk Tanggal"] input {
+                width: 100% !important;
+                max-width: 100% !important; /* Membatalkan batasan lebar */
+                text-align: left !important;
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1174,7 +1197,7 @@
 
             <div style="text-align: center; margin-top: 15px;">
                 <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7;">
-                    Sistem Bolu Sakinah • V18.0
+                    Sistem Bolu Sakinah • V19.0
                 </span>
             </div>
 
@@ -1818,6 +1841,7 @@
             basicClean.pesanan = basicClean.pesanan.map(p => ({
                 id: Schema.str(p.id, "pes_" + Date.now()),
                 n: Schema.str(p.n, "Tanpa Nama"),
+                al: Schema.str(p.al, ""),
                 tgl: Schema.str(p.tgl),
                 timestamp: Schema.num(p.timestamp, Date.now()),
                 items: Schema.arr(p.items).map(item => ({
@@ -2767,16 +2791,19 @@
         });
 
         let thead = `<tr>
-            <th style="width: 20%;">Nama Pemesan</th>
+            <th style="width: 25%;">Info Pemesan</th>
             <th style="width: 15%;">Untuk Tgl</th>
-            <th style="width: 55%;">Rincian Varian (Pilih Varian Produk)</th>
+            <th style="width: 50%;">Rincian Varian (Pilih Varian Produk)</th>
             <th class="text-center" style="width: 10%;">Aksi</th>
         </tr>`;
-        document.getElementById('tabel-pesanan-head').innerHTML = thead;
+        if(document.getElementById('tabel-pesanan-head')) {
+            document.getElementById('tabel-pesanan-head').innerHTML = thead;
+        }
 
         let searchQ = document.getElementById('search-pesanan') ? document.getElementById('search-pesanan').value.toLowerCase() : "";
         let sortType = document.getElementById('sort-pesanan') ? document.getElementById('sort-pesanan').value : "lama";
         let filterDate = document.getElementById('filter-date-pesanan') ? document.getElementById('filter-date-pesanan').value : "";
+        
         let filteredPesanan = pesanan.filter(p => {
             let matchName = (p.n || "").toLowerCase().includes(searchQ);
             let matchDate = filterDate ? (p.tgl === filterDate) : true;
@@ -2792,6 +2819,7 @@
         if (filteredPesanan.length === 0) { 
             tbodyHtml = `<tr><td colspan="4" class="empty-state"><i class="fas fa-folder-open"></i><br>Belum ada pesanan.</td></tr>`; 
         } else {
+    
             filteredPesanan.forEach(p => {
                 let realIdx = pesanan.findIndex(orig => orig.id === p.id);
                 if(p.tgl === todayStr) adaPesananHariIni = true;
@@ -2802,9 +2830,12 @@
                 });
 
                 let tr = `<tr>
-                    <td data-label="Pemesan">
+                    <td data-label="Info Pemesan">
                         <input type="text" list="customer-list-datalist" class="wide" value="${escapeHTML(p.n)}" placeholder="Ketik/Pilih Nama..." 
-                        onchange="if(!this.value){showToast('Nama kosong!','error');}else{pesanan[${realIdx}].n=this.value; saveData();}">
+                        onchange="if(!this.value){showToast('Nama kosong!','error');}else{pesanan[${realIdx}].n=this.value; saveData();}" style="margin-bottom: 8px; font-weight: 800; color: var(--primary);">
+                        
+                        <input type="text" class="wide" value="${escapeHTML(p.al || '')}" placeholder="Ketik Alamat Lengkap..." 
+                        onchange="pesanan[${realIdx}].al=this.value; saveData();" style="font-size: 13.5px;">
                     </td>
                     <td data-label="Untuk Tanggal"><input type="date" value="${p.tgl || ''}" onchange="pesanan[${realIdx}].tgl=this.value; saveData(); renderPesanan();"></td>`;
                 
@@ -2841,7 +2872,8 @@
             });
         }
         
-        tbody.innerHTML = tbodyHtml; 
+        if(tbody) tbody.innerHTML = tbodyHtml; 
+    
         let summaryPak = [], summaryLoyang = [], summaryKresek = [];
         produkBolu.forEach(prod => {
             let t = totals[prod.id];
@@ -2852,6 +2884,7 @@
                 summaryKresek.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${Math.floor(t/5)} Ksk` + (t%5 > 0 ? `, ${t%5} Pk` : "") + `</b></div>`);
             }
         });
+        
         let panelRekap = '';
         if (summaryPak.length > 0) {
             panelRekap += `
@@ -3259,11 +3292,9 @@
     }
 
     window.onload = () => { 
-        loadData(); 
-        setupActivityListeners();
-        
         let currentMonthStr = new Date().toISOString().slice(0,7); 
         if(document.getElementById('filter-bulan')) document.getElementById('filter-bulan').value = currentMonthStr; 
+        
         let todayStrObj = new Date().toISOString().slice(0,10);
         if(document.getElementById('filter-date-pesanan')) document.getElementById('filter-date-pesanan').value = todayStrObj;
 
@@ -3271,6 +3302,8 @@
             input.setAttribute('inputmode', 'numeric');
             input.setAttribute('pattern', '[0-9]*');
         });
+        loadData(); 
+        setupActivityListeners();
 
         const welcomeModal = document.getElementById('welcome-modal');
         if(welcomeModal) {
