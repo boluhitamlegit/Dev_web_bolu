@@ -1425,32 +1425,27 @@
 
     <div id="page-pesanan" class="page-container active">
         <div class="card">
-            <div class="card-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 15px;">
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                    <h2 style="margin: 0;"><i class="fas fa-users"></i> Rekap Pesanan</h2>
-                    <button class="btn btn-primary" onclick="toggleFilterPesanan()" style="height: 40px; padding: 0 15px; font-size: 13px;">
-                        <i class="fas fa-search"></i> <span class="hide-mobile">Cari & Sortir</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div id="area-filter-pesanan" style="display: none; margin-bottom: 15px; padding: 0 20px 20px 20px;">
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: var(--accent); padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--border);">
-                    <div class="input-group" style="min-width: 140px; flex: 1; margin: 0;">
-                        <span class="input-prefix"><i class="fas fa-calendar-day"></i></span>
-                        <input type="date" id="filter-date-pesanan" onchange="renderPesanan()" class="has-prefix" style="width: 100%;" title="Filter Tanggal">
+            <div class="card-header" style="border-bottom: 2px dashed var(--border); padding-bottom: 15px; margin-bottom: 15px;">
+                <div style="width: 100%; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="margin: 0;"><i class="fas fa-users"></i> Rekap Pesanan</h2>
                     </div>
-                    <div class="input-group" style="min-width: 160px; flex: 1; margin: 0;">
-                        <span class="input-prefix"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search-pesanan" placeholder="Cari Pemesan..." oninput="renderPesanan()" class="has-prefix" style="width: 100%;">
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%;">
+                        <div class="input-group" style="flex: 1; min-width: 140px; margin: 0;">
+                            <span class="input-prefix" style="color: var(--secondary);"><i class="fas fa-calendar-check"></i></span>
+                            <input type="date" id="filter-date-pesanan" onchange="renderPesanan()" class="has-prefix" style="width: 100%; background: var(--primary); color: var(--secondary); border: 2px solid var(--primary);" title="Pilih Tanggal Pesanan">
+                        </div>
+                        
+                        <div class="input-group" style="flex: 2; min-width: 160px; margin: 0;">
+                            <span class="input-prefix"><i class="fas fa-search"></i></span>
+                            <input type="text" id="search-pesanan" placeholder="Cari pemesan..." oninput="renderPesanan()" class="has-prefix" style="width: 100%;">
+                        </div>
+
+                        <button class="btn btn-danger" style="height: 48px; padding: 0 15px;" onclick="document.getElementById('filter-date-pesanan').value = new Date().toISOString().slice(0,10); document.getElementById('search-pesanan').value=''; renderPesanan();" title="Reset ke Hari Ini">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
-                    <select id="sort-pesanan" class="custom-select" onchange="renderPesanan()" style="min-width: 160px; flex: 1; margin: 0; cursor: pointer;">
-                        <option value="lama">Urut: Lama ke Terbaru</option>
-                        <option value="baru">Urut: Terbaru ke Lama</option>
-                    </select>
-                    <button class="btn btn-danger" style="flex: 1; min-width: 100px; height: 48px;" onclick="document.getElementById('filter-date-pesanan').value=''; document.getElementById('search-pesanan').value=''; renderPesanan();">
-                        <i class="fas fa-sync"></i> Reset
-                    </button>
                 </div>
             </div>
 
@@ -1805,6 +1800,8 @@
 
     let pesanan = [];
     let kas = [];
+    let lastPesananHash = {};
+    let lastKasHash = {};
     let ownerBeban = { jual: 0, gas: 0, upah: 0, retur: 0 };
     let totalBelanjaGlobal = 0;
     let laporanPenggunaan = [];
@@ -1955,19 +1952,37 @@
         
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
-            const dataToSave = cleanData({ produkBolu, bahanBaku, pesanan, laporanPenggunaan, checklistHistory, pelanggan });
+    
+            const dataToSave = cleanData({ produkBolu, bahanBaku, laporanPenggunaan, checklistHistory, pelanggan });
             db.collection('bolu_sakinah').doc('produksi').set(dataToSave, { merge: true });
-
-            db.collection('bolu_sakinah').doc('kas').set({ kas: cleanData({kas}).kas }, { merge: true });
+            
             db.collection('bolu_sakinah').doc('laba').set({ ownerBeban: ownerBeban }, { merge: true });
             db.collection('bolu_sakinah').doc('auth_data').set({
                 daftarUser: daftarUser,
                 daftarCabang: daftarCabang,
                 daftarToken: daftarToken
-            }, { merge: true })
-            .then(() => console.log("Semua Data Berhasil Tersinkron ke Cloud"))
-            .catch(e => console.error("Cloud Sync Failed", e));
-   
+            }, { merge: true });
+
+            let cleanedPesanan = cleanData({ pesanan: pesanan }).pesanan;
+            cleanedPesanan.forEach(p => {
+                let currentString = JSON.stringify(p);
+                if(lastPesananHash[p.id] !== currentString) {
+                    db.collection('pesanan').doc(p.id).set(p, { merge: true });
+                    lastPesananHash[p.id] = currentString;
+                }
+            });
+
+ 
+            let cleanedKas = cleanData({ kas: kas }).kas;
+            cleanedKas.forEach(k => {
+                let currentString = JSON.stringify(k);
+                if(lastKasHash[k.id] !== currentString) {
+                    db.collection('kas').doc(k.id).set(k, { merge: true });
+                    lastKasHash[k.id] = currentString; 
+                }
+            });
+
+            console.log("Semua Data Berhasil Tersinkron ke Struktur Baru");
         }, 2000); 
     }
 
@@ -1979,18 +1994,21 @@
             db.collection('bolu_sakinah').doc('produksi').get(),
             db.collection('bolu_sakinah').doc('kas').get(),
             db.collection('bolu_sakinah').doc('laba').get(),
-            db.collection('bolu_sakinah').doc('auth_data').get()
-        ]).then(([prodDoc, kasDoc, labDoc, authDoc]) => {
+            db.collection('bolu_sakinah').doc('auth_data').get(),
+          
+            db.collection('pesanan').get(),
+            db.collection('kas').get()
+        ]).then(([prodDoc, oldKasDoc, labDoc, authDoc, pesananSnap, kasSnap]) => {
             let hasData = false;
             if(prodDoc.exists) { 
                 let d = prodDoc.data(); 
                 if(d.produkBolu) produkBolu=d.produkBolu; if(d.bahanBaku) bahanBaku=d.bahanBaku; 
-                if(d.pesanan) pesanan=d.pesanan; if(d.laporanPenggunaan) laporanPenggunaan=d.laporanPenggunaan; 
+               
+                if(d.laporanPenggunaan) laporanPenggunaan=d.laporanPenggunaan; 
                 if(d.checklistHistory) checklistHistory=d.checklistHistory; 
                 if(d.pelanggan) pelanggan=d.pelanggan;
                 hasData=true; 
             }
-            if(kasDoc.exists) { let d = kasDoc.data(); if(d.kas) kas = d.kas; hasData=true; }
             if(labDoc.exists) { let d = labDoc.data(); if(d.ownerBeban) ownerBeban = d.ownerBeban; hasData=true; }
             if(authDoc.exists) {
                 let d = authDoc.data();
@@ -1999,11 +2017,45 @@
                 if(d.daftarToken) daftarToken = d.daftarToken;
             }
 
+        
+            let oldPesanan = prodDoc.exists ? prodDoc.data().pesanan : null;
+            if (pesananSnap.empty && oldPesanan && oldPesanan.length > 0) {
+                pesanan = oldPesanan; 
+                hasData = true;
+                setTimeout(saveData, 3000); 
+            } else {
+                pesanan = [];
+                pesananSnap.forEach(doc => {
+                    let pData = doc.data();
+                    pesanan.push(pData);
+                    lastPesananHash[pData.id] = JSON.stringify(pData); 
+                });
+                if(pesanan.length > 0) hasData = true;
+            }
+
+ 
+            let oldKas = oldKasDoc.exists ? oldKasDoc.data().kas : null;
+            if (kasSnap.empty && oldKas && oldKas.length > 0) {
+                kas = oldKas; 
+                hasData = true;
+                setTimeout(saveData, 3000); 
+            } else {
+                kas = [];
+                kasSnap.forEach(doc => {
+                    let kData = doc.data();
+                    kas.push(kData);
+                    lastKasHash[kData.id] = JSON.stringify(kData); 
+                });
+                if(kas.length > 0) hasData = true;
+            }
+
             if(!hasData) saveData();
             
             applyLoadedData();
             cekSesiLogin(); 
             hideLoading();
+            mulaiSinkronisasiRealtime();
+            
         }).catch(e => {
             console.warn("Gagal fetch cloud, load local", e);
             fallbackLoadLocal(); hideLoading(); showToast("Mode Offline Aktif", "error");
@@ -2939,22 +2991,31 @@
     }
 
     function tambahPesanan() { 
+        let filterDateEl = document.getElementById('filter-date-pesanan');
+        let targetDate = (filterDateEl && filterDateEl.value) ? filterDateEl.value : new Date().toISOString().slice(0,10);
+
         let newPes = { 
             id: "pes_" + Date.now(), 
             n: "", 
-            tgl: new Date().toISOString().slice(0,10), 
+            tgl: targetDate, 
             items: [{ name: "", qty: 1 }], 
             timestamp: Date.now() 
         };
         pesanan.push(newPes); 
         renderPesanan(); 
-        showToast('Form pesanan ditambahkan'); 
+        let tglIndo = targetDate.split('-').reverse().join('/');
+        showToast('Form ditambah untuk tgl ' + tglIndo, 'success'); 
     }
     function hapusPesanan(index) { 
         confirmDelete("Hapus data pesanan ini?", () => { 
+            let idPesananYangDihapus = pesanan[index].id; 
             pesanan.splice(index, 1); 
             renderPesanan(); 
             saveData(); 
+            if(isFirebaseReady) {
+                db.collection('pesanan').doc(idPesananYangDihapus).delete();
+                delete lastPesananHash[idPesananYangDihapus];
+            }
         }); 
     }
 
@@ -3111,9 +3172,14 @@
     }
     function hapusKas(index) { 
         confirmDelete("Hapus riwayat kas ini?", () => { 
+            let idKasYangDihapus = kas[index].id; 
             kas.splice(index, 1); 
             renderKas(); 
             saveData();
+            if(isFirebaseReady) {
+                db.collection('kas').doc(idKasYangDihapus).delete();
+                delete lastKasHash[idKasYangDihapus];
+            }
             logActivity("DELETE", "Menghapus transaksi dari Buku Kas"); 
         }); 
     }
@@ -3131,6 +3197,78 @@
                 indicator.title = "Aman Tersinkron ke Cloud";
             }
         });
+    }
+  
+    let unsubscribePesanan = null;
+    let unsubscribeKas = null;
+
+    function mulaiSinkronisasiRealtime() {
+        if (!isFirebaseReady) return;
+
+
+        unsubscribePesanan = db.collection('pesanan').onSnapshot((snapshot) => {
+            let adaPerubahan = false;
+            snapshot.docChanges().forEach((change) => {
+                let data = change.doc.data();
+                
+                if (change.type === "added" || change.type === "modified") {
+                    let index = pesanan.findIndex(p => p.id === data.id);
+                    if (index !== -1) {
+                        pesanan[index] = data; 
+                    } else {
+                        pesanan.push(data); 
+                    }
+                    lastPesananHash[data.id] = JSON.stringify(data);
+                    adaPerubahan = true;
+                }
+                
+                if (change.type === "removed") {
+                    pesanan = pesanan.filter(p => p.id !== data.id);
+                    delete lastPesananHash[data.id];
+                    adaPerubahan = true;
+                }
+            });
+
+            if (adaPerubahan) {
+                saveToLocal();
+                if (document.getElementById('page-pesanan').classList.contains('active')) {
+                    renderPesanan();
+                }
+            }
+        });
+
+        unsubscribeKas = db.collection('kas').onSnapshot((snapshot) => {
+            let adaPerubahan = false;
+            snapshot.docChanges().forEach((change) => {
+                let data = change.doc.data();
+                
+                if (change.type === "added" || change.type === "modified") {
+                    let index = kas.findIndex(k => k.id === data.id);
+                    if (index !== -1) {
+                        kas[index] = data;
+                    } else {
+                        kas.push(data);
+                    }
+                    lastKasHash[data.id] = JSON.stringify(data);
+                    adaPerubahan = true;
+                }
+                
+                if (change.type === "removed") {
+                    kas = kas.filter(k => k.id !== data.id);
+                    delete lastKasHash[data.id];
+                    adaPerubahan = true;
+                }
+            });
+            if (adaPerubahan) {
+                saveToLocal();
+                if (document.getElementById('page-kas').classList.contains('active')) {
+                    renderKas();
+                }
+                try { hitungOwner(true); } catch(e) {}
+            }
+        });
+        
+        console.log("Radar Realtime Sinkronisasi Aktif!");
     }
     function bukaModalProduk() { 
         const container = document.getElementById('form-resep-dinamis'); 
