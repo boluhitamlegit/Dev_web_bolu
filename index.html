@@ -1212,7 +1212,7 @@
 
             <div style="text-align: center; margin-top: 15px;">
                 <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7;">
-                    Sistem Bolu Sakinah • V20.1
+                    Sistem Bolu Sakinah • V20.2
                 </span>
             </div>
 
@@ -1858,7 +1858,8 @@
                 timestamp: Schema.num(p.timestamp, Date.now()),
                 items: Schema.arr(p.items).map(item => ({
                     name: Schema.str(item.name),
-                    qty: Schema.num(item.qty, 1)
+                    qty: Schema.num(item.qty, 1),
+                    unit: Schema.str(item.unit, "Pak") 
                 }))
             }));
         }
@@ -2846,7 +2847,7 @@
         let todayStr = new Date().toISOString().slice(0,10);
         let adaPesananHariIni = false;
         let totals = {}; 
-        produkBolu.forEach(p => totals[p.id] = 0); 
+        produkBolu.forEach(p => totals[p.id] = {pak: 0, pcs: 0});
         pesanan.forEach(p => {
             if (!p.items) {
                 p.items = [];
@@ -2900,7 +2901,14 @@
 
                 p.items.forEach(item => {
                     let knownProd = produkBolu.find(x => (x.nama || "").toLowerCase() === (item.name || "").toLowerCase());
-                    if (knownProd) totals[knownProd.id] += getVal(item.qty);
+                    if (knownProd) {
+                        let qtyVal = getVal(item.qty);
+                        let u = item.unit || "Pak";
+                        if(u === "Lyg") totals[knownProd.id].pak += (qtyVal * 2);
+                        else if(u === "Ksk") totals[knownProd.id].pak += (qtyVal * 5);
+                        else if(u === "Pcs") totals[knownProd.id].pcs += qtyVal; 
+                        else totals[knownProd.id].pak += qtyVal;
+                    }
                 });
                 let tr = `<tr>
                     <td data-label="Info Pemesan">
@@ -2934,10 +2942,18 @@
                             <select class="wide" onchange="updatePesananItem(${realIdx}, ${itemIdx}, 'name', this)" style="flex: 1; min-height: 48px; font-weight: 700; border: 1px solid var(--border); border-radius: var(--radius-sm); background-color: white;">
                                 ${productOptions}
                             </select>
-                            <div class="input-group" style="width: 140px; margin: 0;">
-                                <input type="number" class="text-right has-unit" value="${item.qty}" onchange="updatePesananItem(${realIdx}, ${itemIdx}, 'qty', this)" onfocus="this.select()">
-                                <span class="input-unit">Pak</span>
+                            
+                            <div class="input-group" style="display: flex !important; flex-direction: row !important; gap: 8px !important; width: 100% !important; max-width: 200px !important; margin: 0 !important;">
+                                <input type="number" class="text-right" value="${item.qty}" onchange="updatePesananItem(${realIdx}, ${itemIdx}, 'qty', this)" onfocus="this.select()" style="width: 50% !important; height: 48px !important; border-radius: 8px !important; border: 1px solid var(--border) !important; font-weight: 800 !important; font-size: 15px !important; background: #ffffff !important; padding: 0 10px !important; box-shadow: none !important;">
+                                
+                                <select onchange="updatePesananItem(${realIdx}, ${itemIdx}, 'unit', this)" style="width: 50% !important; height: 48px !important; border-radius: 8px !important; border: 1px solid var(--border) !important; background-color: #f8fafc !important; font-weight: 800 !important; font-size: 14px !important; padding: 0 20px 0 10px !important; background-position: right 8px center !important; box-shadow: none !important;">
+                                    <option value="Pak" ${(!item.unit || item.unit === 'Pak') ? 'selected' : ''}>Pak</option>
+                                    <option value="Lyg" ${item.unit === 'Lyg' ? 'selected' : ''}>Lyg</option>
+                                    <option value="Ksk" ${item.unit === 'Ksk' ? 'selected' : ''}>Ksk</option>
+                                    <option value="Pcs" ${item.unit === 'Pcs' ? 'selected' : ''}>Pcs</option>
+                                </select>
                             </div>
+                            
                             <button class="btn-danger" style="padding: 10px; border-radius: 6px;" onclick="hapusPesananItem(${realIdx}, ${itemIdx})" title="Hapus Varian"><i class="fas fa-times"></i></button>
                         </div>
                     `;
@@ -2957,12 +2973,21 @@
     
         let summaryPak = [], summaryLoyang = [], summaryKresek = [];
         produkBolu.forEach(prod => {
-            let t = totals[prod.id];
-            if (t > 0) {
+            let tPak = totals[prod.id].pak;
+            let tPcs = totals[prod.id].pcs;
+            
+            if (tPak > 0 || tPcs > 0) {
                 let namaBolu = escapeHTML(prod.nama);
-                summaryPak.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${t} Pak</b></div>`);
-                summaryLoyang.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${Math.floor(t/2)} Lyg` + (t%2 > 0 ? `, ${t%2} Pk` : "") + `</b></div>`);
-                summaryKresek.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${Math.floor(t/5)} Ksk` + (t%5 > 0 ? `, ${t%5} Pk` : "") + `</b></div>`);
+                let strPak = tPak > 0 ? `${tPak} Pak` : '';
+                let strPcs = tPcs > 0 ? `${tPcs} Pcs` : '';
+                let combinedStr = [strPak, strPcs].filter(Boolean).join(' + ');
+
+                summaryPak.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${combinedStr}</b></div>`);
+                
+                if (tPak > 0) {
+                    summaryLoyang.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${Math.floor(tPak/2)} Lyg` + (tPak%2 > 0 ? `, ${tPak%2} Pk` : "") + `</b></div>`);
+                    summaryKresek.push(`<div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed rgba(0,0,0,0.1); padding-bottom:4px;"><span>${namaBolu}</span> <b>${Math.floor(tPak/5)} Ksk` + (tPak%5 > 0 ? `, ${tPak%5} Pk` : "") + `</b></div>`);
+                }
             }
         });
         
@@ -3032,7 +3057,7 @@
     }
     function tambahPesananItem(pesIdx) {
         if (!pesanan[pesIdx].items) pesanan[pesIdx].items = [];
-        pesanan[pesIdx].items.push({ name: "", qty: 1 });
+        pesanan[pesIdx].items.push({ name: "", qty: 1, unit: "Pak" }); 
         saveData(); renderPesanan();
     }
 
@@ -3044,6 +3069,8 @@
     function updatePesananItem(pesIdx, itemIdx, field, element) {
         if (field === 'qty') {
             pesanan[pesIdx].items[itemIdx].qty = validateNumInput(element);
+        } else if (field === 'unit') {
+            pesanan[pesIdx].items[itemIdx].unit = element.value; 
         } else {
             pesanan[pesIdx].items[itemIdx].name = element.value;
         }
@@ -3051,11 +3078,8 @@
         saveData(); 
         if (field !== 'qty') {
             renderPesanan(); 
-        } else {
-           
         }
     }
-
     function tambahPesanan() { 
         let filterDateEl = document.getElementById('filter-date-pesanan');
         let targetDate = (filterDateEl && filterDateEl.value) ? filterDateEl.value : new Date().toISOString().slice(0,10);
