@@ -1212,7 +1212,7 @@
 
             <div style="text-align: center; margin-top: 15px;">
                 <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7;">
-                    Sistem Bolu Sakinah • V20.3
+                    Sistem Bolu Sakinah • V21.0
                 </span>
             </div>
 
@@ -1406,14 +1406,38 @@
         </div>
 
         <div class="card">
-            <div class="card-header" style="cursor: pointer; border-bottom: none; padding-bottom: 0;" onclick="toggleHistoryChecklist()">
-                <h2 style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin: 0;">
-                    <span><i class="fas fa-history"></i> History Checklist</span>
-                    <i class="fas fa-chevron-down" id="icon-toggle-history" style="transition: transform 0.3s; background: transparent; box-shadow: none; border: none; padding: 0;"></i>
-                </h2>
+            <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin: 0;">
+                    <h2 style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px;" onclick="toggleHistoryChecklist()">
+                        <i class="fas fa-history"></i> <span style="font-size: 18px;">History & Laporan</span>
+                    </h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn btn-primary" onclick="toggleFilterChecklist()" style="height: 40px; padding: 0 15px; font-size: 13px;">
+                            <i class="fas fa-filter"></i> <span class="hide-mobile">Laporan Harian</span>
+                        </button>
+                        <i class="fas fa-chevron-down" id="icon-toggle-history" style="transition: transform 0.3s; cursor: pointer; font-size: 18px; color: var(--primary);" onclick="toggleHistoryChecklist()"></i>
+                    </div>
+                </div>
             </div>
             
-            <div id="area-history-checklist" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
+            <div id="area-filter-checklist" style="display: none; margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 20px;">
+                <div class="form-grid" style="background: var(--accent); padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label style="font-size: 11.5px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;">Pilih Tanggal Laporan</label>
+                        <div class="input-group full-width" style="margin: 0; max-width: 100%;">
+                            <span class="input-prefix" style="color: var(--primary); font-size: 16px; left: 15px;"><i class="fas fa-calendar-day"></i></span>
+                            <input type="date" id="filter-date-checklist" onchange="renderChecklistHistory()" class="has-prefix" style="width: 100%; background: #ffffff; color: var(--primary); border: 2px solid var(--border); padding-left: 45px !important; font-weight: 800; font-size: 15px; letter-spacing: 1px; text-transform: uppercase;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-gold" style="width: 100%; height: 48px; box-shadow: 3px 3px 0px var(--border);" onclick="cetakLaporanHarianChecklist()">
+                            <i class="fas fa-file-pdf" style="color: #ef4444; font-size: 18px;"></i> Cetak Laporan PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="area-history-checklist" style="display: none; margin-top: 15px;">
                 <div class="input-group" style="min-width: 200px; margin: 0 0 15px 0;">
                     <span class="input-prefix"><i class="fas fa-search"></i></span>
                     <input type="text" id="search-checklist" placeholder="Cari No. Adonan / Pegawai..." oninput="renderChecklistHistory()" class="has-prefix" style="width: 100%;">
@@ -2406,18 +2430,45 @@
 
 
     
-        function renderChecklistHistory() {
+        // --- FUNGSI BARU: BUKA/TUTUP FILTER CHECKLIST ---
+    function toggleFilterChecklist() {
+        const area = document.getElementById('area-filter-checklist');
+        const areaHistory = document.getElementById('area-history-checklist');
+        const btn = event.currentTarget;
+        const icon = document.getElementById('icon-toggle-history');
+        
+        if (area.style.display === 'none' || area.style.display === '') {
+            area.style.display = 'block';
+            areaHistory.style.display = 'block'; // Otomatis buka tabel juga
+            icon.style.transform = 'rotate(180deg)';
+            btn.innerHTML = '<i class="fas fa-times"></i> <span class="hide-mobile">Tutup Filter</span>';
+            btn.classList.add('btn-danger');
+            btn.classList.remove('btn-primary');
+            renderChecklistHistory();
+        } else {
+            area.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-filter"></i> <span class="hide-mobile">Laporan Harian</span>';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-primary');
+        }
+    }
+
+    // --- FUNGSI RENDER HISTORY CHECKLIST (Sudah Terhubung Filter Tgl) ---
+    function renderChecklistHistory() {
         let tbody = document.getElementById('tabel-checklist-history');
         if(!tbody) return;
         tbody.innerHTML = '';
         
         let searchQ = document.getElementById('search-checklist') ? document.getElementById('search-checklist').value.toLowerCase() : "";
+        let filterDate = document.getElementById('filter-date-checklist') ? document.getElementById('filter-date-checklist').value : "";
         
-        let filteredHistory = checklistHistory.filter(chk => 
-            (chk.no || "").toLowerCase().includes(searchQ) || 
-            (chk.petugas || "").toLowerCase().includes(searchQ) ||
-            (chk.prod || "").toLowerCase().includes(searchQ)
-        );
+        let filteredHistory = checklistHistory.filter(chk => {
+            let matchSearch = (chk.no || "").toLowerCase().includes(searchQ) || 
+                              (chk.petugas || "").toLowerCase().includes(searchQ) ||
+                              (chk.prod || "").toLowerCase().includes(searchQ);
+            let matchDate = filterDate ? (chk.tgl === filterDate) : true;
+            return matchSearch && matchDate;
+        });
 
         if(filteredHistory.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-folder-open"></i><br>History tidak ditemukan.</td></tr>`;
@@ -2441,6 +2492,90 @@
                 </td>
             </tr>`;
         });
+    }
+
+    // --- FUNGSI CETAK LAPORAN HARIAN CHECKLIST A4 (PDF) ---
+    async function cetakLaporanHarianChecklist() {
+        let targetDate = document.getElementById('filter-date-checklist').value;
+        if(!targetDate) return showToast("Pilih tanggal laporan terlebih dahulu!", "error");
+
+        let harianChecklist = checklistHistory.filter(chk => chk.tgl === targetDate);
+        if(harianChecklist.length === 0) return showToast("Tidak ada data checklist produksi pada tanggal tersebut!", "error");
+
+        let ready = await initPdfModules();
+        if (!ready) return;
+
+        showLoading('Menyiapkan Rekap Laporan Harian Checklist...');
+        setTimeout(() => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            // Judul Dokumen
+            doc.setFontSize(18); doc.setFont("helvetica", "bold");
+            doc.text("LAPORAN HARIAN PENGGUNAAN BAHAN", 105, 15, { align: 'center' });
+            
+            doc.setFontSize(11); doc.setFont("helvetica", "normal");
+            doc.text(`Dicetak Pada : ${new Date().toLocaleString('id-ID')}`, 14, 25);
+            doc.text(`Tgl Produksi : ${targetDate}`, 14, 31);
+
+            // 1. Hitung Total Bolu Hari Itu
+            let rekapBolu = {};
+            harianChecklist.forEach(chk => {
+                if(!rekapBolu[chk.prod]) rekapBolu[chk.prod] = 0;
+                rekapBolu[chk.prod] += parseFloat(chk.qty) || 0;
+            });
+
+            // 2. Hitung Total Bahan Baku Terpakai
+            let rekapBahan = {};
+            harianChecklist.forEach(chk => {
+                chk.items.forEach(item => {
+                    let key = item.nama;
+                    if(!rekapBahan[key]) rekapBahan[key] = { qty: 0, unit: item.unit };
+                    let qtyVal = parseFloat(item.butuh.toString().replace(',', '.')); // Konversi koma ke titik
+                    rekapBahan[key].qty += qtyVal;
+                });
+            });
+
+            // Tabel Riwayat Adonan
+            let tableHistoryData = harianChecklist.map((chk, i) => [i+1, chk.waktu_generate.split(' ')[1], chk.no, chk.petugas, chk.prod, `${chk.qty} Lyg`]);
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text("1. Rincian Pembuatan Adonan", 14, 42);
+            doc.autoTable({
+                startY: 45, head: [['No', 'Jam', 'No. Adonan', 'Pegawai', 'Varian Bolu', 'Jml Loyang']],
+                body: tableHistoryData, theme: 'grid', headStyles: { fillColor: [25, 26, 35] }, styles: { fontSize: 9 }
+            });
+
+            let finalY = doc.lastAutoTable.finalY + 10;
+
+            // Tabel Total Bolu
+            let tableBoluData = Object.keys(rekapBolu).map((k, i) => [i+1, k, `${rekapBolu[k]} Loyang`]);
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text("2. Total Bolu Diproduksi Hari Ini", 14, finalY);
+            doc.autoTable({
+                startY: finalY + 3, head: [['No', 'Varian Bolu', 'Total Diproduksi']],
+                body: tableBoluData, theme: 'grid', headStyles: { fillColor: [25, 26, 35] }, styles: { fontSize: 9 }
+            });
+
+            finalY = doc.lastAutoTable.finalY + 10;
+            if (finalY > 240) { doc.addPage(); finalY = 20; } // Pindah halaman jika penuh
+
+            // Tabel Total Pemakaian Bahan
+            let tableBahanData = Object.keys(rekapBahan).map((k, i) => {
+                let b = rekapBahan[k];
+                let qtyStr = (b.unit === 'kg') ? b.qty.toFixed(3).replace('.', ',') : Math.round(b.qty);
+                return [i+1, k, `${qtyStr} ${b.unit}`];
+            });
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text("3. Total Akumulasi Bahan Terpakai Hari Ini", 14, finalY);
+            doc.autoTable({
+                startY: finalY + 3, head: [['No', 'Nama Bahan Baku', 'Total Terpakai']],
+                body: tableBahanData, theme: 'grid', 
+                headStyles: { fillColor: [185, 255, 102], textColor: [25, 26, 35] }, styles: { fontSize: 9 }
+            });
+
+            doc.save(`Laporan_Checklist_Harian_${targetDate}.pdf`);
+            hideLoading(); showToast('Laporan PDF Berhasil Diunduh!', 'success');
+        }, 1000);
     }
 
     function hapusChecklistHistory(idx) {
@@ -3535,6 +3670,7 @@
         if(document.getElementById('filter-date-pesanan')) document.getElementById('filter-date-pesanan').value = todayStrObj;
         if(document.getElementById('log-tanggal')) document.getElementById('log-tanggal').value = todayStrObj;
         if(document.getElementById('chk-tanggal')) document.getElementById('chk-tanggal').value = todayStrObj;
+        if(document.getElementById('filter-date-checklist')) document.getElementById('filter-date-checklist').value = todayStrObj;
 
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.setAttribute('inputmode', 'numeric');
