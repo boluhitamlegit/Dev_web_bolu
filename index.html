@@ -1212,7 +1212,7 @@
 
             <div style="text-align: center; margin-top: 15px;">
                 <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7;">
-                    Sistem Bolu Sakinah • V21.0
+                    Sistem Bolu Sakinah • V21.1
                 </span>
             </div>
 
@@ -2494,7 +2494,6 @@
         });
     }
 
-    // --- FUNGSI CETAK LAPORAN HARIAN CHECKLIST A4 (PDF) ---
     async function cetakLaporanHarianChecklist() {
         let targetDate = document.getElementById('filter-date-checklist').value;
         if(!targetDate) return showToast("Pilih tanggal laporan terlebih dahulu!", "error");
@@ -2505,79 +2504,116 @@
         let ready = await initPdfModules();
         if (!ready) return;
 
-        showLoading('Menyiapkan Rekap Laporan Harian Checklist...');
+        showLoading('Menghitung Rekap & Menyiapkan Struk Laporan...');
         setTimeout(() => {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
 
-            // Judul Dokumen
-            doc.setFontSize(18); doc.setFont("helvetica", "bold");
-            doc.text("LAPORAN HARIAN PENGGUNAAN BAHAN", 105, 15, { align: 'center' });
             
-            doc.setFontSize(11); doc.setFont("helvetica", "normal");
-            doc.text(`Dicetak Pada : ${new Date().toLocaleString('id-ID')}`, 14, 25);
-            doc.text(`Tgl Produksi : ${targetDate}`, 14, 31);
-
-            // 1. Hitung Total Bolu Hari Itu
             let rekapBolu = {};
             harianChecklist.forEach(chk => {
                 if(!rekapBolu[chk.prod]) rekapBolu[chk.prod] = 0;
                 rekapBolu[chk.prod] += parseFloat(chk.qty) || 0;
             });
 
-            // 2. Hitung Total Bahan Baku Terpakai
             let rekapBahan = {};
             harianChecklist.forEach(chk => {
                 chk.items.forEach(item => {
                     let key = item.nama;
                     if(!rekapBahan[key]) rekapBahan[key] = { qty: 0, unit: item.unit };
-                    let qtyVal = parseFloat(item.butuh.toString().replace(',', '.')); // Konversi koma ke titik
+                    let qtyVal = parseFloat(item.butuh.toString().replace(',', '.')); 
                     rekapBahan[key].qty += qtyVal;
                 });
             });
 
-            // Tabel Riwayat Adonan
-            let tableHistoryData = harianChecklist.map((chk, i) => [i+1, chk.waktu_generate.split(' ')[1], chk.no, chk.petugas, chk.prod, `${chk.qty} Lyg`]);
+            let barisAdonan = harianChecklist.length;
+            let barisBolu = Object.keys(rekapBolu).length;
+            let barisBahan = Object.keys(rekapBahan).length;
+         
+            let totalPanjang = 65 + (barisAdonan * 10) + (barisBolu * 6) + (barisBahan * 6);
+            
+            const doc = new jsPDF('p', 'mm', [58, totalPanjang]);
+
+         
             doc.setFontSize(12); doc.setFont("helvetica", "bold");
-            doc.text("1. Rincian Pembuatan Adonan", 14, 42);
-            doc.autoTable({
-                startY: 45, head: [['No', 'Jam', 'No. Adonan', 'Pegawai', 'Varian Bolu', 'Jml Loyang']],
-                body: tableHistoryData, theme: 'grid', headStyles: { fillColor: [25, 26, 35] }, styles: { fontSize: 9 }
+            doc.text("REKAP PRODUKSI HARIAN", 29, 10, {align: 'center'});
+            doc.setFontSize(11); doc.text("BOLU SAKINAH", 29, 15, {align: 'center'});
+            
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9.5);
+            doc.text(`Tgl Cetak: ${new Date().toLocaleString('id-ID')}`, 3, 24);
+            doc.text(`Tgl Prod : ${targetDate}`, 3, 29);
+            
+            let currentY = 33;
+            doc.setLineWidth(0.4);
+            doc.line(3, currentY, 55, currentY); 
+            
+            currentY += 5;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+            doc.text("1. RINCIAN ADONAN", 3, currentY);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+            
+            harianChecklist.forEach((chk, i) => {
+                currentY += 5;
+                let jam = chk.waktu_generate ? chk.waktu_generate.split(' ')[1] : '--:--';
+                doc.setFont("helvetica", "bold");
+                doc.text(`${jam} | ${chk.no} (${chk.petugas})`, 3, currentY);
+                
+                currentY += 4.5;
+                doc.setFont("helvetica", "normal");
+                let namaBolu = chk.prod;
+                if(namaBolu.length > 18) namaBolu = namaBolu.substring(0, 18) + '..'; 
+                doc.text(`  > ${namaBolu}`, 3, currentY);
+                doc.text(`${chk.qty} Lyg`, 55, currentY, {align: 'right'});
             });
 
-            let finalY = doc.lastAutoTable.finalY + 10;
+            currentY += 4;
+            doc.setLineWidth(0.2);
+            doc.line(3, currentY, 55, currentY);
 
-            // Tabel Total Bolu
-            let tableBoluData = Object.keys(rekapBolu).map((k, i) => [i+1, k, `${rekapBolu[k]} Loyang`]);
-            doc.setFontSize(12); doc.setFont("helvetica", "bold");
-            doc.text("2. Total Bolu Diproduksi Hari Ini", 14, finalY);
-            doc.autoTable({
-                startY: finalY + 3, head: [['No', 'Varian Bolu', 'Total Diproduksi']],
-                body: tableBoluData, theme: 'grid', headStyles: { fillColor: [25, 26, 35] }, styles: { fontSize: 9 }
+            currentY += 5;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+            doc.text("2. TOTAL PRODUKSI BOLU", 3, currentY);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+
+            Object.keys(rekapBolu).forEach(k => {
+                currentY += 5.5;
+                let namaBolu = k;
+                if(namaBolu.length > 18) namaBolu = namaBolu.substring(0, 18) + '..';
+                doc.text(namaBolu, 3, currentY);
+                doc.text(`${rekapBolu[k]} Lyg`, 55, currentY, {align: 'right'});
             });
 
-            finalY = doc.lastAutoTable.finalY + 10;
-            if (finalY > 240) { doc.addPage(); finalY = 20; } // Pindah halaman jika penuh
+            currentY += 4;
+            doc.line(3, currentY, 55, currentY);
 
-            // Tabel Total Pemakaian Bahan
-            let tableBahanData = Object.keys(rekapBahan).map((k, i) => {
+        
+            currentY += 5;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+            doc.text("3. TOTAL GABUNGAN BAHAN", 3, currentY);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+
+            Object.keys(rekapBahan).forEach(k => {
+                currentY += 5.5;
                 let b = rekapBahan[k];
                 let qtyStr = (b.unit === 'kg') ? b.qty.toFixed(3).replace('.', ',') : Math.round(b.qty);
-                return [i+1, k, `${qtyStr} ${b.unit}`];
+                
+                let namaBahan = k;
+                if(namaBahan.length > 16) namaBahan = namaBahan.substring(0, 16) + '..';
+                
+                doc.text(namaBahan, 3, currentY);
+                doc.text(`${qtyStr} ${b.unit}`, 55, currentY, {align: 'right'});
             });
-            doc.setFontSize(12); doc.setFont("helvetica", "bold");
-            doc.text("3. Total Akumulasi Bahan Terpakai Hari Ini", 14, finalY);
-            doc.autoTable({
-                startY: finalY + 3, head: [['No', 'Nama Bahan Baku', 'Total Terpakai']],
-                body: tableBahanData, theme: 'grid', 
-                headStyles: { fillColor: [185, 255, 102], textColor: [25, 26, 35] }, styles: { fontSize: 9 }
-            });
+
+            currentY += 5;
+            doc.setLineWidth(0.4);
+            doc.line(3, currentY, 55, currentY);
+            currentY += 4;
+            doc.setFont("helvetica", "italic"); doc.setFontSize(8.5);
+            doc.text("Selesai Rekap Laporan Harian", 29, currentY, {align: 'center'});
 
             doc.save(`Laporan_Checklist_Harian_${targetDate}.pdf`);
-            hideLoading(); showToast('Laporan PDF Berhasil Diunduh!', 'success');
+            hideLoading(); showToast('Laporan Struk Berhasil Diunduh!', 'success');
         }, 1000);
     }
-
     function hapusChecklistHistory(idx) {
         confirmDelete("Hapus data history checklist ini?", () => {
             checklistHistory.splice(idx, 1);
